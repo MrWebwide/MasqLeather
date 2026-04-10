@@ -1,0 +1,37 @@
+# ═══════════════════════════════════════════════════════
+# MASQ Leather — Git Ignore
+# ═══════════════════════════════════════════════════════
+
+# ─── Environment & Secrets ────────────────────────────
+.env
+.env.*
+!.env.example
+config.php
+
+# ─── IDE / Editor ─────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── OS Generated ────────────────────────────────────
+*.tmp
+*.bak
+*.log
+
+# ─── Dependencies (vendor is committed for Stripe) ───
+# stripe/vendor/ is committed because there's no composer.json
+# If you add composer.json later, uncomment:
+# vendor/
+node_modules/
+
+# ─── Uploads (user-generated content) ────────────────
+resimler/
+admin/resimler/
+
+# ─── Build / Cache ───────────────────────────────────
+*.cache

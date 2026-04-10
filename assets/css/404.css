@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+
+.header{
+    font-family: 'Dancing Script', cursive;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+
+@media (max-width: 425px) {
+    .logo{
+        padding-bottom: 3cm;
+    }
+    .yazi1{
+      font-size: 40px !important;
+      padding-bottom: 1cm !important;
+      
+    }
+}
+
+

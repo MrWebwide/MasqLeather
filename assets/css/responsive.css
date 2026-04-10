@@ -1,0 +1,861 @@
+@media (pointer: coarse) {
+    .add-to-cart:hover {
+        background-color: initial !important; /* Orijinal arka plan rengi */
+    }
+    .liq:hover .liquid {
+        top: initial !important;
+    }
+    
+    .liq:hover {
+        box-shadow: initial !important;
+        transition-delay: initial !important;
+    }
+}
+
+
+
+
+
+@media only screen and (max-width: 1540px){
+
+    .single_shipping {
+        width: 250px;
+        
+      }
+
+      .single_shipping .shipping_title h3{
+        font-size: 25px !important;
+      }
+
+      
+
+      .choice_thumb {
+        display: flex;
+        justify-content: center; /* Yatay merkezleme */
+        align-items: center; /* Dikey merkezleme */
+      
+        overflow: hidden; /* Kapsayıcı alanın dışına taşan içerikleri gizle */
+        margin: 0 auto; /* Kapsayıcıyı yatay olarak ortala */
+      }
+      
+      .choice_thumb img {
+        max-width: 500px; /* Resmin genişliğini kapsayıcıya göre ayarla */
+        max-height: 500px; /* Resmin yüksekliğini kapsayıcıya göre ayarla */
+        width: auto; /* Genişliği otomatik ayarla, orijinal oranı koru */
+        height: auto; /* Yüksekliği otomatik ayarla, orijinal oranı koru */
+      }
+
+      .blog_thumb {
+      
+      
+        overflow: hidden; /* Kapsayıcı alanın dışına taşan içerikleri gizle */
+        margin: 0 auto; /* Kapsayıcıyı yatay olarak ortala */
+      }
+      
+      .blog_thumb img {
+        max-width: 500px; /* Resmin genişliğini kapsayıcıya göre ayarla */
+        max-height: 500px; /* Resmin yüksekliğini kapsayıcıya göre ayarla */
+        width: auto; /* Genişliği otomatik ayarla, orijinal oranı koru */
+        height: auto; /* Yüksekliği otomatik ayarla, orijinal oranı koru */
+      }
+
+    
+      .about-thumb {
+       
+      }
+      
+      .about-thumb img {
+       
+        max-width: 600px; /* Resmin genişliğini kapsayıcıya göre ayarla */
+        max-height: 600px; /* Resmin yüksekliğini kapsayıcıya göre ayarla */
+   
+      }
+
+    
+
+    #element{
+        font-size: 120px !important;
+        text-shadow: 2px 2px 0px rgb(127, 69, 11); /* Siyah gölge ekler */
+
+    }
+
+    .main_menu nav>ul>li>a{
+        font-size: 16px !important;
+    }
+
+    .header_section .container {
+        background-size: 56% !important;
+    }
+
+    .header_logo{
+        padding-left: 0 !important;
+        padding-right: 2cm !important;
+    }
+
+    .account_link_menu{
+        white-space: nowrap;
+    }
+
+    .shipping_desc p{
+        font-size: 16px !important;
+    }
+
+    .shipping_section{
+        padding-left: 3.3cm !important;
+        padding-right: 3.3cm !important;
+    }
+
+    .single_shipping .shipping_title h3{
+        white-space: nowrap;
+    }
+
+
+    .cookie-banner p {
+        max-width: 1200px !important;
+        text-align: justify !important;
+    }
+
+    .qty-btn{
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .product_variant_quantity .pro-qty{
+        display: flex !important;
+    }
+
+}
+
+
+@media only screen and (max-width: 1024px){
+    
+     .producter{
+        margin-bottom:1cm !important
+        
+    }
+
+   
+
+    .product-info {
+        display:block !important;
+    }
+
+    .col-1{
+        max-width: unset !important;
+    }
+
+    .col-3{
+        max-width: unset !important;
+    }
+
+    .col-2{
+        max-width: unset !important;
+    }
+
+
+
+    #element{
+        font-size: 85px !important;
+    }
+
+    .product_thumb img {
+        height: 200px !important;
+       
+    }
+
+    .single_shipping {
+        width: 110px;
+        height: 200px;
+        
+        
+      }
+
+     
+      .single_shipping {
+        display: flex; /* Elemanları bir arada sırala */
+        align-items: center; /* Dikey hizalama */
+        
+      }
+
+      .single_shipping .shipping_title {
+        flex: 1; /* Yazıları genişleterek resimlerin sağında yer almasını engelle */
+      }
+      
+      .single_shipping img {
+      
+        max-width: 100%; /* Resimlerin genişliği en fazla %100 olsun */
+        height: auto; /* Oranları koru */
+        margin-right: 40px; /* Resimlerin sağında bir boşluk bırak */
+      }
+
+      .single_shipping .shipping_title h3{
+        font-size: 21px !important;
+      }
+    
+
+      .single_shipping .shipping_desc p{
+        font-size: 14px !important;
+      } 
+
+    .main_menu nav>ul>li>a{
+        font-size: 15px !important;
+    }
+
+    .icon_container img{
+        width: 30px !important;
+    }
+
+    .header_section2 .container {
+
+        height: 105px !important;
+        background-size: 70% !important;
+    }
+
+    .text_container span{
+        white-space: nowrap !important;
+        font-size: 12px !important;
+    }
+
+    .account_link_menu{
+        bottom: 0 !important;
+    }
+
+    .main_menu nav>ul>li>a img{
+        width: 30px !important;
+    }
+
+    .custom-margin{
+        margin-right:12px !important ;
+    }
+
+    .logo1 img {
+        width: 80px !important;
+    }
+
+    .header_section .container {
+        height: 100px !important;
+        background-size: 78% !important;
+    }
+
+    .header_logo{
+        
+    }
+
+    .product-section{
+        padding-left: 0vw !important;
+    }
+
+    .product-section{
+        display: block !important;
+    }
+
+
+    .col-lg-6{
+        max-width: 100% !important;
+        
+    }
+
+    .detail{
+        padding-left: 0!important;
+    }
+
+    .detailer{
+        padding-left: 0 !important;
+    }
+
+    .right{
+        padding-top: 0.1cm !important;
+    }
+
+    .producter{
+        padding-top: 0.4cm !important;
+        padding-bottom: 0.4cm !important;
+    }
+
+    .product_d_info{
+        margin-bottom: 80px !important;
+    }
+
+    .product-writing{
+        max-width: 89% !important;
+    }
+
+    .cookie-banner p {
+        max-width: 800px !important;
+        text-align: justify !important;
+    }
+
+    .accept-cookie-button{
+        margin-top: 20px !important;
+    }
+
+    .divcik{
+    
+        background-size: 224% !important;
+        background-attachment: inherit !important;
+        background-image: url(./1186134823-huge.jpg);
+        background-position: top left -487px !important;
+    }
+
+  .dropdown_menu_item a{
+    font-size: 12px !important;
+  }
+
+  .abot{
+    padding-left: 2.5cm ;
+  }
+
+  .abot p{
+    line-height: 17px;
+    margin-bottom: 5px; /* Paragraflar arasındaki boşluğu 5px yapar */
+
+  }
+
+  .blog_page_thumb img{
+    max-width: 400px !important;
+}
+
+.liq{
+    padding: 8px 10px !important;
+}
+
+}
+
+@media only screen and (max-width:950px){
+
+
+    .liq{
+        padding: 8px 10px !important;
+    }
+
+
+    .blog_page_thumb img{
+        max-width: 400px !important;
+    }
+
+    .abot{
+        padding-left: 0 ;
+      }
+    
+      .abot p{
+        line-height: unset;
+        margin-bottom: unset; /* Paragraflar arasındaki boşluğu 5px yapar */
+        margin-top: 1cm;
+    
+      }
+
+.canvas_open{
+    display: flex !important;
+}
+
+#element{
+    font-size: 60px !important;
+}
+
+.main_header {
+    padding: 12px 0 45px !important;
+}
+
+.divcik{
+    
+    background-size: 274% !important;
+    background-attachment: inherit !important;
+    background-image: url(./1186134823-huge.jpg);
+    background-position: 75% !important;
+}
+
+.cen{
+    display: block !important;
+}
+
+}
+
+@media only screen and (max-width:768px){
+
+    .ripple-link img{
+        box-shadow: unset !important;
+        background-color: unset !important;
+    }
+
+    .icon-loader-check{
+        margin-left: -200px !important;
+    }
+    
+     .producter{
+        margin-bottom:1cm !important
+        
+    }
+
+    .liq{
+        padding: 7px 9px !important;
+    }
+
+    .blog_page_thumb img{
+        max-width:350px !important;
+    }
+
+    .product_thumb img {
+        height: 300px !important;
+       
+    }
+
+    .canvas_open{
+        display: flex !important;
+    }
+
+    #element{
+        font-size: 60px !important;
+    }
+
+    .product-section{
+        padding-left: 2.3vw !important;
+    }
+
+    .product_info_button .detailed{
+        display: none;
+    }
+
+    .product_details_right{
+        margin-top: 30px !important;
+    }
+    .offcanvas_menu{
+        margin-top: -5px;
+    }
+
+    .main_header {
+        padding: 11px 0 45px !important;
+    }
+    .header_section{
+        z-index: 10;
+    }
+
+    .single_shipping {
+        width: 25px;
+        height: 120px;
+    }
+    .single_shipping .shipping_desc p{
+        font-size: 11px !important;
+      }
+
+      .canvas_open a{
+        font-size: 12px !important;
+      }
+
+      .cookie-banner p {
+        max-width: 500px !important;
+        text-align: justify !important;
+        font-size: 12px !important;
+    }
+
+    .accept-cookie-button{
+        margin-top: 25px !important;
+    }
+
+
+    .divcik{
+    
+        background-size: 294% !important;
+        background-attachment: inherit !important;
+        background-position: 75% !important;
+        background-position: top left -687px !important;
+    }
+
+    .cen{
+        display: block !important;
+    }
+
+    .procall .cacc  {
+        font-size: 9px !important;
+    }
+
+    .procall .pacc span{
+        font-size: 8px !important;
+        font-weight: bold;
+        padding: 10px 6px !important;
+    }
+
+    .cacc , .pacc{
+        margin-right: initial !important;
+    }
+    
+
+
+}
+
+@media only screen and (max-width:455px) {
+
+    
+    .icon-loader-check{
+        margin-left: -30px !important;
+        margin-top: 25px !important;
+    }
+
+    .about-thumb img {
+        max-width: 300px !important;
+    }
+
+    .form-messege{
+        font-size: 20px !important;
+    }
+
+    .contact_form img {
+        max-width: 80px !important;
+    }
+    
+    .color_option img {
+        
+        max-height:50px !important;
+        
+    }
+    
+     .producter{
+        margin-bottom:1cm !important
+        
+    }
+
+    .oval-button {
+        font-size:11px !important;
+    }
+
+    .procall .cacc  {
+        font-size: 9px !important;
+    }
+
+    .procall .pacc span{
+        font-size: 8px !important;
+        font-weight: bold;
+        padding: 10px 6px !important;
+    }
+
+    .cacc , .pacc{
+        margin-right: initial !important;
+    }
+    
+
+
+    .injectable{
+        max-width: 5px !important;
+        padding-bottom: 1px !important;
+    }
+
+    .cen{
+        display: block !important;
+    }
+
+    .prev,.next{
+       display: none !important;
+    }
+
+    .chevron{
+        display: none !important;
+    }
+
+    .my-slider  {
+        background-size: 300% !important;
+        height: 400px !important;
+        background-position: top left -487px !important;
+    }
+
+    .banner_advice_section{
+        z-index: 1;
+    }
+
+    .canvas_open a{
+        font-size: 11px !important;
+    }
+    
+     .my-slider img{
+        object-position: right;
+     }
+    
+    
+    .banner_position_img .divcik{
+        background-size:300% !important;
+        height:400px !important;
+                background-position: top left -487px !important;
+        
+    }
+
+    .product_thumb img{
+        width: 370px !important;
+        height: 300px !important;
+    }
+
+    .shopping_cart img{
+        width: 40px !important;
+    }
+
+    .link_container{
+        padding: 2px !important;
+    }
+
+    .single_shipping {
+        width: 140px;
+        
+        
+        
+      }
+
+      .single_shipping .shipping_title h3{
+        font-size: 24px !important;
+      } 
+
+      .single_shipping .shipping_desc p{
+        font-size: 17px !important;
+      } 
+
+    .single_shipping.shipping1::before {
+  
+        border-radius: 20px 20px 0px 0px !important;
+       
+       }
+
+       .single_shipping.shipping3::before {
+       
+        border-radius: 0 0px 20px 20px !important;
+      }
+
+    /* shipping1, shipping2 ve shipping3 için 50px sağ marjini ekler */
+.shipping1, .shipping2, .shipping3 {
+    margin-bottom: 185px !important;
+}
+
+/* Son shipping resimde boşluk bırakmamak için */
+.shipping3 {
+    margin-right: 0 !important;
+}
+
+    .shipping_inner {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .choice_section{
+        margin-bottom: 2cm !important;
+        margin-top: 0 !important;
+    }
+
+    .banner_position_text{
+        padding: 0 107px !important;
+        top: 50% !important;
+        margin-left: 4vw !important;
+    }
+
+    .mouse-btn-down {
+
+        bottom:92px !important;
+    }
+
+    .banner_position_img .divcik{
+        max-height: 742px !important;
+    }
+
+    #element{
+        font-size: 37px !important;
+    }
+
+    .banner_advice_section{
+        margin-top: 0 !important;
+    }
+    
+    .producter img{
+        width: 375px !important;
+    }
+
+    .header_section .container{
+        background-size: 100% !important;
+    }
+
+    .canvas_open{
+        z-index: 9 !important;
+    }
+    .login-container2 {
+        padding: 25px 0 0px 0px !important; /* Sola 10px uzaklık */
+        
+    }
+
+    .header_section2 .container {
+        background-size: 100% !important;
+    }
+
+
+    .cookie-banner p {
+        max-width: 230px !important;
+        text-align: justify !important;
+        font-size: 10px !important;
+    }
+
+    .accept-cookie-button{
+        margin-top: 65px !important;
+    }
+  
+
+}
+
+@media only screen and (max-width:400px) {
+
+    .about-thumb img {
+        max-width: 300px !important;
+    }
+
+    .login-container2 {
+        padding: 25px 0 0px 0px !important; /* Sola 10px uzaklık */
+        
+    }
+
+    .icon_container img{
+        padding-bottom: 6px;
+    }
+    
+    .canvas_open a{
+        font-size: 12px !important;
+      }
+    .login-container{
+        padding: 60px 20px 80px 20px !important;
+    }
+
+    .link_container{
+        padding-top: 4px !important;
+        padding-right: 6px !important;
+    }
+
+    .header_logo{
+        padding-right: 1cm !important;
+    }
+
+    .single_shipping {
+        width: 100px;
+        
+      }
+
+      
+
+      #element{
+        font-size: 33px !important;
+    }
+
+      .single_shipping .shipping_desc p{
+        font-size: 14px !important;
+      } 
+    
+    .producter img{
+        width: 327px !important;
+    }
+
+    .header_section .container{
+        background-size: 100% !important;
+    }
+
+    .cookie-banner p {
+        max-width: 200px !important;
+        text-align: justify !important;
+        font-size: 10px !important;
+    }
+
+    .accept-cookie-button{
+        margin-top: 65px !important;
+        font-size: 14px !important;
+    }
+
+    
+    .procall .pacc span{
+        font-size: 7px !important;
+        font-weight: bolder;
+        padding: 10px 6px !important;
+    }
+
+
+}
+
+@media only screen and (max-width:320px) {
+
+    .oval-button {
+        font-size:8px !important;
+    }
+
+    .shopping_cart img{
+        width: 30px !important;
+        padding-top: 5px;
+    }
+
+    .icon_container {
+        display: none ;
+    }
+
+    .custom-margin{
+        margin-right: 5px !important;
+    }
+
+    #element{
+        font-size: 35px !important;
+    }
+
+    .single_shipping {
+        width: 50px;
+        
+        
+        
+      }
+
+    .single_shipping .shipping_desc p{
+        font-size: 12px !important;
+      } 
+    
+    .producter img{
+        width: 275px !important;
+    }
+
+    .header_section .container{
+        background-size: 100% !important;
+    }
+    .product_variant_quantity .pro-qty input{
+        width: 17px !important;
+    }
+
+    .canvas_open a{
+        font-size: 6px !important;
+        font-weight: 500 !important;
+      }
+
+    .link_container .text_container {
+        padding-top: 4px;
+        padding-bottom: 4px !important; 
+        padding-left: 4px !important;
+    }
+
+
+    .cookie-banner p {
+        max-width: 160px !important;
+        text-align: justify !important;
+        font-size: 10px !important;
+    }
+
+    .accept-cookie-button{
+        margin-top: 95px !important;
+        margin-right: 8px !important;
+        font-size: 12px !important;
+    }
+
+}
+
+
+
+
+
+   
+/* Mobil ekranlar için küçük resimler */
+@media (max-width: 768px) {
+    .product-section .slick-list .slick-track img {
+        max-height:300px !important; /* Küçük resimlerde boşluğu küçült */
+        width: auto !important;
+    }
+}
+
+
+
+
+
+
+
+
+

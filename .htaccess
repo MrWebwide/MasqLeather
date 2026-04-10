@@ -1,0 +1,38 @@
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 301 Redirects for renamed folders (preserve bookmarks and SEO)
+RedirectMatch 301 ^/Sign-in/(.*)$ /auth/$1
+RedirectMatch 301 ^/User-profile/(.*)$ /account/$1
+RedirectMatch 301 ^/Policy/(.*)$ /legal/$1
+RedirectMatch 301 ^/Header-Footer/(.*)$ /layout/$1
+RedirectMatch 301 ^/PHP-Function/(.*)$ /functions/$1
+
+<Files 403.shtml>
+order allow,deny
+allow from all
+</Files>
+
+deny from 178.23.189.67
+deny from 5.8.0.0/16
+deny from 31.28.0.0/14
+deny from 77.32.0.0/11
+deny from 85.112.0.0/12
+deny from 109.120.0.0/13
+deny from 176.8.0.0/13
+deny from 178.154.0.0/16
+deny from 185.8.0.0/16
+deny from 46.0.0.0/11
+deny from 77.120.0.0/13
+deny from 91.200.0.0/13
+deny from 176.36.0.0/14
+deny from 1.0.1.0/24
+deny from 1.0.2.0/23
+deny from 14.0.0.0/8
+deny from 27.0.0.0/8
+deny from 36.0.0.0/8
+deny from 39.0.0.0/8
+deny from 42.0.0.0/8
+deny from 49.0.0.0/8
+deny from 58.0.0.0/8

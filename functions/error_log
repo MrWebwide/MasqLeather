@@ -1,0 +1,20 @@
+[24-Nov-2025 22:05:09 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[24-Nov-2025 22:05:09 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[25-Nov-2025 13:41:00 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[25-Nov-2025 13:41:00 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[25-Nov-2025 18:07:32 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[25-Nov-2025 18:07:32 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[01-Jan-2026 08:13:54 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[01-Jan-2026 08:13:54 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[01-Jan-2026 15:08:19 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[01-Jan-2026 15:08:19 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[07-Jan-2026 11:13:30 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[07-Jan-2026 11:13:30 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[27-Jan-2026 08:16:15 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[27-Jan-2026 08:16:15 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[28-Jan-2026 20:25:44 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[28-Jan-2026 20:25:44 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[23-Feb-2026 21:47:45 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[23-Feb-2026 21:47:45 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
+[26-Feb-2026 14:18:57 Europe/Istanbul] PHP Warning:  session_name(): Session name cannot be changed when a session is active in /home/masql069/public_html/PHP-Function/outofstock.php on line 103
+[26-Feb-2026 14:18:57 Europe/Istanbul] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in /home/masql069/public_html/PHP-Function/outofstock.php on line 104
