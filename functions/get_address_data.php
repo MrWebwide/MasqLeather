@@ -5,8 +5,8 @@
 include("../admin/include/baglan.php");
 include("../admin/include/fonksiyonlar.php");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 // AJAX isteği ile gelen seçilen adresin ID'sini al
 if (isset($_GET['adsoyad'])) {

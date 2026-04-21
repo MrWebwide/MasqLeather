@@ -1,9 +1,9 @@
 <?php
 session_start();
-include("../../admin/include/baglan.php");
-include("../../admin/include/fonksiyonlar.php");
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+include_once("../../admin/include/baglan.php");
+include_once("../../admin/include/fonksiyonlar.php");
+error_reporting(0);
+ini_set('display_errors', 0);
 
 $response = array('success' => false, 'message' => '');
 

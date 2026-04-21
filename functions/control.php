@@ -4,8 +4,8 @@ include("../admin/include/baglan.php");
 include("../admin/include/fonksiyonlar.php");
 
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['id'])) {
     // Adres bilgilerini al

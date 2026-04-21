@@ -1,8 +1,8 @@
 <?php
 // Veritabanı bağlantısı
 include './include/baglan.php';
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 // Gelen JSON verisini al
 $json = file_get_contents('php://input');

@@ -2,12 +2,12 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../PHPMailer/src/Exception.php';
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
+require_once '../PHPMailer/src/Exception.php';
+require_once '../PHPMailer/src/PHPMailer.php';
+require_once '../PHPMailer/src/SMTP.php';
 
-include("../admin/include/baglan.php");
-include("../admin/include/fonksiyonlar.php");
+include_once("../admin/include/baglan.php");
+include_once("../admin/include/fonksiyonlar.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $adsoyad = $_POST["adsoyad"];
@@ -82,6 +82,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         configureMailer($mail);
 
                                         $mail->addAddress($email, 'Your Mail');
+
+                                        $mail->isHTML(true);
+                                        $mail->Subject = $konu;
+                                        $mail->Body    = $icerik;
+
+                                        $mail->send();
+
+                                        $member_id = $user['id'];
+                                        $response = array(
+                                            'success' => true,
+                                            'message' => 'A new verification code has been sent to your email.',
+                                            'show_second_form' => true,
+                                            'member_id' => $member_id
+                                        );
                                         echo json_encode($response);
                                     } catch (Exception $e) {
                                         $response = array(

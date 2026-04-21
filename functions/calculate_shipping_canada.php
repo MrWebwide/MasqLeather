@@ -1,7 +1,7 @@
 <?php
-include("../admin/include/baglan.php");
-include("../admin/include/fonksiyonlar.php");
-session_start(); // Oturumu başlat
+include_once(__DIR__ . "/../admin/include/baglan.php");
+include_once(__DIR__ . "/../admin/include/fonksiyonlar.php");
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 $adsoyad = isset($_SESSION['adsoyad']) ? $_SESSION['adsoyad'] : '';
 $userId = isset($_SESSION['id']) ? $_SESSION['id'] : null;

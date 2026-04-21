@@ -1,8 +1,8 @@
 <?php
 include("../admin/include/baglan.php");
 include("../admin/include/fonksiyonlar.php");
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 $sql = "SELECT unqid FROM uyeler ORDER BY unqid DESC LIMIT 1";
 $stmt = $db->query($sql);

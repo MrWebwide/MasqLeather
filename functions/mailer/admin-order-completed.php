@@ -1,13 +1,13 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+error_reporting(0);
+ini_set('display_errors', 0);
 
 // Gerekli dosyaları dahil edin
-require '../../admin/include/baglan.php'; // Veritabanı bağlantısı
-require '../../admin/include/fonksiyonlar.php'; // Gerekli fonksiyonlar
-require '../../PHPMailer/src/Exception.php';
-require '../../PHPMailer/src/PHPMailer.php';
-require '../../PHPMailer/src/SMTP.php';
+require_once '../../admin/include/baglan.php'; // Veritabanı bağlantısı
+require_once '../../admin/include/fonksiyonlar.php'; // Gerekli fonksiyonlar
+require_once '../../PHPMailer/src/Exception.php';
+require_once '../../PHPMailer/src/PHPMailer.php';
+require_once '../../PHPMailer/src/SMTP.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // AJAX isteğinden gelen verileri al

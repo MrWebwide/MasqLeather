@@ -1,11 +1,11 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require '../PHPMailer/src/Exception.php';
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
-include("../admin/include/baglan.php");
-include("../admin/include/fonksiyonlar.php");
+require_once '../PHPMailer/src/Exception.php';
+require_once '../PHPMailer/src/PHPMailer.php';
+require_once '../PHPMailer/src/SMTP.php';
+include_once("../admin/include/baglan.php");
+include_once("../admin/include/fonksiyonlar.php");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Formdan gönderilen e-posta adresini al
     $email = $_POST["email"];

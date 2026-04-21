@@ -1,8 +1,8 @@
 <?php
-include("baglan.php");
+include_once("baglan.php");
 function oturumkontrolana(){
 	 if (empty($_SESSION["eposta"])){
-		 echo '<script language="javascript">window.location="giris.php";</script>'; die();
+		 echo '<script language="javascript">window.location="login.php";</script>'; die();
 	 }
 	 
 }
