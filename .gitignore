@@ -35,3 +35,7 @@ admin/resimler/
 
 # ─── Build / Cache ───────────────────────────────────
 *.cache
+
+# ─── Claude Code / MCP (local tooling, not deployed) ──
+.mcp.json
+.claude/
