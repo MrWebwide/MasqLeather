@@ -39,3 +39,4 @@ admin/resimler/
 # ─── Claude Code / MCP (local tooling, not deployed) ──
 .mcp.json
 .claude/
+.github/agents/
