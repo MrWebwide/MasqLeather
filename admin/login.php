@@ -64,7 +64,17 @@ if(isset($_COOKIE["hatirla"]) && isset($_SESSION["eposta"])){
 					
 					if($hatirla==1)
 					{
-						setcookie("hatirla",$email_adres,time()+2592000);
+						// MAS-17: cookie güvenlik bayrakları (HttpOnly + Secure(HTTPS) + SameSite=Lax)
+						$isHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+							|| (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+							|| (($_SERVER['SERVER_PORT'] ?? '') == 443);
+						setcookie("hatirla", $email_adres, array(
+							'expires'  => time() + 2592000,
+							'path'     => '/',
+							'httponly' => true,
+							'secure'   => $isHttps,
+							'samesite' => 'Lax',
+						));
 					}
 					
 			

@@ -1,0 +1,28 @@
+# MAS-17: Bu klasör yalnızca yüklenen görseller içindir.
+# Yüklenen hiçbir dosya script olarak ÇALIŞTIRILAMAZ veya doğrudan sunulamaz.
+
+# mod_php (XAMPP) altında PHP motorunu kapat
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php5.c>
+    php_flag engine off
+</IfModule>
+
+# Herhangi bir handler/yorumlayıcıyla çalıştırmayı engelle (FPM/CGI dahil)
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phar .cgi .pl .py
+Options -ExecCGI -Indexes
+
+# Çalıştırılabilir/script türlerine doğrudan erişimi tamamen reddet
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|cgi|pl|py|asp|aspx|sh|exe)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
