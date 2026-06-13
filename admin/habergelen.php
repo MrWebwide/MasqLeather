@@ -9,6 +9,50 @@ oturumkontrolana();
 
 
 
+/**
+ * MAS-12 — Bir sipariş kaleminin "Product Unique ID"sini (ürün tablosundaki
+ * onaciklama alanı) döndürür.
+ *
+ * siparis.tur tutarsız: bazen sepet adı (bagpurses/jewelry), bazen tablo adı
+ * (urunler/jewe), bazen de boş. ID'ler tablolar arası çakıştığı için tur şart;
+ * tur boşsa urunid + ürün adı eşleşmesiyle 4 üründe aranır. Bulunamazsa '' döner.
+ */
+function masq_order_item_unique_id(PDO $db, $tur, $urunid, $name): string
+{
+	// tur -> ürün tablosu (hem sepet adı hem tablo adı kabul edilir)
+	static $map = array(
+		'bagpurses'   => 'urunler',
+		'urunler'     => 'urunler',
+		'jewelry'     => 'jewe',
+		'jewe'        => 'jewe',
+		'accessories' => 'accessories',
+		'homedecor'   => 'homedecor',
+	);
+
+	$tur    = strtolower(trim((string) $tur));
+	$urunid = (int) $urunid;
+
+	// 1) tur biliniyorsa doğrudan ilgili tablodan (tablo adı whitelist'ten gelir)
+	if (isset($map[$tur])) {
+		$stmt = $db->prepare("SELECT onaciklama FROM {$map[$tur]} WHERE id = ?");
+		$stmt->execute(array($urunid));
+		$val = $stmt->fetchColumn();
+		return ($val !== false && $val !== null) ? (string) $val : '';
+	}
+
+	// 2) tur boş/bilinmiyor: urunid + ad eşleşmesiyle tüm ürün tablolarında ara
+	foreach (array('urunler', 'jewe', 'accessories', 'homedecor') as $table) {
+		$stmt = $db->prepare("SELECT onaciklama FROM {$table} WHERE id = ? AND adi = ? LIMIT 1");
+		$stmt->execute(array($urunid, $name));
+		$val = $stmt->fetchColumn();
+		if ($val !== false && $val !== null && $val !== '') {
+			return (string) $val;
+		}
+	}
+
+	return '';
+}
+
 $userid = $_POST['userid'];
 $gid = $_GET['id'];
 $id = $_GET['id'];
@@ -312,12 +356,19 @@ $stmt->execute([$userId, $siparisId]);
 
 <?php foreach ($stmt as $item): ?>
     <?php $totalPrice += $item['total_price']; // Toplam fiyata siparişin fiyatını ekleyin
-          $cargoPrice = $item['cargo'];  
+          $cargoPrice = $item['cargo'];
+          // MAS-12: kalemin ürün unique ID'si (onaciklama)
+          $uniqueId = masq_order_item_unique_id($db, $item['tur'], $item['urunid'], $item['name']);
     ?>
     <div class="product-info d-flex">
         <div class="form-floating d-flex mb-3 col-3">
             <input type="text" class="form-control" value="<?php echo $item['name']; ?>" disabled>
             <label for="floatingInput">Product Name</label>
+        </div>
+
+        <div class="form-floating d-flex mb-3 col-2">
+            <input type="text" class="form-control" value="<?php echo htmlspecialchars($uniqueId !== '' ? $uniqueId : '—', ENT_QUOTES); ?>" disabled>
+            <label for="floatingInput">Product Unique ID</label>
         </div>
 
         <div class="form-floating d-flex mb-3 col-1">
