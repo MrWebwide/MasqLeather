@@ -27,7 +27,7 @@ function seflink($string)
 
 $seo = seflink($adi);
 $tur = "kampanya";
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 if ($_POST['kaydet'] && empty($_GET['islem'])) {
     // Yeni kampanya ekle
@@ -74,7 +74,7 @@ if ($_POST['kaydet'] && $_GET['islem'] == 'duzenle') {
 }
 
 if ($_GET['islem'] == 'duzenle') {
-    $gid = $_GET['id'];
+    $gid = intval($_GET['id']);
     $guncelle = $db->query("select * from homedecorkampanya where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
 ?>

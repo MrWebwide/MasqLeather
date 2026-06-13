@@ -54,8 +54,8 @@ function masq_order_item_unique_id(PDO $db, $tur, $urunid, $name): string
 }
 
 $userid = $_POST['userid'];
-$gid = $_GET['id'];
-$id = $_GET['id'];
+$gid = intval($_GET['id']);
+$id = intval($_GET['id']);
 $guncelle = $db->query("select * from mailgelen where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 
 

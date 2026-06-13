@@ -28,7 +28,7 @@ $seo= seflink($adi);
 
 $tur = "sayfalar";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -116,7 +116,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM menu WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -196,7 +196,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from menu where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }

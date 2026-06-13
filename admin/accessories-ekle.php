@@ -66,7 +66,7 @@ $seo= seflink($adi);
 
 $tur = "accessories";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -211,7 +211,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			}
 		} else {
 			// No new video uploaded, keep the existing one
-			$duzenlenecek_id = $_GET['id'];
+			$duzenlenecek_id = intval($_GET['id']);
 			$ayar_kaydi = $db->query("SELECT * FROM accessories WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 			$video = $ayar_kaydi['video'];
 		}
@@ -225,7 +225,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	 $resim_tmp = $_FILES['resim']['tmp_name'];
 
     if(empty($resim_tmp)) {
-        $duzenlenecek_id = $_GET['id'];
+        $duzenlenecek_id = intval($_GET['id']);
         $ayar_kaydi = $db->query("SELECT * FROM accessories WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
         $resim = $ayar_kaydi['resim'];
     } else {
@@ -244,7 +244,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
     $resim_tmp1 = $_FILES['resim1']['tmp_name'];
 
     if(empty($resim_tmp1)) {
-        $duzenlenecek_id = $_GET['id'];
+        $duzenlenecek_id = intval($_GET['id']);
         $ayar_kaydi = $db->query("SELECT * FROM accessories WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
         $resim1 = $ayar_kaydi['resim1'];
     } else {
@@ -315,7 +315,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from accessories where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }

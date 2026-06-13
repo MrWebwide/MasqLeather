@@ -15,7 +15,9 @@ $tarih = date("d.m.Y");
 $saat = date("H:i");
 
 $yetkiid = $_SESSION['id']; 
-$yetkiliogren = $db->query("select * from yonetici where id='$yetkiid'")->fetch(PDO::FETCH_ASSOC); 
+$yetkiliogren_stmt = $db->prepare("select * from yonetici where id = ?");
+$yetkiliogren_stmt->execute([$yetkiid]);
+$yetkiliogren = $yetkiliogren_stmt->fetch(PDO::FETCH_ASSOC); 
 $yetki = $yetkiliogren['admin'];
 
 $bakim= $db->query("SELECT * FROM bakim_modu Where id='1'")->fetch(PDO::FETCH_ASSOC);
