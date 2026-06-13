@@ -517,7 +517,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $kategori = $urun['kategori'];
 
                 // İlgili kategorideki diğer ürünleri al
-                $hizmett = $db->prepare("SELECT * FROM homedecor WHERE kategori = ? AND id != ? ORDER BY RAND() LIMIT 4");
+                $hizmett = $db->prepare("SELECT * FROM homedecor WHERE kategori = ? AND id != ? AND durum = 'on' ORDER BY RAND() LIMIT 4");
                 $hizmett->execute([$kategori, $id]);
                 $relatedProducts = $hizmett->fetchAll();
 

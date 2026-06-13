@@ -462,7 +462,7 @@ function getDurumById($urun_id) {
                 $kategori = $urun['kategori'];
 
                 // İlgili kategorideki diğer ürünleri al
-                $hizmett = $db->prepare("SELECT * FROM accessories WHERE kategori = ? AND id != ? ORDER BY RAND() LIMIT 4");
+                $hizmett = $db->prepare("SELECT * FROM accessories WHERE kategori = ? AND id != ? AND durum = 'on' ORDER BY RAND() LIMIT 4");
                 $hizmett->execute([$kategori, $id]);
                 $relatedProducts = $hizmett->fetchAll();
 
