@@ -18,9 +18,7 @@ $pageKeywords = '';
 <?php include __DIR__ . '/includes/head-css.php'; ?>
 <?php include __DIR__ . '/includes/head-js.php'; ?>
 
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>window.STRIPE_PK = "<?=STRIPE_PUBLISHABLE_KEY?>";</script>
-    <script src="./stripe/checkout.js" defer></script>
+    <!-- Stripe ödeme akışı stripe/pay.php sayfasına taşındı (MAS-10). Adres formu Stripe yüklemez. -->
 
     <style>
         #exzoom {
@@ -547,7 +545,7 @@ echo "</script>";
         <div class="checkout_form">
             <div class="row">
                 <div class="col-lg-7 col-md-6">
-                <form action="functions/control.php" method="post">
+                <form action="functions/control.php" method="post" id="checkoutForm">
                         <h3>Shipping Address Details</h3>
                         <h4 style="font-weight: 700; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">(Please fill all of the fields for a successful shipment) </h4>
                         <?php
@@ -787,11 +785,11 @@ $(document).ready(function() {
 
                             <div class="checkout_form_input">
                                 <label>First Name <span>*</span></label>
-                                <input type="text" name="namebill" required>
+                                <input type="text" name="namebill">
                             </div>
                             <div class="checkout_form_input">
                                 <label>Last Name <span>*</span></label>
-                                <input type="text" name="surnamebill" required>
+                                <input type="text" name="surnamebill">
                             </div>
                             <div class="checkout_form_input">
                                 <label>Address <span>*</span></label>
@@ -1224,8 +1222,6 @@ $(document).ready(function() {
 
     <?php
     $pageInlineJS = '';
-    // Initialize (Stripe/checkout related)
-    $pageInlineJS .= "<script>initialize();</script>\n";
     // Exzoom init
     $pageInlineJS .= <<<'JSEOF'
 <script>
@@ -1258,18 +1254,38 @@ JSEOF;
     // Form submit + country validation
     $pageInlineJS .= <<<'JSEOF'
 <script>
-$(document).ready(function() {
-    $('#submit-button').click(function(e) { $('form').submit(); });
-});
-document.getElementById('submit-button').addEventListener('click', function(event) {
-    var countrySelect = document.getElementById('country');
-    var selectedCountry = countrySelect.options[countrySelect.selectedIndex].value;
-    if (selectedCountry == "1") {
-        event.preventDefault();
-        alert("Please select a country before proceeding to payment.");
-        location.reload();
-    }
-});
+(function () {
+    var countrySel  = document.getElementById('country');
+    var provinceSel = document.getElementById('issiot');
+
+    // Seçim değişince eski özel uyarıyı temizle
+    if (countrySel)  countrySel.addEventListener('change',  function () { countrySel.setCustomValidity(''); });
+    if (provinceSel) provinceSel.addEventListener('change', function () { provinceSel.setCustomValidity(''); });
+
+    document.getElementById('submit-button').addEventListener('click', function (event) {
+        var country = countrySel ? countrySel.value : '';
+
+        // Country zorunlu (default "Select Country" = "1")
+        if (country === "1") {
+            event.preventDefault();
+            countrySel.setCustomValidity('Please select a country.');
+            countrySel.reportValidity();
+            return;
+        }
+        countrySel.setCustomValidity('');
+
+        // Kanada (2) ise province zorunlu. ABD (3) için province gizli ve "USA" sentinel'i geçerli.
+        if (country === "2" && provinceSel && (provinceSel.value === "USA" || provinceSel.value === "")) {
+            event.preventDefault();
+            provinceSel.setCustomValidity('Please select a province.');
+            provinceSel.reportValidity();
+            return;
+        }
+        if (provinceSel) provinceSel.setCustomValidity('');
+
+        // Aksi halde native submit devam eder; tarayıcı diğer zorunlu alanları (email vb.) doğrular.
+    });
+})();
 </script>
 JSEOF;
     include __DIR__ . '/includes/footer-scripts.php';
