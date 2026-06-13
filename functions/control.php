@@ -66,6 +66,11 @@ foreach ($required as $r) {
 if ($isLoggedIn && ($in['addname'] === '' || $adsoyad === '')) {
     $missing = true;
 }
+// Kanada (country=2) için geçerli bir province (eyalet) zorunlu. "USA" placeholder/sentinel'i
+// Kanada'da geçersiz (vergi/kargo için kritik). Client-side ile aynı kural; JS kapalıyken de korur.
+if ($in['country'] === '2' && ($in['province'] === '' || $in['province'] === 'USA')) {
+    $missing = true;
+}
 if ($missing) {
     header('Location: ../checkout.php');
     exit;
