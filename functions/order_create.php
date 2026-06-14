@@ -86,8 +86,8 @@ function masq_create_order(PDO $db, array $payload): array
 
         // 1) Sipariş kalemleri  +  2) Stok düşme (tur -> doğru tablo)
         $insItem    = $db->prepare(
-            "INSERT INTO siparis (siparisid, name, quantity, total_price, cargo, userid, tur, urunid)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO siparis (siparisid, name, quantity, total_price, cargo, userid, tur, urunid, secimler)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stockStmts = []; // tablo başına tek prepared statement
 
@@ -95,7 +95,7 @@ function masq_create_order(PDO $db, array $payload): array
             $tur = $p['tur'] ?? '';
             $insItem->execute([
                 $siparisId, $p['name'], $p['quantity'], $p['totalPrice'],
-                $maxCargo, $userId, $tur, $p['id'],
+                $maxCargo, $userId, $tur, $p['id'], $p['secimler'] ?? null,
             ]);
 
             $table = masq_stock_table_for_tur($tur);

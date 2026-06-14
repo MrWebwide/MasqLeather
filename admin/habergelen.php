@@ -1,6 +1,7 @@
 ﻿<?php
 include("include/baglan.php");
 include("include/fonksiyonlar.php");
+include("include/product_options.php"); // MAS-46: masq_format_selections()
 
 ob_start();
 session_start();
@@ -380,6 +381,13 @@ $stmt->execute([$userId, $siparisId]);
             <label for="floatingInput">Sub Total</label>
         </div>
     </div>
+    <?php $secimHtml = masq_format_selections($item['secimler'] ?? null); ?>
+    <?php if ($secimHtml !== ''): ?>
+    <div class="mb-3" style="margin-top:-10px;padding-left:4px;">
+        <small class="text-muted" style="font-weight:600;">Seçilen Seçenekler</small>
+        <?php echo $secimHtml; ?>
+    </div>
+    <?php endif; ?>
 <?php endforeach; ?>
 <?php $totalPrice += $cargoPrice ?>
 <div class="form-floating mb-3 col-2">

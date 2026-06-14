@@ -20,7 +20,7 @@ function masq_collect_order_items(PDO $db): array
     if (isset($_SESSION['id'])) {
         // ÜYE — sepet tablosu
         $stmt = $db->prepare(
-            "SELECT UrunID, UrunAdi, UrunMiktari, FiyatToplam, tur FROM sepet WHERE KullaniciID = ?"
+            "SELECT UrunID, UrunAdi, UrunMiktari, FiyatToplam, tur, secimler FROM sepet WHERE KullaniciID = ?"
         );
         $stmt->execute([$_SESSION['id']]);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -30,6 +30,7 @@ function masq_collect_order_items(PDO $db): array
                 'quantity'   => (int) $row['UrunMiktari'],
                 'totalPrice' => $row['FiyatToplam'],
                 'tur'        => $row['tur'],
+                'secimler'   => $row['secimler'], // MAS-46: seçim snapshot'ı (JSON ya da null)
             ];
         }
         return $items;
@@ -45,6 +46,7 @@ function masq_collect_order_items(PDO $db): array
             'quantity'   => $qty,
             'totalPrice' => $item['totalPrice'] ?? (($item['price'] ?? 0) * $qty),
             'tur'        => $item['tur'] ?? '',
+            'secimler'   => $item['secimler'] ?? null, // MAS-46: seçim snapshot'ı
         ];
     }
     return $items;
