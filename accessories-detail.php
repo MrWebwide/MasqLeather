@@ -73,29 +73,7 @@ $pageKeywords    = $urunler['yazi22'] ?? '';
     <div class="product-section" style="padding-left: 15vw;">
         <!-- product gallery section start -->
         <div class="col-lg-6">
-        <div class="producter">
-                <div class="product-details-tab">
-                    <div class="pro-dec-big-img-slider">
-                        <?php foreach ($resimler as $resim): ?>
-                        <div class="easyzoom-style">
-                            <img src="admin/resimler/<?= $resim['img'] ?>" style="display:inline;" />
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="product-dec-slider-small product-dec-small-style1">
-                 
-                        <?php foreach ($resimler as $resim): ?>
-                            
-                        <div class="product-dec-small">
-                     
-                            <img src="admin/resimler/<?= $resim['img'] ?>" />
-                        </div>
-                        <?php endforeach; ?>
-                   
-                    </div>
-
-                </div>
-            </div>
+        <?php include __DIR__ . '/includes/product_gallery.php'; ?>
         </div>
 
         <!-- product gallery section end -->
@@ -288,9 +266,6 @@ if ($haberg) {
                                 <a id="video-tab" data-toggle="tab" href="#video" role="tab" aria-controls="video" aria-selected="false">Product Video</a>
                             </li>
                             <li>
-                                <a id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Product Detailed Image</a>
-                            </li>
-                            <li>
                                 <a id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews (<?=$yorumSayisi?>)</a>
                             </li>
                         </ul>
@@ -338,35 +313,6 @@ if ($haberg) {
                                 <?php else: ?>
                                     <video controls src="admin/videolar/<?=$urunler['video']?>"></video>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
-                            <!-- Detailed Image Content -->
-                            <div class="product-info-button" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div class="product-hover">
-                                    <div class="hover-content">
-                                        <p>You can hover your mouse on the image to get a detailed look.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product_info__flex d-flex">
-                                <div class="product-slider">
-                                    <div class="exzoom hidden" id="exzoom">
-                                        <div class="exzoom_img_box">
-                                            <ul class='exzoom_img_ul'>
-                                                <?php foreach ($resimler as $resim): ?>
-                                                    <li><img src="admin/resimler/<?= $resim['img'] ?>" /></li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </div>
-                                        <div class="exzoom_nav"></div>
-                                        <p class="exzoom_btn">
-                                            <a href="javascript:void(0);" class="exzoom_prev_btn"><</a>
-                                            <a href="javascript:void(0);" class="exzoom_next_btn">></a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="memo"></div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
