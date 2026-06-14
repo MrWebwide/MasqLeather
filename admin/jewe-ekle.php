@@ -1,6 +1,7 @@
 <?php
 include("include/baglan.php");
 include("include/fonksiyonlar.php");
+include("include/product_options.php");
 
 
 ob_start();
@@ -65,6 +66,8 @@ $seo= seflink($adi);
 
 
 $tur = "jewelry";
+
+$productOptions = array(); // MAS-46: düzenleme modunda aşağıda doldurulur
 
 $id = intval($_GET['id']);
 
@@ -160,6 +163,9 @@ if(empty($resim_tmpd1)) {
 		  $sonid=$db->query("select * from jewe order by id desc")->fetch(PDO::FETCH_ASSOC);
 				
         $yeni =$sonid['id'];
+
+	// MAS-46: ürün seçeneklerini kaydet (yeni ürün)
+	masq_save_product_options($db, (int)$yeni, $tur, isset($_POST['options']) ? $_POST['options'] : array());
         if(isset($_POST['img'])){
     	foreach ($_POST['img'] as $img) {
     		$islem = $db->prepare("INSERT INTO jewe_img SET urun_id = ?, img = ?,tur=?");
@@ -279,6 +285,9 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 	 $simdi1 = $db->prepare("update jewe set video=:video, adi=:adi,sira=:sira,resim=:resim,resim1=:resim1,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,yazi1=:yazi1,yazi3=:yazi3,yazi2=:yazi2,yazi4=:yazi4,yazi5=:yazi5,yazi6=:yazi6,yazi7=:yazi7,yazi8=:yazi8,yazi9=:yazi9,yazi10=:yazi10,yazi11=:yazi11,yazi12=:yazi12,yazi13=:yazi13,yazi14=:yazi14,yazi15=:yazi15,yazi16=:yazi16,yazi17=:yazi17,yazi18=:yazi18,yazi19=:yazi19,yazi20=:yazi20,yazi21=:yazi21,yazi22=:yazi22,cargo=:cargo,stock=:stock,aciklama=:aciklama,cargo_us=:cargo_us,seo=:seo,tur=:tur,guncelleme_tarihi=:guncelleme_tarihi where id=:id");
 	$ekle1 = $simdi1->execute(array("video"=>$video,"adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"resim1"=>$resim1,"kategori"=>$kategori,"aciklama"=>$aciklama,"seo"=>$seo,"tur"=>$tur,"onaciklama"=>$onaciklama,"durum"=>$durum,"yazi1"=>$yazi1,"yazi3"=>$yazi3,"yazi2"=>$yazi2,"yazi4"=>$yazi4,"yazi5"=>$yazi5,"yazi6"=>$yazi6,"yazi7"=>$yazi7,"yazi8"=>$yazi8,"yazi9"=>$yazi9,"yazi10"=>$yazi10,"yazi11"=>$yazi11,"yazi12"=>$yazi12,"yazi13"=>$yazi13,"yazi14"=>$yazi14,"yazi15"=>$yazi15,"yazi16"=>$yazi16,"yazi17"=>$yazi17,"yazi18"=>$yazi18,"yazi19"=>$yazi19,"yazi20"=>$yazi20,"yazi21"=>$yazi21,"yazi22"=>$yazi22,"cargo"=>$cargo,"cargo_us"=>$cargo_us,"stock"=>$stock,"guncelleme_tarihi"=>$tarih,"id"=>$id));
+
+	// MAS-46: ürün seçeneklerini kaydet (düzenleme)
+	masq_save_product_options($db, (int)$id, $tur, isset($_POST['options']) ? $_POST['options'] : array());
 	if($ekle1){
 		
 		
@@ -314,6 +323,7 @@ if($_GET['islem']=='duzenle'){
 	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from jewe where id='$gid'")->fetch(PDO::FETCH_ASSOC);
+	$productOptions = masq_get_product_options($db, (int)$gid, $tur);
 }
 
 // 1. Son 'sira' değerini al
@@ -698,7 +708,8 @@ $durum = $result['durum'];
 
 
 									 
-							 <h5>Product Details</h5>
+							 <?php echo masq_render_options_repeater($productOptions); ?>
+<h5>Product Details</h5>
 									
 							 <div class=" mb-3">
                                             <label for="floatingInput">Product Short Info</label>
