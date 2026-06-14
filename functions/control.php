@@ -76,6 +76,38 @@ if ($missing) {
     exit;
 }
 
+// --- Vergi hesabı (MAS-25): province_tax oranına göre, sadece Kanada (country=2) ---
+$baseAmount = $totalAmount;            // vergisiz tutar (string, number_format'lı)
+$taxRate    = 0.0;
+if ($in['country'] === '2') {
+    try {
+        $tq = $db->prepare("SELECT rate FROM province_tax WHERE code = ?");
+        $tq->execute([$in['province']]);
+        $rr = $tq->fetchColumn();
+        if ($rr !== false) { $taxRate = (float) $rr; }
+    } catch (\Throwable $e) {
+        $taxRate = 0.0; // tablo yoksa vergi eklenmez (checkout yine çalışır)
+    }
+}
+$taxAmount     = round(((float) $baseAmount) * $taxRate / 100, 2);
+$grandTotal    = ((float) $baseAmount) + $taxAmount;
+$taxAmountStr  = number_format($taxAmount, 2, '.', '');
+$grandTotalStr = number_format($grandTotal, 2, '.', '');
+
+// --- Bülten opt-in (MAS-26) --- "I would like to receive e-mails..." tiki işaretliyse
+// müşteri e-postasını abone listesine (mail.site_mail) ekle. footer newsletter ile aynı kaynak.
+if (!empty($_POST['campaign']) && filter_var($in['email'], FILTER_VALIDATE_EMAIL)) {
+    try {
+        $chk = $db->prepare("SELECT COUNT(*) FROM mail WHERE site_mail = ?");
+        $chk->execute([$in['email']]);
+        if ((int) $chk->fetchColumn() === 0) {
+            $db->prepare("INSERT INTO mail (site_mail) VALUES (?)")->execute([$in['email']]);
+        }
+    } catch (\Throwable $e) {
+        error_log('[control] bülten abone kaydı yapılamadı: ' . $e->getMessage());
+    }
+}
+
 // --- Session'a temel bilgiler (geriye dönük uyumluluk + stripe/checkout.php tutar için) ---
 foreach ($textFields as $f) {
     $_SESSION[$f] = $in[$f];
@@ -98,7 +130,10 @@ $_SESSION['masq_order_payload'] = [
     'siparisId'   => $siparisId,
     'userId'      => $userId,
     'isGuest'     => !$isLoggedIn,
-    'totalAmount' => $totalAmount,
+    'baseAmount'  => $baseAmount,    // vergisiz
+    'taxRate'     => $taxRate,       // yüzde
+    'taxAmount'   => $taxAmountStr,  // hesaplanan vergi
+    'totalAmount' => $grandTotalStr, // base + vergi (kaydedilen/ödenen tutar)
     'maxCargo'    => $maxCargo,
     'adsoyad'     => $adsoyad,
     'addname'     => $isLoggedIn ? $in['addname'] : 'No account',

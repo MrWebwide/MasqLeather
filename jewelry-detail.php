@@ -264,41 +264,10 @@ if ($haberg) {
                             </div>
 
                         </div>
-                        <div class="product_details_title" style="<?php echo (empty($urunler['yazi10']) && empty($urunler['yazi11']) && empty($urunler['yazi12']) && empty($urunler['yazi13']) && empty($urunler['yazi14'])) ? 'display: none;' : ''; ?>">
-    <h3>
-        Color Options
-    </h3>
-
-    <?php
-// Ürün durumunu kontrol eden fonksiyon
-function getDurumById($urun_id) {
-    global $db; // Veritabanı bağlantısı
-    $stmt = $db->prepare("SELECT durum FROM jewe WHERE id = ?");
-    $stmt->execute([$urun_id]);
-    $result = $stmt->fetch();
-    return $result ? $result['durum'] : null;
-}
-?>
-
-<div class="coloropt d-flex">
-    <?php if (!empty($urunler['yazi10']) && getDurumById($urunler['yazi10']) === 'on'): ?>
-        <a href="./jewelry-detail.php?id=<?=$urunler['yazi10']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi15']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi11']) && getDurumById($urunler['yazi11']) === 'on'): ?>
-        <a href="./jewelry-detail.php?id=<?=$urunler['yazi11']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi16']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi12']) && getDurumById($urunler['yazi12']) === 'on'): ?>
-        <a href="./jewelry-detail.php?id=<?=$urunler['yazi12']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi17']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi13']) && getDurumById($urunler['yazi13']) === 'on'): ?>
-        <a href="./jewelry-detail.php?id=<?=$urunler['yazi13']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi18']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi14']) && getDurumById($urunler['yazi14']) === 'on'): ?>
-        <a href="./jewelry-detail.php?id=<?=$urunler['yazi14']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi19']?>" alt=""></a>
-    <?php endif; ?>
-</div>
-
-</div>
+                        <?php
+                        require_once __DIR__ . '/includes/color_options.php';
+                        masq_render_color_options($db, 'jewe', 'jewelry-detail.php', $urunler);
+                        ?>
                     </div>
                 </div>
             </div>

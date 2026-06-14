@@ -413,59 +413,7 @@ $(document).ready(function() {
 
 
 
-// newsletter //
-
-$(document).ready(function() {
-    $('#newsletter_form').submit(function(e) {
-        e.preventDefault();
-
-        var email = $('input[name="email"]').val();
-        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        // Email formatını kontrol et
-        if (!emailPattern.test(email)) {
-            $('#message_success').hide();
-            $('#message_failed').text("Please enter a valid email address.").show();
-            setTimeout(function() {
-                $('#message_failed').fadeOut();
-            }, 3000);
-            return; // E-posta formatı geçersizse formu gönderme
-        }
-
-        var formData = $(this).serialize();
-
-        $.ajax({
-            type: 'POST',
-            url: './functions/mailer/newsletter.php',
-            data: formData,
-            dataType: 'json', // JSON yanıtı beklediğimizi belirtir
-            success: function(response) {
-                if (response.success) {
-                    $('#message_success').show();
-                    $('#message_failed').hide();
-                } else {
-                    $('#message_success').hide();
-                    $('#message_failed').text(response.message).show();
-                }
-
-                setTimeout(function() {
-                    $('#message_success').fadeOut();
-                    $('#message_failed').fadeOut();
-                }, 3000);
-            },
-            error: function(xhr, status, error) {
-                console.log(xhr.responseText);
-                $('#message_success').hide();
-                $('#message_failed').text("There was an error. Please try again.").show();
-
-                setTimeout(function() {
-                    $('#message_success').fadeOut();
-                    $('#message_failed').fadeOut();
-                }, 3000);
-            }
-        });
-    });
-});
+// newsletter handler moved to assets/js/newsletter.js (site-wide, MAS-26)
 
 
 

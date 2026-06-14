@@ -30,11 +30,13 @@ $yazi11 = $_POST['yazi11'];
 $yazi12 = $_POST['yazi12'];
 $yazi13 = $_POST['yazi13'];
 $yazi14 = $_POST['yazi14'];
-$yazi15 = $_POST['yazi15'];
-$yazi16 = $_POST['yazi16'];
-$yazi17 = $_POST['yazi17'];
-$yazi18 = $_POST['yazi18'];
-$yazi19 = $_POST['yazi19'];
+// yazi15..19: eski color-variant görsel kopyaları — artık kullanılmıyor (MAS-28).
+// Detail sayfası görseli varyantın canlı resim'inden çekiyor; bu kolonlar boş bırakılır.
+$yazi15 = '';
+$yazi16 = '';
+$yazi17 = '';
+$yazi18 = '';
+$yazi19 = '';
 $yazi20 = $_POST['yazi20'];
 $yazi21 = $_POST['yazi21'];
 $yazi22 = $_POST['yazi22'];
@@ -536,172 +538,11 @@ $durum = $result['durum'];
     </select>
 </div>
 
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi10" onchange="updateImage(this)">
-        <option value="" <?php if(empty($guncelle['yazi10'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM homedecor ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi10']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi15" id="yazi15" value="<?=$guncelle['yazi15']?>">
-</div>
-
-<script>
-    function updateImage(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi15").value = resim;
-        } else {
-            document.getElementById("yazi15").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi11" onchange="updateImage1(this)">
-        <option value="" <?php if(empty($guncelle['yazi11'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM homedecor ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi11']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi16" id="yazi16" value="<?=$guncelle['yazi16']?>">
-</div>
-
-<script>
-    function updateImage1(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi16").value = resim;
-        } else {
-            document.getElementById("yazi16").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi12" onchange="updateImage2(this)">
-        <option value="" <?php if(empty($guncelle['yazi12'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM homedecor ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi12']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi17" id="yazi17" value="<?=$guncelle['yazi17']?>">
-</div>
-
-<script>
-    function updateImage2(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi17").value = resim;
-        } else {
-            document.getElementById("yazi17").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi13" onchange="updateImage3(this)">
-        <option value="" <?php if(empty($guncelle['yazi13'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM homedecor ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi13']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi18" id="yazi18" value="<?=$guncelle['yazi18']?>">
-</div>
-
-<script>
-    function updateImage3(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi18").value = resim;
-        } else {
-            document.getElementById("yazi18").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi14" onchange="updateImage4(this)">
-        <option value="" <?php if(empty($guncelle['yazi14'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM homedecor ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi14']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi19" id="yazi19" value="<?=$guncelle['yazi19']?>">
-</div>
-
-<script>
-    function updateImage4(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi19").value = resim;
-        } else {
-            document.getElementById("yazi19").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
+<?php
+// Renk varyantı seçicileri — ortak modül (MAS-28/MAS-29).
+$cvTable = 'homedecor';
+include __DIR__ . '/include/color_variants_form.php';
+?>
 
 
 							

@@ -770,7 +770,7 @@ $(document).ready(function() {
                         <input type="hidden" name="siparis" id="siparis" value='<?php echo json_encode($groupedItems); ?>'>
 
                         <div class="checkout_form_input">
-                            <input type="checkbox" id="campaign" checked>
+                            <input type="checkbox" id="campaign" name="campaign" value="1" checked>
                             <label for="campaign">I would like to receive e-mails about future sales and campaigns.</label>
                         </div>
                         <div class="checkout_form_input">
@@ -1150,12 +1150,16 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
                         </form>
                         <?php
-$taxRates = [
-    'AB' => 5, 'BC' => 5, 'MB' => 5,
-    'NB' => 15, 'NL' => 15, 'NS' => 15,
-    'ON' => 13, 'PE' => 15, 'QC' => 5,
-    'SK' => 5, 'NT' => 5, 'NU' => 5, 'YT' => 5,
-];
+// MAS-25: Province vergi oranları artık panelden (province_tax tablosu) yönetilir.
+$taxRates = [];
+try {
+    $rs = $db->query("SELECT code, rate FROM province_tax", PDO::FETCH_ASSOC);
+    foreach ($rs as $r) {
+        $taxRates[$r['code']] = (float) $r['rate'];
+    }
+} catch (\Throwable $e) {
+    // Tablo yoksa/sorun varsa vergi gösterimi yapılmaz (checkout yine çalışır).
+}
 ?>
 
 <script>

@@ -108,15 +108,19 @@ foreach ($hizmetkategori as $hizmetka) { ?>
                             <div class="shop_gallery">
                                 <div class="row">
                                 <?php
-        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        // MAS-35: sayfa hesabı — page [1, totalPages] aralığına sıkıştırılır (boş sayfa olmasın)
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $productsPerPage = 9;
-        $startIndex = ($page - 1) * $productsPerPage;
 
         $totalProducts = $db->prepare("SELECT COUNT(*) as total FROM $productTable WHERE kategori = :kategori AND durum = 'on'");
         $totalProducts->bindParam(':kategori', $kategori);
         $totalProducts->execute();
-        $totalProductsCount = $totalProducts->fetchColumn();
-        $totalPages = ceil($totalProductsCount / $productsPerPage);
+        $totalProductsCount = (int) $totalProducts->fetchColumn();
+        $totalPages = max(1, (int) ceil($totalProductsCount / $productsPerPage));
+
+        // İstenen sayfa toplam sayfadan büyükse son sayfaya çek (boş son sayfa bug'ı)
+        if ($page > $totalPages) { $page = $totalPages; }
+        $startIndex = ($page - 1) * $productsPerPage;
 
         $stmt = $db->prepare("SELECT * FROM $productTable WHERE durum = 'on' AND kategori = :kategori ORDER BY sira ASC LIMIT $startIndex, $productsPerPage");
         $stmt->bindParam(':kategori', $kategori);
@@ -156,17 +160,24 @@ foreach ($urunler as $urun) {
                             <div class="loding_bar">
                                 <ul class="d-flex justify-content-center">
                                 <?php
-    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    // MAS-35: $page yukarıda zaten [1, totalPages] aralığına sıkıştırıldı.
+    $currentPage = $page;
     $encodedKategori = str_replace('&', '%26', $kategori);
-    for ($i = 1; $i <= $totalPages; $i++) {
-        $activeClass = ($i == $currentPage) ? 'active' : '';
-        echo '<li><a class="' . $activeClass . '" href="?kategori=' . $encodedKategori . '&page=' . $i . '">' . $i . '</a></li>';
-    }
-    $nextPage = $currentPage + 1;
-    if ($currentPage >= $totalPages) {
-        echo '<li><a style="border:initial !important; font-size:xxx-large; padding-top: 4px;" href="#"><i class="ion-ios-close-outline"></i></a></li>';
-    } else {
-        echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . $nextPage . '"><i class="ion-ios-arrow-right"></i></a></li>';
+    // Tek sayfa varsa pagination çubuğu gösterme.
+    if ($totalPages > 1) {
+        // Önceki
+        if ($currentPage > 1) {
+            echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . ($currentPage - 1) . '"><i class="ion-ios-arrow-left"></i></a></li>';
+        }
+        // Sayfa numaraları
+        for ($i = 1; $i <= $totalPages; $i++) {
+            $activeClass = ($i == $currentPage) ? 'active' : '';
+            echo '<li><a class="' . $activeClass . '" href="?kategori=' . $encodedKategori . '&page=' . $i . '">' . $i . '</a></li>';
+        }
+        // Sonraki (son sayfada gösterilmez; eski bozuk "x" ikonu kaldırıldı)
+        if ($currentPage < $totalPages) {
+            echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . ($currentPage + 1) . '"><i class="ion-ios-arrow-right"></i></a></li>';
+        }
     }
     ?>
                                 </ul>

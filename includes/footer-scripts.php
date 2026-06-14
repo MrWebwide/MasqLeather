@@ -40,8 +40,8 @@ if (!isset($basePath)) {
     <script src="<?=$basePath?>assets/js/jquery-waypoints.js"></script>
     <script src="<?=$basePath?>assets/js/jquery-ui.min.js"></script>
 
-    <!-- Newsletter -->
-    <script src="<?=$basePath?>assets/js/mailchimp-ajax.js"></script>
+    <!-- Newsletter (footer subscribe, site-wide) -->
+    <script src="<?=$basePath?>assets/js/newsletter.js"></script>
 
     <!-- Product Detail extras -->
 <?php if (!empty($needsEasyzoom)): ?>
