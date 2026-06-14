@@ -185,4 +185,44 @@ if (!function_exists('masq_save_product_options')) {
         <?php
         return ob_get_clean();
     }
+
+    /**
+     * STOREFRONT: ürün detay sayfasında müşterinin seçeceği <select>'leri basar.
+     * Her selector -> name="secim[<option_id>]", option value = <value_id> (sunucu ID'den çözer).
+     * Zorunlu olanlara required + boş placeholder konur.
+     * Seçenek yoksa boş string döner (form değişmez).
+     */
+    function masq_render_options_storefront(array $options): string
+    {
+        if (empty($options)) {
+            return '';
+        }
+        ob_start(); ?>
+        <div class="masq-product-options" style="margin:6px 0 18px;">
+            <?php foreach ($options as $o):
+                $oid = (int) ($o['id'] ?? 0);
+                $baslik = htmlspecialchars((string) ($o['baslik'] ?? ''), ENT_QUOTES);
+                $zorunlu = !empty($o['zorunlu']);
+                $vals = isset($o['values']) && is_array($o['values']) ? $o['values'] : [];
+                if (empty($vals)) { continue; }
+                ?>
+                <div class="form-group masq-option" style="margin-bottom:12px;">
+                    <label style="display:block;font-weight:600;margin-bottom:6px;">
+                        <?php echo $baslik; ?><?php if ($zorunlu): ?> <span style="color:#c0392b;">*</span><?php endif; ?>
+                    </label>
+                    <select class="form-control masq-option-select" name="secim[<?php echo $oid; ?>]" data-baslik="<?php echo $baslik; ?>"<?php echo $zorunlu ? ' required' : ''; ?>>
+                        <option value="" <?php echo $zorunlu ? 'disabled ' : ''; ?>selected><?php echo $zorunlu ? 'Seçiniz...' : '(Opsiyonel) Seçiniz...'; ?></option>
+                        <?php foreach ($vals as $v):
+                            $vid = (int) ($v['id'] ?? 0);
+                            $deger = htmlspecialchars((string) ($v['deger'] ?? ''), ENT_QUOTES);
+                            ?>
+                            <option value="<?php echo $vid; ?>"><?php echo $deger; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
 }

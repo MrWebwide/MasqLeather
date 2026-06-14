@@ -10,6 +10,10 @@ $stmt = $db->prepare("SELECT * FROM urunler WHERE id = ?");
 $stmt->execute([$id]);
 $urunler = $stmt->fetch();
 
+// MAS-46: müşterinin seçeceği yapılandırılabilir seçenekler (selector'lar)
+require_once __DIR__ . '/admin/include/product_options.php';
+$productOptions = masq_get_product_options($db, (int) $id, 'bagpurses');
+
 // İlgili ürünün resimlerini çek
 $stmt = $db->prepare("SELECT * FROM urun_img WHERE urun_id = ?");
 $stmt->execute([$id]);
@@ -192,6 +196,7 @@ if ($stock >0) {
     <input type="hidden" name="productCargo" value="<?=$urunler['cargo']?>">
     <input type="hidden" name="productCargos" value="<?=$urunler['cargo_us']?>">
     <input type="hidden" name="producttur" value="<?=$urunler['tur']?>">
+    <?php echo masq_render_options_storefront($productOptions); ?>
     <div class="product_variant_quantity d-flex align-items-center">
         <div class="pro-qty border">
             <input min="1" max="100" type="number" name="productQuantity" value="1" class="no-spin">

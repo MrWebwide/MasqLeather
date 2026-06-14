@@ -2,6 +2,26 @@
 $basePath = '';
 require_once __DIR__ . '/includes/init.php';
 
+$email = $_SESSION['email'] ?? '';
+$id = $_GET['id'];
+
+// Ürünü, görsellerini ve stoğunu yükle
+$stmt = $db->prepare("SELECT * FROM homedecor WHERE id = ?");
+$stmt->execute([$id]);
+$urunler = $stmt->fetch();
+
+$stmt = $db->prepare("SELECT * FROM home_img WHERE urun_id = ?");
+$stmt->execute([$id]);
+$resimler = $stmt->fetchAll();
+
+$stmt = $db->prepare("SELECT stock FROM homedecor WHERE id = ?");
+$stmt->execute([$id]);
+$stock = $stmt->fetchColumn();
+
+// MAS-46: müşterinin seçeceği yapılandırılabilir seçenekler (selector'lar)
+require_once __DIR__ . '/admin/include/product_options.php';
+$productOptions = masq_get_product_options($db, (int) $id, 'homedecor');
+
 $pageTitle       = $yazi['yazi5'] ?? 'Home Decor';
 $pageDescription = $urunler['yazi21'] ?? '';
 $pageKeywords    = $urunler['yazi22'] ?? '';
@@ -173,6 +193,7 @@ if ($haberg) {
                                     <input type="hidden" name="productCargo" value="<?=$urunler['cargo']?>">
                                     <input type="hidden" name="productCargos" value="<?=$urunler['cargo_us']?>">
                                     <input type="hidden" name="producttur" value="<?=$urunler['tur']?>">
+                                    <?php echo masq_render_options_storefront($productOptions); ?>
 
 
 
