@@ -46,6 +46,27 @@ $(document).ready(function() {
         var productCargos = form.find("input[name='productCargos']").val();
         var producttur = form.find("input[name='producttur']").val();
 
+        // MAS-46: yapılandırılabilir selector seçimlerini topla + zorunlu doğrulama
+        var secim = {};
+        var eksik = false;
+        form.find("select.masq-option-select").each(function() {
+            var name = $(this).attr("name") || "";
+            var m = name.match(/secim\[(\d+)\]/);
+            if (!m) return;
+            var val = $(this).val();
+            if ($(this).prop("required") && (!val || val === "")) {
+                eksik = true;
+                $(this).css("border-color", "#c0392b");
+            } else {
+                $(this).css("border-color", "");
+            }
+            if (val) { secim[m[1]] = val; }
+        });
+        if (eksik) {
+            alert("Lütfen zorunlu seçenekleri seçiniz.");
+            return;
+        }
+
         $.ajax({
             type: "POST",
             url: "functions/addToCart.php",
@@ -59,6 +80,7 @@ $(document).ready(function() {
                 productCargo: productCargo,
                 productCargos: productCargos,
                 producttur:producttur,
+                secim: secim, // MAS-46: {option_id: value_id}
                 addToCart: 1 // Bu alanın eklenmesi önemlidir, AJAX işleminin çalışmasını sağlar
             },
             success: function(response) {

@@ -225,4 +225,74 @@ if (!function_exists('masq_save_product_options')) {
         <?php
         return ob_get_clean();
     }
+
+    /**
+     * Müşterinin POST ettiği seçimleri ($secimPost = [option_id => value_id]) SUNUCUDA doğrular ve çözer.
+     * - value_id gerçekten o option'a, option da bu (urun_id, tur) ürününe ait olmalı (tamper-proof).
+     * - Zorunlu bir option seçilmemişse hata döner.
+     * @return array ['error'=>?string, 'snapshot'=>array, 'json'=>?string]
+     *   snapshot: [['option_id','value_id','baslik','deger'], ...] (deterministik sıra: sira,id)
+     */
+    function masq_resolve_selections(PDO $db, int $urunId, string $tur, $secimPost): array
+    {
+        $options = masq_get_product_options($db, $urunId, $tur);
+        if (!is_array($secimPost)) {
+            $secimPost = [];
+        }
+        $snapshot = [];
+        foreach ($options as $opt) {
+            $oid = (int) $opt['id'];
+            $chosen = isset($secimPost[$oid]) ? trim((string) $secimPost[$oid]) : '';
+            if ($chosen === '') {
+                if (!empty($opt['zorunlu'])) {
+                    return ['error' => 'Lütfen "' . $opt['baslik'] . '" seçeneğini seçiniz.', 'snapshot' => [], 'json' => null];
+                }
+                continue; // opsiyonel + boş -> atla
+            }
+            $vid = (int) $chosen;
+            $deger = null;
+            foreach ($opt['values'] as $v) {
+                if ((int) $v['id'] === $vid) {
+                    $deger = (string) $v['deger'];
+                    break;
+                }
+            }
+            if ($deger === null) {
+                return ['error' => 'Geçersiz seçim.', 'snapshot' => [], 'json' => null];
+            }
+            $snapshot[] = ['option_id' => $oid, 'value_id' => $vid, 'baslik' => $opt['baslik'], 'deger' => $deger];
+        }
+        $json = $snapshot ? json_encode($snapshot, JSON_UNESCAPED_UNICODE) : null;
+        return ['error' => null, 'snapshot' => $snapshot, 'json' => $json];
+    }
+
+    /**
+     * Seçim snapshot'ını (JSON string veya array) sepet/sipariş/admin için küçük HTML olarak basar.
+     * Boşsa '' döner.
+     */
+    function masq_format_selections($secimler): string
+    {
+        if (is_string($secimler)) {
+            $secimler = json_decode($secimler, true);
+        }
+        if (empty($secimler) || !is_array($secimler)) {
+            return '';
+        }
+        $parts = [];
+        foreach ($secimler as $s) {
+            if (!is_array($s)) {
+                continue;
+            }
+            $b = htmlspecialchars((string) ($s['baslik'] ?? ''), ENT_QUOTES);
+            $d = htmlspecialchars((string) ($s['deger'] ?? ''), ENT_QUOTES);
+            if ($b === '' && $d === '') {
+                continue;
+            }
+            $parts[] = $b . ': <strong>' . $d . '</strong>';
+        }
+        if (!$parts) {
+            return '';
+        }
+        return '<div class="cart-secimler" style="font-size:12px;color:#777;margin-top:2px;line-height:1.4;">' . implode('<br>', $parts) . '</div>';
+    }
 }
