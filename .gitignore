@@ -40,3 +40,6 @@ admin/resimler/
 .mcp.json
 .claude/
 .github/agents/
+
+# Ortama özel (cPanel handler/HTTPS/cache) — her sunucuda elle yönetilir
+.htaccess
