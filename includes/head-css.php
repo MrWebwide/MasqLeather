@@ -15,8 +15,7 @@ if (!isset($basePath)) {
     $basePath = '';
 }
 ?>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700&amp;display=swap" rel="stylesheet" />
+    <!-- Google Fonts: Inter yüklemesi kaldırıldı — hiçbir CSS/markup kullanmıyordu (MAS-22). -->
 
     <!-- Bootstrap 4 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
