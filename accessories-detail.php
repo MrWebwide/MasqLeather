@@ -14,9 +14,8 @@ $stmt = $db->prepare("SELECT * FROM accessories_img WHERE urun_id = ?");
 $stmt->execute([$id]);
 $resimler = $stmt->fetchAll();
 
-$stmt = $db->prepare("SELECT stock FROM accessories WHERE id = ?");
-$stmt->execute([$id]);
-$stock = $stmt->fetchColumn();
+// Stok bilgisi $urunler'de zaten var (gereksiz ekstra sorgu kaldırıldı — MAS-23)
+$stock = $urunler['stock'] ?? 0;
 
 // MAS-46: müşterinin seçeceği yapılandırılabilir seçenekler (selector'lar)
 require_once __DIR__ . '/admin/include/product_options.php';

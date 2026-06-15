@@ -102,7 +102,7 @@ $ssscek= $db->query("SELECT * FROM sss Where durum='on' order by sira asc")->fet
 $uruncek= $db->query("SELECT * FROM urunler Where durum='on' order by sira asc")->fetchAll(PDO::FETCH_ASSOC);
 $galericek = $db->query("SELECT * FROM galeri Where durum='on' order by sira asc")->fetchAll(PDO::FETCH_ASSOC);
 $galericek6 = $db->query("SELECT * FROM galeri Where durum='on' order by id desc limit 6")->fetchAll(PDO::FETCH_ASSOC);
-$galericekfooter = $db->query("SELECT * FROM galeri Where durum='on' order by id desc limit 6 ")->fetchAll(PDO::FETCH_ASSOC);
+$galericekfooter = $galericek6; // MAS-20: galericek6 ile aynı sorgu, tekrar çekme
 $istatikcek= $db->query("SELECT * FROM istatik Where durum='on' order by sira asc")->fetchAll(PDO::FETCH_ASSOC);
 $kategoricek= $db->query("SELECT * FROM urun_kategori Where durum='on' order by sira asc")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -115,24 +115,34 @@ $stmt = $db->prepare("SELECT * FROM referanslar WHERE id = :id");
     // Sonucu al ve değişkene atama yap
     $refcek = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$yorumcek1= $db->query("SELECT * FROM yorumlar WHERE sira = '1'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek2= $db->query("SELECT * FROM yorumlar WHERE sira = '2'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek3= $db->query("SELECT * FROM yorumlar WHERE sira = '3'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek4= $db->query("SELECT * FROM yorumlar WHERE sira = '4'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek5= $db->query("SELECT * FROM yorumlar WHERE sira = '5'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek6= $db->query("SELECT * FROM yorumlar WHERE sira = '6'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek7= $db->query("SELECT * FROM yorumlar WHERE sira = '7'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek8= $db->query("SELECT * FROM yorumlar WHERE sira = '8'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek9= $db->query("SELECT * FROM yorumlar WHERE sira = '9'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek10= $db->query("SELECT * FROM yorumlar WHERE sira = '10'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek11= $db->query("SELECT * FROM yorumlar WHERE sira = '11'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek12= $db->query("SELECT * FROM yorumlar WHERE sira = '12'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek13= $db->query("SELECT * FROM yorumlar WHERE sira = '13'")->fetch(PDO::FETCH_ASSOC);
-$yorumcek14= $db->query("SELECT * FROM yorumlar WHERE sira = '14'")->fetch(PDO::FETCH_ASSOC);
+// MAS-20: 14 ayrı sorgu yerine tek sorgu + sira map (davranış korunur; yoksa false)
+$yorumSiraMap = [];
+foreach ($db->query("SELECT * FROM yorumlar")->fetchAll(PDO::FETCH_ASSOC) as $yr) {
+    $yorumSiraMap[(int) $yr['sira']] = $yr;
+}
+$yorumcek1  = $yorumSiraMap[1]  ?? false;
+$yorumcek2  = $yorumSiraMap[2]  ?? false;
+$yorumcek3  = $yorumSiraMap[3]  ?? false;
+$yorumcek4  = $yorumSiraMap[4]  ?? false;
+$yorumcek5  = $yorumSiraMap[5]  ?? false;
+$yorumcek6  = $yorumSiraMap[6]  ?? false;
+$yorumcek7  = $yorumSiraMap[7]  ?? false;
+$yorumcek8  = $yorumSiraMap[8]  ?? false;
+$yorumcek9  = $yorumSiraMap[9]  ?? false;
+$yorumcek10 = $yorumSiraMap[10] ?? false;
+$yorumcek11 = $yorumSiraMap[11] ?? false;
+$yorumcek12 = $yorumSiraMap[12] ?? false;
+$yorumcek13 = $yorumSiraMap[13] ?? false;
+$yorumcek14 = $yorumSiraMap[14] ?? false;
 
-$slider1 = $db->query("select * from slider WHERE sira = '1'")->fetch(PDO::FETCH_ASSOC);
-$slider2 = $db->query("select * from slider WHERE sira = '2'")->fetch(PDO::FETCH_ASSOC);
-$slider3 = $db->query("select * from slider WHERE sira = '3'")->fetch(PDO::FETCH_ASSOC);
+// MAS-20: 3 ayrı sorgu yerine tek sorgu + sira map
+$sliderSiraMap = [];
+foreach ($db->query("select * from slider")->fetchAll(PDO::FETCH_ASSOC) as $sr) {
+    $sliderSiraMap[(int) $sr['sira']] = $sr;
+}
+$slider1 = $sliderSiraMap[1] ?? false;
+$slider2 = $sliderSiraMap[2] ?? false;
+$slider3 = $sliderSiraMap[3] ?? false;
 
 
 

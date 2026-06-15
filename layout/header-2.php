@@ -1,4 +1,5 @@
-﻿<?php if (!isset($basePath)) $basePath = ''; ?>
+﻿<?php
+require_once __DIR__ . '/../includes/cat_counts.php'; if (!isset($basePath)) $basePath = ''; ?>
 <div class="offcanvas_menu">
         <div class="container">
             <div class="row">
@@ -17,10 +18,7 @@
                                     <ul class="sub-menu">
 
                                         <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                         FROM urun_kategori AS bk
-                         LEFT JOIN urunler AS b ON bk.adi = b.kategori
-                         GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'urun_kategori', 'urunler'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
 $adi = $hizmetka['adi'];
@@ -40,10 +38,7 @@ $urun_sayisi = $hizmetka['urun_sayisi'];
                                 <ul class="sub-menu">
 
                                 <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                            FROM bolge_kategori AS bk
-                            LEFT JOIN accessories AS b ON bk.adi = b.kategori
-                            GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'bolge_kategori', 'accessories'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
    $adi = $hizmetka['adi'];
@@ -106,10 +101,7 @@ foreach ($hizmetkategori as $hizmetka) {
                                     <li><a href="<?=$basePath?>bagpurses.php">Bags & Purses</a>
                                         <ul class="sub_menu">
                                             <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                            FROM urun_kategori AS bk
-                            LEFT JOIN urunler AS b ON bk.adi = b.kategori
-                            GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'urun_kategori', 'urunler'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
    $adi = $hizmetka['adi'];
@@ -127,10 +119,7 @@ foreach ($hizmetkategori as $hizmetka) {
                                         <ul class="sub_menu">
 
                                             <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                            FROM bolge_kategori AS bk
-                            LEFT JOIN accessories AS b ON bk.adi = b.kategori
-                            GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'bolge_kategori', 'accessories'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
    $adi = $hizmetka['adi'];

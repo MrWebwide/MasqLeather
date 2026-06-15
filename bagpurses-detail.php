@@ -19,10 +19,8 @@ $stmt = $db->prepare("SELECT * FROM urun_img WHERE urun_id = ?");
 $stmt->execute([$id]);
 $resimler = $stmt->fetchAll();
 
-// İlgili ürünün stok bilgisini çek
-$stmt = $db->prepare("SELECT stock FROM urunler WHERE id = ?");
-$stmt->execute([$id]);
-$stock = $stmt->fetchColumn();
+// Stok bilgisi $urunler'de zaten var (gereksiz ekstra sorgu kaldırıldı — MAS-23)
+$stock = $urunler['stock'] ?? 0;
 
 $needsEasyzoom = true;
 $needsAjaxComment = true;

@@ -2,6 +2,8 @@
 include("include/baglan.php");
 include("include/fonksiyonlar.php");
 include("include/product_options.php");
+include("include/img_helpers.php");
+include("include/post_helper.php");
 
 
 ob_start();
@@ -10,26 +12,26 @@ oturumkontrolana();
 
 
 
-$adi = $_POST['adi'];
-$sira=$_POST['sira'];
-$aciklama = $_POST['aciklama'];
-$onaciklama = $_POST['onaciklama'];
-$durum = $_POST['durum'];
-$kategori = $_POST['kategori'];
-$yazi1 = $_POST['yazi1'];
-$yazi3 = $_POST['yazi3'];
-$yazi2 = $_POST['yazi2'];
-$yazi4 = $_POST['yazi4'];
-$yazi5 = $_POST['yazi5'];
-$yazi6 = $_POST['yazi6'];
-$yazi7 = $_POST['yazi7'];
-$yazi8 = $_POST['yazi8'];
-$yazi9 = $_POST['yazi9'];
-$yazi10 = $_POST['yazi10'];
-$yazi11 = $_POST['yazi11'];
-$yazi12 = $_POST['yazi12'];
-$yazi13 = $_POST['yazi13'];
-$yazi14 = $_POST['yazi14'];
+$adi = post_str('adi');
+$sira = post_str('sira');
+$aciklama = post_str('aciklama');
+$onaciklama = post_str('onaciklama');
+$durum = post_str('durum');
+$kategori = post_str('kategori');
+$yazi1 = post_str('yazi1');
+$yazi3 = post_str('yazi3');
+$yazi2 = post_str('yazi2');
+$yazi4 = post_str('yazi4');
+$yazi5 = post_str('yazi5');
+$yazi6 = post_str('yazi6');
+$yazi7 = post_str('yazi7');
+$yazi8 = post_str('yazi8');
+$yazi9 = post_str('yazi9');
+$yazi10 = post_str('yazi10');
+$yazi11 = post_str('yazi11');
+$yazi12 = post_str('yazi12');
+$yazi13 = post_str('yazi13');
+$yazi14 = post_str('yazi14');
 // yazi15..19: eski color-variant görsel kopyaları — artık kullanılmıyor (MAS-28).
 // Detail sayfası görseli varyantın canlı resim'inden çekiyor; bu kolonlar boş bırakılır.
 $yazi15 = '';
@@ -37,15 +39,15 @@ $yazi16 = '';
 $yazi17 = '';
 $yazi18 = '';
 $yazi19 = '';
-$yazi20 = $_POST['yazi20'];
-$yazi21 = $_POST['yazi21'];
-$yazi22 = $_POST['yazi22'];
+$yazi20 = post_str('yazi20');
+$yazi21 = post_str('yazi21');
+$yazi22 = post_str('yazi22');
 
 
 
-$cargo = $_POST['cargo'];
-$stock = $_POST['stock'];
-$cargo_us = $_POST['cargo_us'];
+$cargo = post_str('cargo');
+$stock = post_str('stock');
+$cargo_us = post_str('cargo_us');
 
 
 
@@ -162,17 +164,11 @@ if(empty($resim_tmpd1)) {
 		
 		
 		
-		  $sonid=$db->query("select * from homedecor order by id desc")->fetch(PDO::FETCH_ASSOC);
-				
-$yeni =$sonid['id'];
+		  $yeni = (int) $db->lastInsertId(); // MAS-30
 
 	// MAS-46: ürün seçeneklerini kaydet (yeni ürün)
 	masq_save_product_options($db, (int)$yeni, $tur, isset($_POST['options']) ? $_POST['options'] : array());
-    if(isset($_POST['img'])){
-    	foreach ($_POST['img'] as $img) {
-    		$islem = $db->prepare("INSERT INTO home_img SET urun_id = ?, img = ?,tur=?");
-        	$islem = $islem->execute(array($yeni,$img,$tur));
-    	}}
+    masq_save_product_images($db, 'home_img', (int)$yeni, $_POST['img'] ?? array(), $tur); // MAS-30
 		
 		
 		$mesaj = "
@@ -270,16 +266,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	
 		
-		  $deleteee = $db->exec("DELETE FROM home_img WHERE urun_id = '$id' ");
-        
-	if(isset($_POST['img'])){
-    	foreach ($_POST['img'] as $img) {
-			
-	
-    		$islem = $db->prepare("INSERT INTO home_img SET urun_id = ?, img = ?,tur=?");
-        	$islem = $islem->execute(array($id,$img,$tur));
-    	}
-    }
+		  masq_save_product_images($db, 'home_img', (int)$id, $_POST['img'] ?? array(), $tur); // MAS-30
 	
 
 		
