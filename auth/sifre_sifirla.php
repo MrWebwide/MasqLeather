@@ -18,10 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
+        // MAS-78: kayıt/giriş password_hash/password_verify kullanıyor; reset de HASH'lemeli
+        // (düz metin kaydedilince reset sonrası giriş yapılamıyordu).
+        $hashedSifre = password_hash($yeniSifre, PASSWORD_DEFAULT);
+
         // Veritabanında şifreyi güncelle, sadece belirli email adresine sahip kullanıcı için
         $sql_update = "UPDATE uyeler SET sifre = :yeniSifre WHERE email = :email";
         $stmt_update = $db->prepare($sql_update);
-        $stmt_update->bindParam(':yeniSifre', $yeniSifre);
+        $stmt_update->bindParam(':yeniSifre', $hashedSifre);
         $stmt_update->bindParam(':email', $email);
 
         if ($stmt_update->execute()) {

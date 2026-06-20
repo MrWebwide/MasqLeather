@@ -211,7 +211,7 @@ label {
                 <input type="hidden" name="email" id="email" value="">
             </div>
             <div class="form-group col-md-12">
-                <button class="button2" style="--clr:#d67900;" type="submit" id="sifreSifirla"><span>Verification</span><i></i></button>
+                <button class="button2" style="--clr:#d67900;" type="submit" id="sifreSifirla"><span>Reset Password</span><i></i></button>
             </div>
         </div>
     </form>

@@ -163,7 +163,7 @@ if ($stock >0) {
 
                                         Product ID: 274</span>
                                 </div>
-                               <form method="POST" action="functions/add-comment.php" id="addToCartForm">
+                               <form method="POST" action="functions/addToCart.php" id="addToCartForm">
     <input type="hidden" name="productId" value="<?=$urunler['id']?>">
     <input type="hidden" name="productName" value="<?=$urunler['adi']?>">
     <input type="hidden" name="productPrice" value="<?php echo $urunler['kampanya'] ? $urunler['yazi1'] - ($urunler['yazi1'] * $urunler['kampanya'] / 100) : $urunler['yazi1']; ?>">

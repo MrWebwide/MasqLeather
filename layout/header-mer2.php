@@ -161,14 +161,14 @@ foreach ($hizmetkategori as $hizmetka) {
 if (isset($_SESSION['adsoyad'])) {
     echo '<div class="dropdown_menu">';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/address-details.php">Saved Address</a>';
+    echo '<a href="' . $basePath . 'account/address-details.php">Saved Address</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/recent-orders.php">Recent Orders</a>';
+    echo '<a href="' . $basePath . 'account/recent-orders.php">Recent Orders</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
     // Önceki sayfanın URL'sini hidden input ile alın
-    echo '<form action="<?=$basePath?>auth/cikis.php" method="post">';
+    echo '<form action="' . $basePath . 'auth/cikis.php" method="post">';
     echo '<input type="hidden" name="previous_page" value="' . $_SERVER['REQUEST_URI'] . '">';
     echo '<button type="submit">Log-Out</button>';
     echo '</form>';
@@ -215,10 +215,10 @@ if (isset($_SESSION['adsoyad'])) {
 if (isset($_SESSION['adsoyad'])) {
     echo '<div class="dropdown_menu">';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/address-details.php">Saved Address</a>';
+    echo '<a href="' . $basePath . 'account/address-details.php">Saved Address</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/recent-orders.php">Recent Orders</a>';
+    echo '<a href="' . $basePath . 'account/recent-orders.php">Recent Orders</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
     // Önceki sayfanın URL'sini hidden input ile alın
@@ -347,7 +347,7 @@ if (isset($_SESSION['id'])) {
             // Her bir ürünü sepette listeleyin
             echo '<div class="cart_item" data-product-id="' . $productId . '" data-product-category="' . $productCategory . '" data-product-price="' . $productPrice . '" data-product-quantity="' . $productQuantity . '">';
             echo '<div class="cart_img">';
-            echo '<a href="#"><img src="<?=$basePath?>admin/resimler/' . $productImage . '" alt=""></a>';
+            echo '<a href="#"><img src="' . $basePath . 'admin/resimler/' . $productImage . '" alt=""></a>';
             echo '</div>';
             echo '<div class="cart_info">';
             echo '<div class="close-sec d-flex">';

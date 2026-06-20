@@ -16,6 +16,7 @@ $resimler = $stmt->fetchAll();
 
 // Stok bilgisi $urunler'de zaten var (gereksiz ekstra sorgu kaldırıldı — MAS-23)
 $stock = $urunler['stock'] ?? 0;
+$needsAjaxComment = true; // sepet + yorum AJAX'ı (ajax.js) yüklensin — MAS-80
 
 // MAS-46: müşterinin seçeceği yapılandırılabilir seçenekler (selector'lar)
 require_once __DIR__ . '/admin/include/product_options.php';
@@ -154,7 +155,7 @@ if ($haberg) {
 
                                         Product ID: 274</span>
                                 </div>
-                                <form method="POST" action="addToCart.php" id="addToCartForm">
+                                <form method="POST" action="functions/addToCart.php" id="addToCartForm">
                                     <input type="hidden" name="productId" value="<?=$urunler['id']?>">
                                     <input type="hidden" name="productName" value="<?=$urunler['adi']?>">
                                     <input type="hidden" name="productPrice"
