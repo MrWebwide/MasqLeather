@@ -14,10 +14,11 @@ function masq_category_counts(PDO $db, string $catTable, string $prodTable): arr
     if (isset($cache[$key])) { return $cache[$key]; }
 
     $rows = $db->query(
-        "SELECT bk.adi, COUNT(b.id) AS urun_sayisi
+        "SELECT bk.adi, bk.sira, COUNT(b.id) AS urun_sayisi
            FROM {$catTable} AS bk
            LEFT JOIN {$prodTable} AS b ON bk.adi = b.kategori
-          GROUP BY bk.adi"
+          GROUP BY bk.adi, bk.sira
+          ORDER BY bk.sira ASC, bk.adi ASC"
     )->fetchAll(PDO::FETCH_ASSOC);
 
     return $cache[$key] = $rows;

@@ -16,10 +16,10 @@ session_start();
 oturumkontrolana();
 
 $campTabs = [
-    ['key' => 'bagpurses',   'label' => 'Bags & Purses', 'table' => 'kampanya',           'ekle' => 'bag-purses-kampanya-ekle.php',  'list' => 'bag-purses-kampanya-listele.php'],
-    ['key' => 'accessories', 'label' => 'Accessories',   'table' => 'accessorieskampanya', 'ekle' => 'accessories-kampanya-ekle.php', 'list' => 'accessories-kampanya-listele.php'],
-    ['key' => 'jewe',        'label' => 'Jewelry',       'table' => 'jewekampanya',        'ekle' => 'jewe-kampanya-ekle.php',        'list' => 'jewe-kampanya-listele.php'],
-    ['key' => 'homedecor',   'label' => 'Home Decor',    'table' => 'homedecorkampanya',   'ekle' => 'homedecor-kampanya-ekle.php',   'list' => 'homedecor-kampanya-listele.php'],
+    ['key' => 'bagpurses',   'label' => 'Bags & Purses', 'table' => 'kampanya',           'prod' => 'urunler',     'ekle' => 'bag-purses-kampanya-ekle.php',  'list' => 'bag-purses-kampanya-listele.php'],
+    ['key' => 'accessories', 'label' => 'Accessories',   'table' => 'accessorieskampanya', 'prod' => 'accessories', 'ekle' => 'accessories-kampanya-ekle.php', 'list' => 'accessories-kampanya-listele.php'],
+    ['key' => 'jewe',        'label' => 'Jewelry',       'table' => 'jewekampanya',        'prod' => 'jewe',        'ekle' => 'jewe-kampanya-ekle.php',        'list' => 'jewe-kampanya-listele.php'],
+    ['key' => 'homedecor',   'label' => 'Home Decor',    'table' => 'homedecorkampanya',   'prod' => 'homedecor',   'ekle' => 'homedecor-kampanya-ekle.php',   'list' => 'homedecor-kampanya-listele.php'],
 ];
 
 $active = isset($cpActive) ? $cpActive : 'bagpurses';
@@ -28,14 +28,24 @@ foreach ($campTabs as $t) { if ($t['key'] === $active) { $tab = $t; break; } }
 if (!$tab) { $tab = $campTabs[0]; }
 $table = $tab['table']; // whitelist'ten geldiği için güvenli
 
-// --- Sil (görseli de kaldır) ---
+// --- Sil (görseli kaldır + MAS-73: kampanyanın ürünlere uyguladığı indirimi geri al) ---
 if (isset($_GET['sil'])) {
     $idd = intval($_GET['sil']);
     if ($idd > 0) {
-        $r = $db->prepare("SELECT resim FROM {$table} WHERE id = ?");
+        $prodTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tab['prod']);
+        $r = $db->prepare("SELECT resim, kategori FROM {$table} WHERE id = ?");
         $r->execute([$idd]);
-        $img = $r->fetchColumn();
-        if ($img && file_exists(__DIR__ . '/../resimler/' . $img)) { @unlink(__DIR__ . '/../resimler/' . $img); }
+        $row = $r->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            // MAS-73: kampanya bu kategorideki ürünlere kampanya=:fiyat yazıyordu;
+            // silinince indirimi sıfırla (yoksa fiyatlar indirimli kalıyordu).
+            if (!empty($row['kategori'])) {
+                $db->prepare("UPDATE {$prodTable} SET kampanya = 0 WHERE kategori = ?")->execute([$row['kategori']]);
+            }
+            if (!empty($row['resim']) && file_exists(__DIR__ . '/../resimler/' . $row['resim'])) {
+                @unlink(__DIR__ . '/../resimler/' . $row['resim']);
+            }
+        }
         $db->prepare("DELETE FROM {$table} WHERE id = ?")->execute([$idd]);
     }
 }

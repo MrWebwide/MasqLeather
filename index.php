@@ -264,7 +264,7 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
                     <a href="<?=$hizmet['kategori']?>">
                         <div class="single_choice wow fadeInUp" data-wow-delay="0.1s" data-wow-duration="1.1s">
                             <div class="choice_thumb">
-                                <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+                                <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
                             </div>
                             <div class="choice_text">
                                 <h4><a href="<?=$hizmet['kategori']?>"><?=$hizmet['adi']?></a></h4>
@@ -310,9 +310,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="bagpurses-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -335,9 +335,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="accessories-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -373,9 +373,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="accessories-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -398,9 +398,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="bagpurses-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -637,7 +637,7 @@ foreach($hizmett as $hizmet) { ?>
                         <article class="single_blog wow fadeInUp" data-wow-delay="0.1s" data-wow-duration="1.1s">
                             <figure>
                                 <div class="blog_thumb">
-                                    <a href="blog-details.php?id=<?= $hizmet['id'] ?>"><img src="admin/resimler/<?=$hizmet['resim']?>" alt=""></a>
+                                    <a href="blog-details.php?id=<?= $hizmet['id'] ?>"><img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt=""></a>
                                 </div>
                                 <figcaption class="blog_content">
                                     <h3><a href="blog-details.php?id=<?= $hizmet['id'] ?>"><?=$hizmet['adi']?> </a></h3>
