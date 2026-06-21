@@ -34,6 +34,23 @@ function masq_compress_image(string $path, int $maxDim = 1400, int $quality = 82
         return false;
     }
 
+    // Bellek güvenliği: çok yüksek çözünürlüklü görsellerde GD çökmesin (MAS-18).
+    // Kaynak + hedef truecolor ~ w*h*4 byte; pay bırakarak memory_limit'i geçici yükselt.
+    $needed = (int) ($w * $h * 4 * 2.1) + 64 * 1024 * 1024;
+    $curr = trim((string) ini_get('memory_limit'));
+    if ($curr !== '-1') {
+        $unit = strtolower(substr($curr, -1));
+        $val = (int) $curr;
+        $currBytes = $unit === 'g' ? $val * 1073741824 : ($unit === 'm' ? $val * 1048576 : ($unit === 'k' ? $val * 1024 : $val));
+        if ($currBytes < $needed) {
+            @ini_set('memory_limit', $needed);
+        }
+    }
+    // GD gerçekten bu görseli açabilecek mi? (açamazsa orijinali bozma, dokunma)
+    if (function_exists('imagecreatefromjpeg') === false) {
+        return false;
+    }
+
     // PNG opak mı? (MAS-18) Opak PNG'ler JPEG olarak yazılır (foto PNG'leri ~10x küçülür);
     // gerçekten şeffaf olanlar PNG kalır. Dosya ADI değişmez (içerik JPEG olur).
     $pngOpaque = ($isPng && masq_png_is_opaque($path, $w, $h));
