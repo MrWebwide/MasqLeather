@@ -422,7 +422,7 @@ function getUpdatedCartContentFromSession() {
         </div>
         <form class="border-bottom" action="<?=$basePath?>product.php" method="GET">
             <input class="border-0" name="search_query" placeholder="Search products..." type="text">
-            <button type="submit"><i class="icofont-search"></i></button>
+            <button type="submit"><i class="fa fa-search"></i></button>
         </form>
     </div>
     <!--header area end-->

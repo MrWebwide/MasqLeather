@@ -13,6 +13,10 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
 <?php include __DIR__ . '/functions/analytics.php'; ?>
 <?php include __DIR__ . '/includes/head-meta.php'; ?>
 <?php include __DIR__ . '/includes/head-css.php'; ?>
+<?php if (!empty($sayac['resim4'])): ?>
+    <!-- LCP preload: anasayfa banner görseli erken ve yüksek öncelikle çekilsin (PageSpeed LCP) -->
+    <link rel="preload" as="image" href="admin/resimler/<?=htmlspecialchars($sayac['resim4'])?>" fetchpriority="high">
+<?php endif; ?>
 <?php include __DIR__ . '/includes/head-js.php'; ?>
 
     <!-- Cookie Banner JS -->
@@ -45,12 +49,11 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
     }
     </script>
 
-    <!-- Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-16643612077"></script>
+    <!-- Google Ads: ayrı gtag.js kütüphane yüklemesi kaldırıldı (analytics.php zaten yüklüyor);
+         tek kütüphane birden fazla ID destekler → ~140KB tasarruf (perf) -->
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
     gtag('config', 'AW-16643612077');
     function gtag_report_conversion(url) {
         var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } };

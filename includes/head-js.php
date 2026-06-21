@@ -25,17 +25,16 @@ if (!isset($basePath)) {
     <!-- Modernizr -->
     <script src="<?=$basePath?>assets/js/vendor/modernizr-3.7.1.min.js"></script>
 
-    <!-- imagesLoaded -->
-    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+    <!-- imagesLoaded: head'deki unpkg kopyası kaldırıldı (footer'da local images-loaded.min.js zaten yükleniyordu = çift). -->
 
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.6/gsap.min.js"></script>
+    <!-- GSAP: defer — yalnızca tıklama animasyonunda kullanılıyor, ilk render'ı bloke etmesin (perf) -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.6/gsap.min.js"></script>
 
     <!-- Exzoom Slider -->
 <?php if (empty($noExzoom)): ?>
     <script src="<?=$basePath?>slider/jquery.exzoom.js"></script>
 <?php endif; ?>
 
-    <!-- Site utilities -->
-    <script src="<?=$basePath?>assets/js/handlewindowsize.js"></script>
-    <script src="<?=$basePath?>assets/js/loadingscreen.js"></script>
+    <!-- Site utilities: defer — load/DOMContentLoaded dinleyicileri, render'ı bloke etmesin (perf) -->
+    <script defer src="<?=$basePath?>assets/js/handlewindowsize.js"></script>
+    <script defer src="<?=$basePath?>assets/js/loadingscreen.js"></script>

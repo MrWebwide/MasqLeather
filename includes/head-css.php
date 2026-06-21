@@ -15,7 +15,17 @@ if (!isset($basePath)) {
     $basePath = '';
 }
 ?>
-    <!-- Google Fonts: Inter yüklemesi kaldırıldı — hiçbir CSS/markup kullanmıyordu (MAS-22). -->
+    <!-- Preconnect: dış kaynaklara erken bağlantı (kritik zincir kısalır) — MAS-22/perf -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Google Fonts: <link> ile paralel yükleme (eskiden style.css içinde @import vardı = seri/yavaş). display=swap. -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Dancing+Script:wght@600;700&family=Lugrasimo&display=swap">
 
     <!-- Bootstrap 4 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
@@ -32,7 +42,7 @@ if (!isset($basePath)) {
     <!-- Icon Fonts -->
     <link rel="stylesheet" href="<?=$basePath?>assets/css/font.awesome.css">
     <link rel="stylesheet" href="<?=$basePath?>assets/css/ionicons.min.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/icofont.min.css">
+    <!-- icofont kaldırıldı: tek bir arama ikonu için 525KiB font yüklüyordu → fa fa-search ile değiştirildi (perf). -->
     <link rel="stylesheet" href="<?=$basePath?>assets/css/elegant-icons.min.css">
 
     <!-- AOS Animations -->
