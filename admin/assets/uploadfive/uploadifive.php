@@ -63,6 +63,9 @@ $targetPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/admin/resimler';
 $targetFile = $targetPath . '/' . $fileName;
 
 if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+    // MAS-18: yüklenen görseli otomatik küçült (GD yoksa dokunmaz)
+    require_once __DIR__ . '/../../../includes/image.php';
+    masq_compress_image($targetFile);
     echo $fileName;
 } else {
     echo 3;

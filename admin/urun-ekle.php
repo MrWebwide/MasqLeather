@@ -3,6 +3,7 @@ include("include/baglan.php");
 include("include/fonksiyonlar.php");
 include("include/product_options.php");
 include("include/img_helpers.php");
+require_once __DIR__ . "/../includes/image.php";
 include("include/post_helper.php");
 
 
@@ -127,6 +128,7 @@ if(empty($resim_tmpd)) {
         $random = rand(0,99999);
         $resim = $random . "-" . $seo . "." . substr($_FILES['resim']['name'], -3);
         move_uploaded_file($_FILES['resim']['tmp_name'], $klasord . "/" . $resim);
+        masq_compress_image($klasord . "/" . $resim); // MAS-18
     } else {
         $bilgi = '<div class="alert alert-error">
                                 <button class="close" data-dismiss="alert">×</button>
@@ -143,6 +145,7 @@ if(empty($resim_tmpd1)) {
         $random = rand(0,99999);
         $resim1 = $random . "-" . $seo . "." . substr($_FILES['resim1']['name'], -3);
         move_uploaded_file($_FILES['resim1']['tmp_name'], $klasord . "/" . $resim1);
+        masq_compress_image($klasord . "/" . $resim1); // MAS-18
     } else {
         $bilgi = '<div class="alert alert-error">
                                 <button class="close" data-dismiss="alert">×</button>
@@ -233,6 +236,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
             $random = rand(0, 99999);
             $resim = $random . "-" . $_FILES['resim']['name']; // Dosya adını rastgele bir sayı ile birleştirerek oluşturuyoruz
             move_uploaded_file($_FILES['resim']['tmp_name'], $klasor . "/" . $resim);
+            masq_compress_image($klasor . "/" . $resim); // MAS-18
         } else {
             $bilgi = '<div class="alert alert-error">
                                     <button class="close" data-dismiss="alert">×</button>
@@ -252,6 +256,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
             $random = rand(0, 99999);
             $resim1 = $random . "-" . $_FILES['resim1']['name']; // Dosya adını rastgele bir sayı ile birleştirerek oluşturuyoruz
             move_uploaded_file($_FILES['resim1']['tmp_name'], $klasor . "/" . $resim1);
+            masq_compress_image($klasor . "/" . $resim1); // MAS-18
         } else {
             $bilgi = '<div class="alert alert-error">
                                     <button class="close" data-dismiss="alert">×</button>

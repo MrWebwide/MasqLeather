@@ -50,6 +50,36 @@ if (!is_dir($dir))   { out("HATA: $dir yok."); exit; }
 if (!is_dir($backup)) { @mkdir($backup, 0775, true); }
 
 $exts = ['jpg', 'jpeg', 'png'];
+
+// --- TEŞHİS MODU: ?diag=1 ---  (hiçbir şeyi değiştirmez)
+if (!$CLI && isset($_GET['diag'])) {
+    out("GD yuklu: " . (extension_loaded('gd') ? 'EVET' : 'HAYIR'));
+    out("imagejpeg var: " . (function_exists('imagejpeg') ? 'EVET' : 'HAYIR'));
+    out("resimler yazilabilir: " . (is_writable($dir) ? 'EVET' : 'HAYIR (sorun bu olabilir!)'));
+    out("resimler_orig yazilabilir: " . (is_writable($backup) ? 'EVET' : 'HAYIR'));
+    $bk = is_dir($backup) ? max(0, count(scandir($backup)) - 2) : 0;
+    out("yedek (zaten islenmis) dosya sayisi: $bk");
+    // canlı test: ilk büyük jpg'yi geçici dosyaya küçült
+    foreach (scandir($dir) as $tf) {
+        $tp = "$dir/$tf"; if (!is_file($tp)) continue;
+        $te = strtolower(pathinfo($tf, PATHINFO_EXTENSION)); if (!in_array($te, ['jpg','jpeg'], true)) continue;
+        $ti = @getimagesize($tp); if (!$ti || max($ti[0],$ti[1]) <= $MAXDIM) continue;
+        $ob = filesize($tp);
+        $im = @imagecreatefromjpeg($tp);
+        if (!$im) { out("TEST: '$tf' GD ile ACILAMADI (GD/jpeg sorunu)"); break; }
+        $sc = $MAXDIM / max($ti[0],$ti[1]); $nw=(int)round($ti[0]*$sc); $nh=(int)round($ti[1]*$sc);
+        $d = imagecreatetruecolor($nw,$nh); imagecopyresampled($d,$im,0,0,0,0,$nw,$nh,$ti[0],$ti[1]);
+        $tmp = "$backup/_test_$tf"; $ok = imagejpeg($d,$tmp,$QUALITY); imagedestroy($im); imagedestroy($d);
+        if ($ok) { out("TEST OK: '$tf' {$ti[0]}x{$ti[1]} ".round($ob/1024)."KB -> {$nw}x{$nh} ".round(filesize($tmp)/1024)."KB"); @unlink($tmp); }
+        else { out("TEST: '$tf' imagejpeg YAZAMADI (yazma izni/disk sorunu)"); }
+        break;
+    }
+    exit;
+}
+
+// Kümülatif toplam (sayfalar arası) — gerçek toplam kazancı göstermek için
+$progFile = $backup . '/_progress.json';
+$prog = @json_decode(@file_get_contents($progFile), true) ?: ['saved' => 0, 'done' => 0];
 $files = scandir($dir);
 $processed = 0; $skipped = 0; $errors = 0; $saved = 0; $remaining = 0;
 
@@ -93,6 +123,7 @@ foreach ($files as $f) {
     imagedestroy($src); imagedestroy($dst);
 
     if ($ok) {
+        clearstatcache(true, $path); // filesize() cache'i temizle (yoksa eski boyut okunur → "kazanç 0" yanılgısı)
         $newBytes = filesize($path);
         $saved += ($bytes - $newBytes);
         $processed++;

@@ -43,3 +43,7 @@ admin/resimler/
 
 # Ortama özel (cPanel handler/HTTPS/cache) — her sunucuda elle yönetilir
 .htaccess
+
+# MAS-18 araç çıktıları
+optimize.log
+admin/resimler_orig/
