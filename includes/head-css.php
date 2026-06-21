@@ -31,22 +31,32 @@ if (!isset($basePath)) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
         integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
-    <!-- Vendor CSS -->
+    <!-- Vendor CSS — kritik (hero slider) bloke kalır -->
     <link rel="stylesheet" href="<?=$basePath?>assets/css/swiper-bundle.min.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/slick.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/animate.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/nice-select.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/magnific-popup.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/jquery-ui.min.css">
 
-    <!-- Icon Fonts -->
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/font.awesome.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/ionicons.min.css">
-    <!-- icofont kaldırıldı: tek bir arama ikonu için 525KiB font yüklüyordu → fa fa-search ile değiştirildi (perf). -->
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/elegant-icons.min.css">
+    <?php
+    // icofont kaldırıldı (525KiB font tek ikon için → fa fa-search).
+    // Kritik OLMAYAN CSS'ler asenkron yüklenir (render-blocking azaltma — PageSpeed).
+    // media="print" + onload hilesi: ilk render'ı bloke etmez; JS kapalıysa <noscript> devreye girer.
+    $asyncCss = [
+        'assets/css/slick.css',
+        'assets/css/animate.css',
+        'assets/css/nice-select.css',
+        'assets/css/magnific-popup.css',
+        'assets/css/jquery-ui.min.css',
+        'assets/css/font.awesome.css',
+        'assets/css/ionicons.min.css',
+        'assets/css/elegant-icons.min.css',
+    ];
+    foreach ($asyncCss as $css):
+        $href = $basePath . $css; ?>
+    <link rel="stylesheet" href="<?=$href?>" media="print" onload="this.media='all';this.onload=null;">
+    <noscript><link rel="stylesheet" href="<?=$href?>"></noscript>
+    <?php endforeach; ?>
 
-    <!-- AOS Animations -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- AOS Animations (asenkron) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" media="print" onload="this.media='all';this.onload=null;">
+    <noscript><link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"></noscript>
 
     <!-- Exzoom Slider (product pages) -->
 <?php if (empty($noExzoom)): ?>
