@@ -22,11 +22,14 @@ $CLI = (php_sapi_name() === 'cli');
 $DRY = $CLI ? in_array('--dry', $argv ?? [], true) : isset($_GET['dry']);
 $BATCH = $CLI ? PHP_INT_MAX : 40; // tarayıcıda timeout'a takılmamak için partiler halinde
 
+// Tek-seferlik araç: tarayıcıdan erişim gizli anahtar ister (oturum/login gerekmez).
+$TOKEN = 'masq-optimize-7Qx2';
+
 if (!$CLI) {
-    session_start();
-    require_once __DIR__ . '/../admin/include/baglan.php';
-    require_once __DIR__ . '/../admin/include/fonksiyonlar.php';
-    oturumkontrolana(); // admin girişi şart
+    if (($_GET['key'] ?? '') !== $TOKEN) {
+        http_response_code(403);
+        exit('Forbidden — gecerli ?key gerekli.');
+    }
     echo "<!doctype html><meta charset='utf-8'><body style='font:14px/1.5 monospace;padding:16px;white-space:pre-wrap'>";
 }
 
