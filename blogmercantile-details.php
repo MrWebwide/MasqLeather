@@ -2,6 +2,13 @@
 $basePath = '';
 require_once __DIR__ . '/includes/init.php';
 
+// Blog detayı id'den çekiliyor (sorgu eksikti → sayfa boş geliyordu).
+// (int) cast eski "id=5.html" formatındaki linkleri de tolere eder.
+$blogId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$stmt = $db->prepare("SELECT * FROM bloglarmer WHERE id = ?");
+$stmt->execute([$blogId]);
+$hizmet = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
 $pageTitle       = $hizmet['yazi3'] ?? 'Blog';
 $pageDescription = $hizmet['yazi4'] ?? '';
 $pageKeywords    = $hizmet['yazi5'] ?? '';
