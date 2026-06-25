@@ -126,8 +126,8 @@ $baseQs = $q !== '' ? ('?key=' . urlencode($active) . '&q=' . urlencode($q) . '&
                                     </thead>
                                     <tbody>
                                         <?php foreach ($rows as $urungoster) { ?>
-                                        <tr>
-                                            <th scope="row"><?=$urungoster['sira']?></th>
+                                        <tr data-id="<?=$urungoster['id']?>" data-oldorder="<?=$urungoster['sira']?>">
+                                            <th scope="row"><span class="drag-handle">&#9776;</span><?=$urungoster['sira']?></th>
                                             <td><?=htmlspecialchars($urungoster['adi'])?></td>
                                             <td><span class="badge bg-primary"><?=$urungoster['eklenme_tarihi']?></span></td>
                                             <td>
@@ -173,5 +173,6 @@ $baseQs = $q !== '' ? ('?key=' . urlencode($active) . '&q=' . urlencode($q) . '&
     <script src="assets/js/main.min.js"></script>
     <script src="https://use.fontawesome.com/ca9a29c061.js"></script>
     <?php include __DIR__ . '/../silme.php'; ?>
+    <?php if ($q === '') { $reorderTable = $table; $reorderOffset = $startIndex; include __DIR__ . '/reorder_script.php'; } ?>
 </body>
 </html>
