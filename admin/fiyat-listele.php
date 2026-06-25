@@ -81,11 +81,11 @@ if($_GET['sil']){
                                             </thead>
                                             <tbody>
                                             <?php
-                                            $urunlistele = $db->query("select * from fiyatlar order by id desc",PDO::FETCH_ASSOC);
+                                            $urunlistele = $db->query("select * from fiyatlar order by sira asc",PDO::FETCH_ASSOC);
 											if($urunlistele->rowCount()){foreach($urunlistele as $urungoster){
 											?>
-                                              <tr>
-                                                <th scope="row"><?=$urungoster['sira']?></th>
+                                              <tr data-id="<?=$urungoster['id']?>" data-oldorder="<?=$urungoster['sira']?>">
+                                                <th scope="row"><span class="drag-handle">&#9776;</span><?=$urungoster['sira']?></th>
                                                 <td><img src="resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>">  </td>
                                                 <td><?=$urungoster['yazi1']?></td>
                                                
@@ -121,6 +121,7 @@ if($_GET['sil']){
         <script src="assets/js/pages/datatables.js"></script>
            <script src="https://use.fontawesome.com/ca9a29c061.js"></script>
            <script src="https://use.fontawesome.com/ca9a29c061.js"></script><?php include("silme.php");?>
+    <?php $reorderTable='fiyatlar'; include("include/reorder_script.php"); ?>
     </body>
 
 </html>
