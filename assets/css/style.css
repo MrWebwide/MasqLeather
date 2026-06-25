@@ -10651,3 +10651,20 @@ margin-top: 16px;
 @media only screen and (max-width: 767px) {
     .blog_page_thumb img { height: 240px !important; }
 }
+
+/* ============================================================
+   PAGINATION — ok/numara yuvarlağın TAM ortasında.
+   Eskiden line-height ile ortalanıyordu; ionicons ok glyph'i kendi baseline'ı
+   yüzünden yukarı kayıyordu. Flexbox ile her içerik (numara/ikon) ortalanır.
+   ============================================================ */
+.loding_bar ul li a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+.loding_bar ul li a i {
+    line-height: 1 !important;
+    display: block !important;
+}
