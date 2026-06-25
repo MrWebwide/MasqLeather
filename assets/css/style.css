@@ -10668,3 +10668,38 @@ margin-top: 16px;
     line-height: 1 !important;
     display: block !important;
 }
+
+/* ============================================================
+   OUR COLLECTION slider — slide görselleri büyük & tek tip (büyük ekran fix).
+   Sorun: slick kurulunca .col-lg-4 (bootstrap max-width:33.33%) artık flex .row
+   içinde olmadığından slide'ın 1/3'üne sıkışıyor, görsel de doğal (küçük) boyutta
+   kalıyordu. Slide'ı tam genişlik yapıp görseli sabit çerçeveye oturtuyoruz.
+   ============================================================ */
+.choice_slick .slick-slide > div,
+.choice_slick .col-lg-4 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+.choice_slick .choice_thumb {
+    display: block !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+}
+.choice_slick .choice_thumb img {
+    width: 100% !important;
+    height: 320px !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+}
+@media only screen and (max-width: 991px) {
+    .choice_slick .choice_thumb img { height: 260px !important; }
+}
+@media only screen and (max-width: 575px) {
+    .choice_slick .choice_thumb img { height: 300px !important; }
+}
