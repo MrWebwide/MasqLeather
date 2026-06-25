@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include("admin/include/baglan.php");
 include("admin/include/fonksiyonlar.php");
 

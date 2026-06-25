@@ -29,8 +29,8 @@
 
 html, body {
   height: 100%;
+  margin: 0; /* UA default body margin (8px) üstte/yanda beyaz boşluk yapıyordu — sıfırla */
   padding: 0;
- 
 }
 
 body {

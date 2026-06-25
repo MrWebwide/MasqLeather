@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include("include/baglan.php");
 include("include/fonksiyonlar.php");
 include("include/product_options.php"); // MAS-46: masq_format_selections()
