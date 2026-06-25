@@ -10552,6 +10552,61 @@ margin-top: 16px;
     margin-left: auto !important;
     margin-right: 10rem !important;
 }
+/* Mobil/tablet: galeri sağ margin'i (10rem) içeriği sağa itip taşma yapıyordu → ortala, tam genişlik */
+@media only screen and (max-width: 991px) {
+    .masq-gallery {
+        margin: 0 auto !important;
+        max-width: 100% !important;
+    }
+    .masq-gallery-top .swiper-slide { height: 360px !important; }
+    .masq-gallery-top img { max-height: 340px !important; }
+}
+
+/* ============================================================
+   SEPET (cart) — mobil kompakt düzen. Eskiden tüm hücreler alt alta (column)
+   diziliyordu; artık görsel SOLDA, bilgiler SAĞDA grid ile yan yana.
+   ============================================================ */
+@media only screen and (max-width: 767px) {
+    .cart_page_tabel table tbody tr {
+        display: grid !important;
+        grid-template-columns: 96px 1fr 1fr !important;
+        column-gap: 12px !important;
+        row-gap: 6px !important;
+        align-items: center !important;
+        text-align: left !important;
+        padding: 14px 0 !important;
+        border-top: 1px solid #eee !important;
+    }
+    .cart_page_tabel table tbody tr td {
+        padding: 2px 0 !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+    /* Görsel: sol sütun, 3 satır boyunca */
+    .cart_page_tabel table tbody tr td:nth-child(1) {
+        grid-column: 1 !important;
+        grid-row: 1 / span 3 !important;
+        width: 96px !important;
+    }
+    .cart_page_tabel table tbody tr td:nth-child(1) img { width: 100% !important; height: auto !important; border-radius: 8px !important; }
+    /* İsim + kategori: üst, 2 sütun boyunca */
+    .cart_page_tabel table tbody tr td:nth-child(2) {
+        grid-column: 2 / 4 !important;
+        grid-row: 1 !important;
+        display: block !important;
+        padding-left: 0 !important;
+    }
+    /* Fiyat | Adet (2. satır) */
+    .cart_page_tabel table tbody tr td:nth-child(3) { grid-column: 2 !important; grid-row: 2 !important; }
+    .cart_page_tabel table tbody tr td.product_quantity,
+    .cart_page_tabel table tbody tr td:nth-child(4) { grid-column: 3 !important; grid-row: 2 !important; }
+    /* Toplam | Sil (3. satır) */
+    .cart_page_tabel table tbody tr td:nth-child(5) { grid-column: 2 !important; grid-row: 3 !important; font-weight: 600 !important; }
+    .cart_page_tabel table tbody tr td:nth-child(6) { grid-column: 3 !important; grid-row: 3 !important; text-align: right !important; }
+    /* Etiketler (thead gizli olduğu için) */
+    .cart_page_tabel table tbody tr td:nth-child(3)::before { content: "Price: "; font-weight: 600; color: #888; }
+    .cart_page_tabel table tbody tr td:nth-child(5)::before { content: "Total: "; font-weight: 600; color: #888; }
+}
 
 /* ============================================================
    SHIPPING / "OUR PROMISE" PANELLERİ — yapışık TÜP düzeni (overlap fix)

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../includes/cat_counts.php'; if (!isset($basePath)) $basePath = ''; ?>
 <div class="offcanvas_menu">
     <div class="container">

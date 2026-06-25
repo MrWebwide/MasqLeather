@@ -1,4 +1,4 @@
-﻿<?php if (!isset($basePath)) $basePath = ''; ?>
+<?php if (!isset($basePath)) $basePath = ''; ?>
 <footer class="footer_section footer_bg">
     <div class="container">
         <div class="row">
