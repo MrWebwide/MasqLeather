@@ -10552,3 +10552,102 @@ margin-top: 16px;
     margin-left: auto !important;
     margin-right: 10rem !important;
 }
+
+/* ============================================================
+   SHIPPING / "OUR PROMISE" PANELLERİ — yapışık TÜP düzeni (overlap fix)
+   Eski padding/margin + komşuya taşan ::before hack'lerini ezer.
+   style.css en sonda ve bloke yüklendiği için bu blok kazanır.
+   Masaüstü: 3 panel yan yana yapışık. Mobil: alt alta yapışık (dikey tüp).
+   ============================================================ */
+.shipping_section .shipping_inner {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+}
+.shipping_section .single_shipping {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 380px !important;
+    margin: 0 !important;
+    padding: 45px 35px !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    overflow: hidden !important;
+}
+/* Arka plan görseli paneli TAM doldurur, komşuya taşmaz */
+.shipping_section .single_shipping::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-size: cover !important;
+    background-position: center !important;
+    opacity: 0.7 !important;
+    z-index: 0 !important;
+}
+/* Dış köşeler yuvarlak (tüpün uçları), orta panel düz */
+.shipping_section .single_shipping.shipping1,
+.shipping_section .single_shipping.shipping1::before { border-radius: 20px 0 0 20px !important; }
+.shipping_section .single_shipping.shipping3,
+.shipping_section .single_shipping.shipping3::before { border-radius: 0 20px 20px 0 !important; }
+.shipping_section .single_shipping.shipping2,
+.shipping_section .single_shipping.shipping2::before { border-radius: 0 !important; }
+/* Yazılar görselin üstünde kalsın */
+.shipping_section .single_shipping .shipping_title,
+.shipping_section .single_shipping .shipping_desc {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+.shipping_section .single_shipping .shipping_title { margin-bottom: 12px !important; }
+
+/* MOBİL: dikey tüp (3 panel alt alta yapışık, her biri kendi görseli, uçlar yuvarlak) */
+@media only screen and (max-width: 767px) {
+    .shipping_section .shipping_inner { flex-direction: column !important; }
+    .shipping_section .single_shipping {
+        width: 100% !important;
+        min-height: 175px !important;
+        padding: 30px 25px !important;
+        text-align: left !important;
+        align-items: flex-start !important;
+    }
+    .shipping_section .single_shipping,
+    .shipping_section .single_shipping::before { border-radius: 0 !important; }
+    .shipping_section .single_shipping.shipping1,
+    .shipping_section .single_shipping.shipping1::before { border-radius: 20px 20px 0 0 !important; }
+    .shipping_section .single_shipping.shipping3,
+    .shipping_section .single_shipping.shipping3::before { border-radius: 0 0 20px 20px !important; }
+}
+
+/* ============================================================
+   BLOG GÖRSELLERİ — sabit çerçeve boyutu (yüklenen orijinal boyut ne olursa olsun).
+   object-fit: cover ile her oran aynı çerçeveye kırpılır → hepsi tek tip görünür.
+   ============================================================ */
+.blog_page_thumb img {
+    width: 100% !important;
+    height: 420px !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 16px !important;
+    display: block !important;
+}
+@media only screen and (max-width: 991px) {
+    .blog_page_thumb img { height: 340px !important; }
+}
+@media only screen and (max-width: 767px) {
+    .blog_page_thumb img { height: 240px !important; }
+}
