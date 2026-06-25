@@ -61,43 +61,36 @@ if (!isset($extraStyles)) $extraStyles = '';
                 <div class="col-12">
                     <div class="shop_page_inner d-flex ">
                         <div class="shop_sidebar_widget">
-                            
+                        <?php
+                        // Marka'ya göre sidebar kategorileri: Mercantile (Jewelry + Home Decor)
+                        // vs Leather (Bags & Purses + Accessories). Önceden Bags/Accessories sabitti.
+                        $isMercantile = (isset($headerFile) && strpos($headerFile, 'mer') !== false);
+                        $sidebarGroups = $isMercantile ? [
+                            ['title' => 'Jewelry',    'catTable' => 'jewe_kategori', 'prodTable' => 'jewe',      'catPage' => 'jewelry-category.php'],
+                            ['title' => 'Home Decor', 'catTable' => 'mer_kategori',  'prodTable' => 'homedecor', 'catPage' => 'homedecor-category.php'],
+                        ] : [
+                            ['title' => 'Bags & Purses', 'catTable' => 'urun_kategori',  'prodTable' => 'urunler',     'catPage' => 'bagpurses-category.php'],
+                            ['title' => 'Accessories',   'catTable' => 'bolge_kategori', 'prodTable' => 'accessories', 'catPage' => 'accessories-category.php'],
+                        ];
+                        foreach ($sidebarGroups as $grp):
+                            $rows = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
+                                                FROM {$grp['catTable']} AS bk
+                                                LEFT JOIN {$grp['prodTable']} AS b ON bk.adi = b.kategori
+                                                GROUP BY bk.adi");
+                        ?>
                             <div class="shop_widget_list categories">
                                 <div class="shop_widget_title categories_title">
-                                    <h3>Bags & Purses</h3>
+                                    <h3><?= $grp['title'] ?></h3>
                                 </div>
                                 <div class="widget_categories">
                                     <ul>
-                                    <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM urun_kategori AS bk
-                             LEFT JOIN urunler AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
-foreach ($hizmetkategori as $hizmetka) { ?>
-                                    <li><a href="bagpurses-category.php?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
-                                    <?php } ?>
+                                    <?php foreach ($rows as $hizmetka): ?>
+                                    <li><a href="<?= $grp['catPage'] ?>?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
+                                    <?php endforeach; ?>
                                     </ul>
                                 </div>
                             </div>
-                           
-                            <div class="shop_widget_list categories">
-                                <div class="shop_widget_title categories_title">
-                                    <h3>Accessories</h3>
-                                </div>
-                                <div class="widget_categories">
-                                    <ul>
-                                    <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM bolge_kategori AS bk
-                             LEFT JOIN accessories AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
-foreach ($hizmetkategori as $hizmetka) { ?>
-                                    <li><a href="accessories-category.php?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
-                                    <?php } ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        
+                        <?php endforeach; ?>
                         </div>
                         <div class="shop_right_sidaber">
                             <div class="shop_gallery">
