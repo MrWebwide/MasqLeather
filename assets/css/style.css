@@ -10765,3 +10765,53 @@ margin-top: 16px;
 .single_product .product_content h4 {
     min-height: 42px;   /* ~2 satır başlık yüksekliği */
 }
+
+/* ============================================================
+   ÜRÜN DETAY — color options düzgün swatch + mobil/tablet hizalama.
+   Color options 100px kutuda 50px görselle minik/dağınıktı; detay içeriği
+   iç içe .container + .row'suz col'lar yüzünden mobil/tablette daralıp
+   sola yatıyordu.
+   ============================================================ */
+.coloropt {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+.color_option {
+    width: 64px !important;
+    height: 64px !important;
+    margin: 0 !important;
+    border: 1px solid #e2e2e2 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    display: block !important;
+}
+.color_option img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+.product_details_title h3 { margin-bottom: 12px; }
+
+/* Mobil + tablet: detay içeriği tam genişlik, tutarlı boşluk (sola yatma fix) */
+@media only screen and (max-width: 991px) {
+    .product_details_section .detailer.container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    .product_details_section .right { padding-top: 20px !important; }
+    .product_details_section .product-writing.col-lg-8,
+    .product_details_section .col-lg-5 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .product_details_section .product_d_meta { margin-top: 10px; }
+}
