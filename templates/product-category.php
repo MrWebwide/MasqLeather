@@ -48,11 +48,7 @@ $kategoriisim = $statement->fetchColumn();
                 <div class="col-12">
                     <div class="breadcrumb_content text-center">
                         <h2><?= htmlspecialchars($kategoriisim) ?></h2>
-                        <ul class="d-flex justify-content-center">
-                            <li><a href="<?=$homeLink?>">Home</a></li>
-                            <li>></li>
-                            <li><a><?=$sectionTitle?></a></li>
-                        </ul>
+                        <!-- breadcrumb navigasyonu kaldırıldı (sadece başlık kalsın) -->
                     </div>
                 </div>
             </div>

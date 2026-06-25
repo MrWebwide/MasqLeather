@@ -10722,3 +10722,46 @@ margin-top: 16px;
 @media only screen and (max-width: 991px) {
     .blog_thumb img { height: 240px !important; }
 }
+
+/* ============================================================
+   ÜRÜN KARTLARI — her ekranda TÜM kutular aynı boyut (Bags/Accessories/
+   Jewelry/Home Decor + anasayfa + arama). Eskiden .product_thumb img
+   max-height:320px + object-fit:contain ile yüksekliği orana göre değişiyordu
+   → kartlar farklı boy → küçük ekranda kayma. Sabit oranlı kutu + contain.
+   ============================================================ */
+.single_product .product_thumb {
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 3 / 4 !important;   /* tüm kutular aynı oran → aynı boy */
+    height: auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+}
+.single_product .product_thumb > a {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+.single_product .product_thumb img,
+.single_product .product_thumb .second_image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;   /* ürünün tamamı görünür, kutu sabit kalır */
+    object-position: center !important;
+}
+.single_product .product_thumb .second_image {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+}
+/* Kart içeriği eşit hizalansın (başlık 1-2 satır farkı kaymasın) */
+.single_product { height: auto; }
+.single_product .product_content h4 {
+    min-height: 42px;   /* ~2 satır başlık yüksekliği */
+}

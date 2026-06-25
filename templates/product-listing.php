@@ -43,11 +43,7 @@ if (!isset($extraStyles)) $extraStyles = '';
                 <div class="col-12">
                     <div class="breadcrumb_content text-center">
                         <h2><?=$sectionTitle?></h2>
-                        <ul class="d-flex justify-content-center">
-                            <li><a href="<?=$homeLink?>"><?=$homeLink === 'index-2.php' ? 'Home' : 'Home'?></a></li>
-                            <li>></li>
-                            <li><a><?=$sectionTitle?></a></li>
-                        </ul>
+                        <!-- breadcrumb navigasyonu kaldırıldı (sadece başlık kalsın) -->
                     </div>
                 </div>
             </div>
