@@ -62,15 +62,16 @@ $pageKeywords    = '';
         <div class="form_input">
             <input name="email" class="border-0" placeholder="Email address" type="text" required>
         </div>
-        <input type="hidden" name="senderip" value="<?php echo $_SERVER['REMOTE_ADDR']; ?>">
     </div>
     <div class="form_textarea">
         <textarea name="message" class="border-0" placeholder="Write us a message..." required></textarea>
     </div>
+    <!-- Honeypot: gerçek kullanıcılar görmez/boş bırakır; botlar doldurur → spam sunucuda yakalanır. -->
+    <div class="hp-field" aria-hidden="true">
+        <label>Website (leave this field empty)</label>
+        <input type="text" name="website" tabindex="-1" autocomplete="off">
+    </div>
     <div class="form_input_btn">
-         <div class="recaptcha-container">
-            <div class="g-recaptcha" data-sitekey="6LeKXjEnAAAAAHAs0ZHPz4jO4k3YV6aUY5ruh19T"></div>
-        </div>
         <button class="btn btn-link">Send message</button>
     </div>
 </form>
@@ -83,13 +84,22 @@ $pageKeywords    = '';
                 </div>
 
                 <style>
+    /* Honeypot alanını ekrandan gizle (botlar yine görür/doldurur) */
+    .hp-field {
+        position: absolute !important;
+        left: -9999px !important;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
     .success {
         display: none;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-       
-        
+
+
     }
     .form-messege {
         font-size: 50px;
@@ -109,7 +119,7 @@ $pageKeywords    = '';
 
                 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- jQuery zaten head'de (3.7.1) yüklü; buradaki ikinci/eski kopya (3.5.1) kaldırıldı. -->
 
 <script>
     $(document).ready(function(){
