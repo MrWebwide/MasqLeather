@@ -10703,3 +10703,22 @@ margin-top: 16px;
 @media only screen and (max-width: 575px) {
     .choice_slick .choice_thumb img { height: 300px !important; }
 }
+
+/* ============================================================
+   ANASAYFA "LATEST BLOGS" kartları — kompakt & tek tip boyut.
+   Eskiden .blog_thumb img'de boyut kuralı yoktu → görseller doğal (devasa).
+   Hepsi aynı genişlik+yükseklik (object-fit:cover) = OUR COLLECTION gibi.
+   ============================================================ */
+.blog_thumb img {
+    width: 100% !important;
+    height: 280px !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+    border-radius: 10px !important;
+}
+@media only screen and (max-width: 991px) {
+    .blog_thumb img { height: 240px !important; }
+}
