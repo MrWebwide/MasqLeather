@@ -31,7 +31,7 @@ if (!empty($bakim['kategori']) && $bakim['kategori'] == 1) {
     header('HTTP/1.1 503 Service Unavailable');
     header('Content-Type: text/html; charset=utf-8');
     header('Retry-After: 3600');
-    include_once __DIR__ . '/../404.php';
+    include_once __DIR__ . '/../maintenance.php'; // MAS-84: eskiden var olmayan 404.php dahil ediliyordu → boş sayfa
     exit();
 }
 
