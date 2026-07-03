@@ -108,6 +108,7 @@ if($yetki == 'yetkili') {
             <ul class="">
                 <li><a href="sayac.php"><i class="fa fa-circle"></i>Security</a></li>
                 <li><a href="mailayarlari.php"><i class="fa fa-circle"></i>User Accounts</a></li>
+                <li><a href="mail-metinleri.php"><i class="fa fa-circle"></i>Mail Texts</a></li>
                 <?php if($izin['yoneticiizni'] == 'on'){ ?>
                 <li><a href="yonetici-listele.php"><i class="fa fa-circle"></i>Admins</a></li>
                 <li><a href="yonetici-ekle.php"><i class="fa fa-circle"></i>Admins — Add</a></li>

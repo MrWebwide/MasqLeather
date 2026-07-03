@@ -163,16 +163,27 @@ function masq_create_order(PDO $db, array $payload): array
  */
 function masq_send_order_emails(string $name, string $surname, string $email, string $siparisId): void
 {
+    // MAS-83: mail metinleri panelden (mail_sablon) düzenlenebilir; $db yoksa/şablon yoksa default.
+    global $db;
+    require_once __DIR__ . '/mail_templates.php';
+    $tpl = function (string $key, array $vars, array $def) use ($db): array {
+        return ($db instanceof PDO) ? masq_mail_template($db, $key, $vars, $def) : $def;
+    };
+
     // Müşteri onayı
     try {
+        $t = $tpl('order_confirmation',
+            ['name' => $name, 'surname' => $surname, 'order_no' => $siparisId],
+            ['konu' => 'Order Confirmation',
+             'icerik' => "Dear {$name} {$surname}, <br><br>We are pleased to inform you that your order has been confirmed. "
+                . "Your order number is <strong>{$siparisId}</strong>. We sincerely appreciate your business and thank you for "
+                . "choosing Masq Leather. If you have any further inquiries, please do not hesitate to contact us.<br><br>"
+                . "Best regards,<br><strong>Masq Leather</strong>"]);
         $mail = new PHPMailer(true);
         configureMailer($mail);
         $mail->addAddress($email, $name);
-        $mail->Subject = 'Order Confirmation';
-        $mail->Body    = "Dear {$name} {$surname}, <br><br>We are pleased to inform you that your order has been confirmed. "
-            . "Your order number is <strong>{$siparisId}</strong>. We sincerely appreciate your business and thank you for "
-            . "choosing Masq Leather. If you have any further inquiries, please do not hesitate to contact us.<br><br>"
-            . "Best regards,<br><strong>Masq Leather</strong>";
+        $mail->Subject = $t['konu'];
+        $mail->Body    = $t['icerik'];
         $mail->send();
     } catch (\Throwable $e) {
         error_log('[order_create] müşteri maili başarısız (' . $siparisId . '): ' . $e->getMessage());
@@ -180,15 +191,19 @@ function masq_send_order_emails(string $name, string $surname, string $email, st
 
     // Admin uyarısı
     try {
+        $t = $tpl('order_admin_alert',
+            ['order_no' => $siparisId],
+            ['konu' => 'New Order Alert!',
+             'icerik' => "A new order (<strong>{$siparisId}</strong>) has been placed on your website. "
+                . "Please review the order details on the administration panel.<br><br><strong>Masq Leather</strong>"]);
         $mail = new PHPMailer(true);
         configureMailer($mail);
         $mail->addAddress(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
         if (defined('ADMIN_EMAIL') && ADMIN_EMAIL) {
             $mail->addAddress(ADMIN_EMAIL, MAIL_FROM_NAME);
         }
-        $mail->Subject = 'New Order Alert!';
-        $mail->Body    = "A new order (<strong>{$siparisId}</strong>) has been placed on your website. "
-            . "Please review the order details on the administration panel.<br><br><strong>Masq Leather</strong>";
+        $mail->Subject = $t['konu'];
+        $mail->Body    = $t['icerik'];
         $mail->send();
     } catch (\Throwable $e) {
         error_log('[order_create] admin maili başarısız (' . $siparisId . '): ' . $e->getMessage());

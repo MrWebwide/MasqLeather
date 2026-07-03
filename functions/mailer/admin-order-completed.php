@@ -17,9 +17,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $siparisid = $_POST['siparisid'];
     
-    // E-posta gönderimi
-    $konu = "Order Completed";
-    $icerik = "Dear <strong>$name $surname</strong>, <br><br>We're delighted to inform you that your order with the order number <strong>$siparisid</strong> has been successfully delivered to your doorstep. We hope you're excited to receive your purchase and that it meets your expectations.<br><br>You can make your comments about the product in the comment section on our website.<br><br>Best regards,<br><strong> Masq Leather <br>info@masqleather.com </strong> ";
+    // E-posta gönderimi (MAS-83: metin panelden düzenlenebilir; yoksa aşağıdaki default kullanılır)
+    require_once __DIR__ . '/../mail_templates.php';
+    $tpl = masq_mail_template($db, 'order_completed',
+        ['name' => $name, 'surname' => $surname, 'order_no' => $siparisid],
+        ['konu' => "Order Completed",
+         'icerik' => "Dear <strong>$name $surname</strong>, <br><br>We're delighted to inform you that your order with the order number <strong>$siparisid</strong> has been successfully delivered to your doorstep. We hope you're excited to receive your purchase and that it meets your expectations.<br><br>You can make your comments about the product in the comment section on our website.<br><br>Best regards,<br><strong> Masq Leather <br>info@masqleather.com </strong> "]);
+    $konu = $tpl['konu'];
+    $icerik = $tpl['icerik'];
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
     try {
