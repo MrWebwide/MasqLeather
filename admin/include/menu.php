@@ -107,7 +107,6 @@ if($yetki == 'yetkili') {
         <li>
             <a href="index.php"><i data-feather="settings"></i>System<i class="fa fa-chevron-right dropdown-icon"></i></a>
             <ul class="">
-                <li><a href="sayac.php"><i class="fa fa-circle"></i>Security</a></li>
                 <li><a href="mailayarlari.php"><i class="fa fa-circle"></i>User Accounts</a></li>
                 <li><a href="mail-metinleri.php"><i class="fa fa-circle"></i>Mail Texts</a></li>
                 <li><a href="hata-loglari.php"><i class="fa fa-circle"></i>Error Logs
