@@ -1091,6 +1091,41 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
 <input type="hidden" name="cargo_transfer" id="cargo_transfer" value="<?php echo $maxCargo; ?>">
 
+<!-- MAS-85: Ülke US seçilince kargoyu panelden yönetilen US oranıyla yeniden hesapla.
+     Eskiden US seçilince kargo değişmiyordu (Kanada kargosu ödeniyordu). -->
+<script>
+(function () {
+    var shipEl  = document.getElementById('shipping_id');
+    var cargoEl = document.getElementById('cargo_transfer');
+    var totalEl = document.getElementById('order_id');
+    var countryEl = document.getElementById('country');
+    if (!shipEl || !cargoEl || !totalEl || !countryEl) { return; }
+
+    function money(n) { return '$' + (parseFloat(n) || 0).toFixed(2); }
+    var canadaShipping = parseFloat(cargoEl.value) || 0; // sayfa yükünde Kanada kargosu
+    var orderBase = (parseFloat((totalEl.textContent || '').replace(/[^0-9.]/g, '')) || 0) - canadaShipping;
+
+    function applyShipping(ship) {
+        ship = parseFloat(ship) || 0;
+        shipEl.textContent = money(ship);
+        cargoEl.value = ship;
+        totalEl.textContent = money(orderBase + ship);
+    }
+
+    countryEl.addEventListener('change', function () {
+        var c = this.value;
+        if (c === '3') { // United States → panelden yönetilen US kargosu
+            fetch('functions/calculate_shipping_us.php', { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { applyShipping(d.maxCargo); })
+                .catch(function () { /* hata olursa mevcut değer kalır */ });
+        } else if (c === '2') { // Canada → sayfa yükündeki Kanada kargosuna dön
+            applyShipping(canadaShipping);
+        }
+    });
+})();
+</script>
+
 
 
       

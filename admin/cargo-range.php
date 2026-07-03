@@ -9,9 +9,13 @@ ob_start();
 session_start();
 oturumkontrolana();
 
+// MAS-85: region ile Kanada (icecek id=1) veya US (icecek id=2) kargo config'i düzenlenir.
+$cargoRegion = ((($_GET['region'] ?? $_POST['region'] ?? 'ca')) === 'us') ? 'us' : 'ca';
+$cargoId = ($cargoRegion === 'us') ? 2 : 1;
+
 if($_POST['kaydet']){
-	
-	$id = 1;
+
+	$id = $cargoId;
 	$adi = $_POST['adi'];
 	$sira=$_POST['sira'];
 	$aciklama = $_POST['aciklama'];
@@ -49,7 +53,10 @@ return $string;
 $seo= seflink($site_title);
 
 
-	$ekle  = $db->prepare("update icecek set adi=:adi,sira=:sira,kategori=:kategori,durum=:durum,durum1=:durum1,durum2=:durum2,onaciklama=:onaciklama,yazi1=:yazi1,yazi2=:yazi2,yazi3=:yazi3,yazi4=:yazi4,yazi5=:yazi5,yazi6=:yazi6,yazi7=:yazi7,yazi8=:yazi8,yazi9=:yazi9,yazi10=:yazi10,tur=:tur where id=:id");
+	// MAS-85: UPSERT — US satırı (id=2) yoksa oluştur, varsa güncelle. Kanada (id=1) davranışı aynı.
+	$ekle  = $db->prepare("INSERT INTO icecek (id,adi,sira,kategori,durum,durum1,durum2,onaciklama,yazi1,yazi2,yazi3,yazi4,yazi5,yazi6,yazi7,yazi8,yazi9,yazi10,tur)
+		VALUES (:id,:adi,:sira,:kategori,:durum,:durum1,:durum2,:onaciklama,:yazi1,:yazi2,:yazi3,:yazi4,:yazi5,:yazi6,:yazi7,:yazi8,:yazi9,:yazi10,:tur)
+		ON DUPLICATE KEY UPDATE adi=VALUES(adi),sira=VALUES(sira),kategori=VALUES(kategori),durum=VALUES(durum),durum1=VALUES(durum1),durum2=VALUES(durum2),onaciklama=VALUES(onaciklama),yazi1=VALUES(yazi1),yazi2=VALUES(yazi2),yazi3=VALUES(yazi3),yazi4=VALUES(yazi4),yazi5=VALUES(yazi5),yazi6=VALUES(yazi6),yazi7=VALUES(yazi7),yazi8=VALUES(yazi8),yazi9=VALUES(yazi9),yazi10=VALUES(yazi10),tur=VALUES(tur)");
 	
 	$simdi = $ekle->execute(array("adi"=>$adi,"sira"=>$sira,"kategori"=>$kategori,"durum"=>$durum,"durum1"=>$durum1,"durum2"=>$durum2,"onaciklama"=>$onaciklama,"yazi1"=>$yazi1,"yazi2"=>$yazi2,"yazi3"=>$yazi3,"yazi4"=>$yazi4,"yazi5"=>$yazi5,"yazi6"=>$yazi6,"yazi7"=>$yazi7,"yazi8"=>$yazi8,"yazi9"=>$yazi9,"yazi10"=>$yazi10,"tur"=>$tur,"id"=>$id));
 	
@@ -67,7 +74,7 @@ $seo= seflink($site_title);
 	
 }
 
-$guncelle = $db->query("select * from icecek where id='1'")->fetch(PDO::FETCH_ASSOC);
+$guncelle = $db->query("select * from icecek where id='" . (int)$cargoId . "'")->fetch(PDO::FETCH_ASSOC) ?: [];
 
 
 
@@ -143,7 +150,12 @@ $durum2 = $result['durum2'];
                         <div class="col">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2 class="">Cargo Range</h2>
+                                    <h2 class="">Cargo Range — <?= $cargoRegion === 'us' ? 'United States' : 'Canada' ?></h2>
+                                    <!-- MAS-85: Kanada / US kargo oranları ayrı ayrı yönetilir -->
+                                    <ul class="nav nav-tabs mb-3">
+                                        <li class="nav-item"><a class="nav-link <?= $cargoRegion === 'ca' ? 'active' : '' ?>" href="cargo-range.php?region=ca">Canada</a></li>
+                                        <li class="nav-item"><a class="nav-link <?= $cargoRegion === 'us' ? 'active' : '' ?>" href="cargo-range.php?region=us">United States</a></li>
+                                    </ul>
                                     <h6 class="card-title" style="color:red">Important Notice !!!</h6>
                                     <h7 class="card-2" style="color:red">(Read before filling in)</h7>
                                     <p class="card-description" style="color:red; padding-top:0.5cm;">The "Price Range 1 for Shipping Fee" and "Free Cargo Price Limit" must be filled in.If you want to give more detailed shipping fee ranges, you can use the other price ranges by opening them from the buttons above them. You can close the ones you do not need when you no longer need them.</p>
@@ -151,6 +163,7 @@ $durum2 = $result['durum2'];
                                    
                                     <?=$mesaj?>
                                     <form method="post" enctype="multipart/form-data" >
+                                        <input type="hidden" name="region" value="<?= htmlspecialchars($cargoRegion) ?>">
 								
 <h6>Free Cargo Price Limit(Subtotals that exceed this limit will have free cargo)</h6>
                                     <div class="form-group form-floating mb-3 col-3  dolar-isareti1">

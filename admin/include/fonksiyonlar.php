@@ -53,6 +53,7 @@ $sosyal= $db->query("SELECT * FROM sosyalmedya Where id='1'")->fetch(PDO::FETCH_
 
 $anasayfa= $db->query("SELECT * FROM anasayfa Where id='1'")->fetch(PDO::FETCH_ASSOC);
 $cargoprices= $db->query("SELECT * FROM icecek Where id='1'")->fetch(PDO::FETCH_ASSOC);
+$cargopricesus= $db->query("SELECT * FROM icecek Where id='2'")->fetch(PDO::FETCH_ASSOC) ?: []; // MAS-85: US kargo config (Kanada'dan bağımsız)
 
 
 

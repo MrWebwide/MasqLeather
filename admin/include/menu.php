@@ -91,7 +91,8 @@ if($yetki == 'yetkili') {
         <li>
             <a href="index.php"><i data-feather="truck"></i>Shipping &amp; Tax<i class="fa fa-chevron-right dropdown-icon"></i></a>
             <ul class="">
-                <li><a href="cargo-range.php"><i class="fa fa-circle"></i>Cargo Fee</a></li>
+                <li><a href="cargo-range.php?region=ca"><i class="fa fa-circle"></i>Cargo Fee — Canada</a></li>
+                <li><a href="cargo-range.php?region=us"><i class="fa fa-circle"></i>Cargo Fee — US</a></li>
                 <li><a href="province-tax.php"><i class="fa fa-circle"></i>Province Tax Rates</a></li>
             </ul>
         </li>
