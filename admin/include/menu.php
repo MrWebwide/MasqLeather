@@ -110,6 +110,9 @@ if($yetki == 'yetkili') {
                 <li><a href="sayac.php"><i class="fa fa-circle"></i>Security</a></li>
                 <li><a href="mailayarlari.php"><i class="fa fa-circle"></i>User Accounts</a></li>
                 <li><a href="mail-metinleri.php"><i class="fa fa-circle"></i>Mail Texts</a></li>
+                <li><a href="hata-loglari.php"><i class="fa fa-circle"></i>Error Logs
+                    <?php try { $__ec = (int) $db->query("SELECT COUNT(*) FROM hata_log WHERE cozuldu = 0")->fetchColumn(); if ($__ec > 0) { echo '<span class="badge bg-danger" style="float:right;">' . $__ec . '</span>'; } } catch (\Throwable $e) {} ?>
+                </a></li>
                 <?php if($izin['yoneticiizni'] == 'on'){ ?>
                 <li><a href="yonetici-listele.php"><i class="fa fa-circle"></i>Admins</a></li>
                 <li><a href="yonetici-ekle.php"><i class="fa fa-circle"></i>Admins — Add</a></li>
