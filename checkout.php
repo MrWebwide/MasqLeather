@@ -1129,16 +1129,34 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
                                 </div>
                                   <script>
                                     $('.order').click(function(e) {
-                    
+
+                    // MAS-87: Zorunlu alanlar dolu değilse "Order Placed" animasyonunu OYNATMA
+                    // ve gönderimi engelle. Eskiden animasyon koşulsuz oynuyordu → kullanıcı
+                    // ülke/eyalet girmeden butona basınca yanlışlıkla "Order Placed" görüyordu.
+                    var country = $('[name="country"]').val();
+                    var province = $('[name="province"]').val();
+                    var missing = false;
+                    ['name', 'surname', 'address', 'city', 'postal', 'phone', 'email'].forEach(function (n) {
+                        if (!$.trim($('[name="' + n + '"]').first().val() || '')) { missing = true; }
+                    });
+                    if (!country || country === '1') { missing = true; }            // ülke seçilmemiş
+                    if (country === '2' && (!province || province === 'USA')) { missing = true; } // Kanada eyaleti seçilmemiş
+
+                    if (missing) {
+                        e.preventDefault();
+                        alert('Please fill in all required fields (country, province and address details) before proceeding to payment.');
+                        return false;
+                    }
+
                     let button = $(this);
-                    
+
                     if(!button.hasClass('animate')) {
                         button.addClass('animate');
                         setTimeout(() => {
                             button.removeClass('animate');
                         }, 10000);
                     }
-                    
+
                     });
 
 
