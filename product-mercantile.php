@@ -126,19 +126,23 @@ $startIndex = ($page - 1) * $productsPerPage;
 // Arama sorgusu
 $search_query = isset($_GET['search_query']) ? $_GET['search_query'] : '';
 
-// Veritabanı sorgusu için LIMIT ve OFFSET değerleri ile sayfalama
-$sql = "
-    SELECT id, adi, resim, resim1, yazi1, 'homedecor' as tablo FROM homedecor
-    WHERE adi LIKE :search_query
-    UNION
-    SELECT id, adi, resim, resim1, yazi1, 'jewe' as tablo FROM jewe
-    WHERE adi LIKE :search_query
-    LIMIT :startIndex, :productsPerPage
-";
+// MAS-90: Arama isim + açıklama (yazi3) + kategori'de VE markalar arası (4 ürün tablosu),
+// sadece aktif (durum='on') ürünler. Tablo→detay eşlemesi $searchTables.
+$searchTables = [
+    'homedecor'   => 'homedecor-detail.php',
+    'jewe'        => 'jewelry-detail.php',
+    'urunler'     => 'bagpurses-detail.php',
+    'accessories' => 'accessories-detail.php',
+];
+$unionParts = [];
+foreach ($searchTables as $t => $dp) {
+    $unionParts[] = "SELECT id, adi, resim, resim1, yazi1, '$t' AS tablo FROM $t
+        WHERE durum = 'on' AND (adi LIKE :q OR yazi3 LIKE :q OR kategori LIKE :q)";
+}
+$searchUnion = implode("\nUNION\n", $unionParts);
 
-// Bu sorguyu veritabanınıza göre uyarlamalısınız.
-$stmt = $db->prepare($sql);
-$stmt->bindValue(':search_query', '%' . $search_query . '%', PDO::PARAM_STR);
+$stmt = $db->prepare($searchUnion . "\nLIMIT :startIndex, :productsPerPage");
+$stmt->bindValue(':q', '%' . $search_query . '%', PDO::PARAM_STR);
 $stmt->bindValue(':startIndex', $startIndex, PDO::PARAM_INT);
 $stmt->bindValue(':productsPerPage', $productsPerPage, PDO::PARAM_INT);
 $stmt->execute();
@@ -163,14 +167,7 @@ if(count($urunler) == 0) { ?>
         <article class="single_product">
             <figure>
                 <div class="product_thumb"  onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
-                    <?php
-                    $detailPage = '';
-                    if ($urun['tablo'] == 'homedecor') {
-                        $detailPage = 'homedecor-detail.php';
-                    } elseif ($urun['tablo'] == 'jewe') {
-                        $detailPage = 'jewelry-detail.php';
-                    }
-                    ?>
+                    <?php $detailPage = $searchTables[$urun['tablo']] ?? 'homedecor-detail.php'; ?>
                     <a href="<?= $detailPage ?>?id=<?= $urun['id'] ?>"><img src="admin/resimler/<?= $urun['resim'] ?>" alt="">
                     <?php if ($urun['resim1'] !== null): ?>
             <img class="second_image" src="admin/resimler/<?=$urun['resim1']?>" alt="">
@@ -203,16 +200,10 @@ if(count($urunler) == 0) { ?>
     <ul class="d-flex justify-content-center">
         <?php
         // Toplam ürün sayısını hesaplayın (her iki tablodan)
-        $totalProducts = $db->query("
-            SELECT COUNT(*) as total
-            FROM (
-                SELECT id, adi, resim, yazi1, 'homedecor' as tablo FROM homedecor
-                WHERE adi LIKE '%$search_query%'
-                UNION
-                SELECT id, adi, resim, yazi1, 'jewe' as tablo FROM jewe
-                WHERE adi LIKE '%$search_query%'
-            ) AS combined
-        ")->fetchColumn();
+        $countStmt = $db->prepare("SELECT COUNT(*) FROM (" . $searchUnion . ") AS combined");
+        $countStmt->bindValue(':q', '%' . $search_query . '%', PDO::PARAM_STR);
+        $countStmt->execute();
+        $totalProducts = (int) $countStmt->fetchColumn();
         
         // Toplam sayfa sayısını hesaplayın
         $totalPages = ceil($totalProducts / $productsPerPage);
