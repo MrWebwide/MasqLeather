@@ -316,10 +316,18 @@ if($_GET['islem']=='duzenle'){
 					
 				</div>
 <div id="queue"></div>
-                                      
-                                      
+
+                                      <!-- MAS-86: Kategori başlık arka plan görseli (opsiyonel) -->
+                                      <div class="mb-3">
+                                        <label for="formFile" class="form-label">Kategori Başlık Arka Plan Görseli (opsiyonel — kategori sayfasında başlığın arkasında görünür, boş bırakılabilir)</label>
+                                        <input class="form-control" type="file" name="resim" id="formFile">
+                                        <?php if (!empty($guncelle['resim']) && $guncelle['resim'] !== 'resim-yok'): ?>
+                                            <img src="../resimler/<?=$guncelle['resim']?>" width="200" style="margin-top:8px;">
+                                        <?php endif; ?>
+                                      </div>
+
                                         <div class="mb-3">
-                                 
+
                                            <input type="submit" name="kaydet" class="btn btn-primary" value="Kaydet">
                                       </div>
                                       </div>

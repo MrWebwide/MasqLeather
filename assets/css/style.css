@@ -10895,3 +10895,33 @@ margin-top: 16px;
     }
     .product_details_section .product_d_meta { margin-top: 10px; }
 }
+/* ============================================================
+   KATEGORİ BAŞLIK ARKA PLAN GÖRSELİ (MAS-86) — opsiyonel, per-kategori.
+   Kategoriye görsel eklenirse başlık (breadcrumbs) o görselin üstünde görünür;
+   okunabilirlik için koyu overlay + beyaz başlık. Görsel yoksa eski görünüm.
+   ============================================================ */
+.breadcrumbs_area.has-cat-bg {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 90px 0;
+}
+.breadcrumbs_area.has-cat-bg::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
+}
+.breadcrumbs_area.has-cat-bg .breadcrumb_content {
+    position: relative;
+    z-index: 1;
+}
+.breadcrumbs_area.has-cat-bg .breadcrumb_content h2 {
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+@media only screen and (max-width: 767px) {
+    .breadcrumbs_area.has-cat-bg { padding: 55px 0; }
+}

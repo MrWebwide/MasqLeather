@@ -20,10 +20,13 @@ if (!isset($extraStyles)) $extraStyles = '';
 
 // Get category from URL
 $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : '';
-$statement = $db->prepare("SELECT adi FROM $categoryTable WHERE adi = :kategori");
+// MAS-86: kategori başlığı + (opsiyonel) başlık arka plan görseli (resim kolonu) çekilir.
+$statement = $db->prepare("SELECT adi, resim FROM $categoryTable WHERE adi = :kategori");
 $statement->bindParam(':kategori', $kategori, PDO::PARAM_STR);
 $statement->execute();
-$kategoriisim = $statement->fetchColumn();
+$catRow = $statement->fetch(PDO::FETCH_ASSOC);
+$kategoriisim = $catRow['adi'] ?? $kategori;
+$catHeaderImg = (!empty($catRow['resim']) && $catRow['resim'] !== 'resim-yok') ? $catRow['resim'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="en" class="no-js">
@@ -42,8 +45,8 @@ $kategoriisim = $statement->fetchColumn();
 <div class="body_overlay"></div>
 <?php include __DIR__ . "/../layout/$headerFile"; ?>
 
-    <div class="breadcrumbs_area">
-        <div class="container">   
+    <div class="breadcrumbs_area<?= $catHeaderImg ? ' has-cat-bg' : '' ?>"<?= $catHeaderImg ? ' style="background-image:url(admin/resimler/' . htmlspecialchars($catHeaderImg) . ')"' : '' ?>>
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content text-center">
