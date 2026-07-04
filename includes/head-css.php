@@ -71,8 +71,12 @@ if (!isset($basePath)) {
 <?php endif; ?>
 
     <!-- Responsive & Main Style (load last to override) -->
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/responsive.css">
-    <link rel="stylesheet" href="<?=$basePath?>assets/css/style.css">
+    <?php
+    // Cache-bust: dosya her değiştiğinde ?v=filemtime otomatik değişir → 30 günlük cache elle temizlenmeden kırılır.
+    $cssV = function ($rel) { $abs = __DIR__ . '/../' . $rel; return is_file($abs) ? '?v=' . filemtime($abs) : ''; };
+    ?>
+    <link rel="stylesheet" href="<?=$basePath?>assets/css/responsive.css<?=$cssV('assets/css/responsive.css')?>">
+    <link rel="stylesheet" href="<?=$basePath?>assets/css/style.css<?=$cssV('assets/css/style.css')?>">
 
     <!-- Page-specific CSS -->
 <?php if (!empty($pageCSS) && is_array($pageCSS)): ?>

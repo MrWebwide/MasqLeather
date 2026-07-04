@@ -39,6 +39,14 @@ if (empty($galImgs) && !empty($urunler['resim'])) { $galImgs[] = $urunler['resim
         overflow: hidden; z-index: 60; pointer-events: none; }
     /* Mobil/tablette hover paneli tamamen gizli (pinch kullanılır) */
     @media (max-width: 991px) { .masq-zoom-pane { display: none !important; } }
+    /* MAS-91: Mobilde portre ürün görselleri "ince ve uzun" çıkıyordu (max-height kaynaklı
+       genişlik daralması). Çözüm: görseli GENİŞLİĞE göre ölçekle (edge-to-edge), doğal en-boy
+       oranını koru; Swiper autoHeight slide yüksekliğini görsele uydurur. */
+    @media (max-width: 991px) {
+        .masq-gallery-top .swiper-slide { height: auto !important; }
+        .masq-gallery-top .swiper-zoom-container { height: auto !important; width: 100% !important; }
+        .masq-gallery-top img { width: 100% !important; height: auto !important; max-height: 80vh !important; }
+    }
 </style>
 
 <div class="masq-gallery">
@@ -84,6 +92,7 @@ if (empty($galImgs) && !empty($urunler['resim'])) { $galImgs[] = $urunler['resim
 
         new Swiper('.masq-gallery-top', {
             spaceBetween: 10,
+            autoHeight: true, // MAS-91: slide yüksekliğini aktif görselin doğal oranına uydur (mobilde ince-uzun görsel fix)
             zoom: true, // mobil pinch + çift dokunuş
             navigation: { nextEl: '.masq-gallery .swiper-button-next', prevEl: '.masq-gallery .swiper-button-prev' },
             thumbs: thumbs ? { swiper: thumbs } : undefined

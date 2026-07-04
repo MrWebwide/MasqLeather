@@ -8179,7 +8179,7 @@ transition: 0.4s;
 .my-slider {
   width: 100%;
   top: 0;
-  margin-bottom: 2cm;
+  margin-bottom: 40px; /* MAS-92: 2cm (~75px) slider ile ürünler arasında fazla boşluk yapıyordu */
   height: 100vh; /* Ekran yüksekliği kadar kapla */
   position: relative;
   z-index: 1;
@@ -10558,8 +10558,9 @@ margin-top: 16px;
         margin: 0 auto !important;
         max-width: 100% !important;
     }
-    .masq-gallery-top .swiper-slide { height: 360px !important; }
-    .masq-gallery-top img { max-height: 340px !important; }
+    /* MAS-91: mobilde görseli genişliğe göre ölçekle (ince-uzun görsel fix; asıl kurallar product_gallery.php içinde) */
+    .masq-gallery-top .swiper-slide { height: auto !important; }
+    .masq-gallery-top img { width: 100% !important; height: auto !important; max-height: 80vh !important; }
 }
 
 /* ============================================================
