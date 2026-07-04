@@ -4,6 +4,10 @@ ini_set('display_errors', 0);
 
 // Gerekli dosyaları dahil edin
 require_once '../../admin/include/baglan.php'; // Veritabanı bağlantısı
+
+// Guvenlik (prod): yalnizca giris yapmis admin. (MAS-17 devami)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION["eposta"])) { http_response_code(403); exit("forbidden"); }
 require_once '../../admin/include/fonksiyonlar.php'; // Gerekli fonksiyonlar
 require_once '../../PHPMailer/src/Exception.php';
 require_once '../../PHPMailer/src/PHPMailer.php';
