@@ -136,8 +136,8 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			
 			$random = rand(0,999);
 			
-			$resim = $random."-".$adii.".".substr($_FILES['resim']['name'], -3);
-			
+			$resim = $random."-".$seo.".".substr($_FILES['resim']['name'], -3);
+
 			move_uploaded_file($_FILES['resim']['tmp_name'],$klasor."/".$resim);
 		}
 		else
@@ -307,6 +307,19 @@ function updateDurum() {
     // Sayfa yüklendiğinde veya input alanında her değişiklik olduğunda durumInput güncellenir
     updateDurum();
 </script>
+
+                                      <!-- MAS-86: Kategori başlık arka plan görseli (opsiyonel — boş bırakılabilir) -->
+                                      <div class="mb-3">
+                                        <label for="formFile" class="form-label">Kategori Başlık Arka Plan Görseli (opsiyonel — kategori sayfasında başlığın arkasında görünür, boş bırakılabilir)</label>
+                                        <input class="form-control" type="file" name="resim" id="formFile">
+                                        <?php if (!empty($guncelle['resim']) && $guncelle['resim'] !== 'resim-yok'): ?>
+                                            <img src="../resimler/<?=$guncelle['resim']?>" width="200" style="margin-top:8px;">
+                                        <?php endif; ?>
+                                      </div>
+                                      <!-- MAS-86: bu alanlar formda görünmüyor; düzenlemede mevcut değerleri koru (durum JS ile ayarlanıyor) -->
+                                      <input type="hidden" name="kategori" value="<?= htmlspecialchars($guncelle['kategori'] ?? '', ENT_QUOTES) ?>">
+                                      <input type="hidden" name="aciklama" value="<?= htmlspecialchars($guncelle['aciklama'] ?? '', ENT_QUOTES) ?>">
+                                      <input type="hidden" name="onaciklama" value="<?= htmlspecialchars($guncelle['onaciklama'] ?? '', ENT_QUOTES) ?>">
                                       
                                   
                                     <!--

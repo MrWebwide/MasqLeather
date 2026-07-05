@@ -8184,6 +8184,10 @@ transition: 0.4s;
   position: relative;
   z-index: 1;
 }
+/* MAS-92: mobilde hero 400px'e iniyor; alttaki boşluğu da orantılı sıkılaştır. */
+@media only screen and (max-width: 767px) {
+  .my-slider { margin-bottom: 18px; }
+}
 
 /* Slayt içeriğinin tam ekranı kaplaması */
 .my-slider > div {
@@ -10554,6 +10558,11 @@ margin-top: 16px;
 }
 /* Mobil/tablet: galeri sağ margin'i (10rem) içeriği sağa itip taşma yapıyordu → ortala, tam genişlik */
 @media only screen and (max-width: 991px) {
+    /* MAS-91: detay sayfası kabı masaüstü için inline padding-left:15vw ile ortalanıyordu;
+       mobilde bu sola devasa indent + daralma yapıyordu. Sıfırla, kolonları tam genişlik yap. */
+    .product-section { padding-left: 0 !important; padding-right: 0 !important; }
+    .product-section > .col-lg-6,
+    .product-section .detail.col-lg-6 { flex: 0 0 100% !important; max-width: 100% !important; }
     .masq-gallery {
         margin: 0 auto !important;
         max-width: 100% !important;

@@ -1,123 +1,123 @@
 body {
   display: flex;
   justify-content: center;
-  background-image:url("../assets/shutterstock/stock-photo-pieces-of-leather-on-table-1141776233-transformed.jpeg") ;
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position: center 50%; /* Resmi yukarıda %20 oranında kaydır */
+  align-items: center;
+  background-image: url("../assets/shutterstock/stock-photo-pieces-of-leather-on-table-1141776233-transformed.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 50%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-  'Helvetica Neue', 'Ubuntu', sans-serif;
-  height: 100vh;
+    'Helvetica Neue', 'Ubuntu', sans-serif;
+  min-height: 100vh;
   margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-section {
 
+section {
   display: flex;
   flex-direction: column;
-  width: 400px;
-  height: 112px;
-  border-radius: 6px;
-  justify-content: center; /* Yatay hizalama */
-  align-items: center; /* Dikey hizalama */
-  height: 100vh; /* Ekran yüksekliği kadar */
-}
-p {
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: -0.154px;
-  color: #242d60;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  padding: 0 20px;
+  min-height: calc(100vh - 40px);
   box-sizing: border-box;
 }
-#checkout {
-  width: 100vw;
+
+.suc {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .hidden {
   display: none;
 }
+
 .frame {
-  border: 2px solid #000; 
+  border: 2px solid #000;
   border-radius: 10px;
-  width: 1100px;
+  width: 100%;
   background-color: white;
-  padding: 0.5cm; 
-  display: inline-flex; 
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .frame p {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.5;
-  
+  font-weight: 500;
+  letter-spacing: -0.154px;
+  color: #242d60;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.frame p a {
+  word-break: break-all;
 }
 
 .success-image {
-  float: left;
-  margin-right: 20px; 
+  float: none;
+  margin-right: 20px;
+  flex-shrink: 0;
 }
-
 
 .button-container {
   text-align: center;
-  margin-top: 40px; 
+  margin-top: 32px;
 }
 
-.back-to-home {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #007bff; 
-  color: #fff;
-  text-decoration: none;
-  border-radius: 5px;
-}
-
-.button2{
+.button2 {
   position: relative;
-  background: black; /* Arka planı kaldırın veya istediğiniz bir değeri ayarlayın */
-  color: white; /* Metin rengini istediğiniz renge ayarlayın */
+  background: black;
+  color: white;
   text-decoration: none;
   text-transform: uppercase;
-  font-size: 1.2em;
+  font-size: 1.1em;
   letter-spacing: 0.1em;
   font-weight: 400;
-  padding: 20px 30px;
+  padding: 18px 28px;
   transition: 0.5s;
   white-space: nowrap;
-  margin: 0 auto; /* Butonu yatayda ortala */
+  margin: 0 auto;
   cursor: pointer;
-  margin-top: 20px;
-  
+  display: inline-block;
 }
-.button2:hover{
+
+.button2:hover {
   letter-spacing: 0.25em;
   background: var(--clr);
   box-shadow: 0 0 35px var(--clr);
   color: var(--clr);
 }
-.button2:before{
+
+.button2:before {
   content: '';
   position: absolute;
   inset: 2px;
   background: #27282c;
 }
 
-.button2 span{
+.button2 span {
   position: relative;
   z-index: 1;
 }
 
-.button2 i{
+.button2 i {
   position: absolute;
   inset: 0;
   display: block;
 }
 
-.button2 i::before{
+.button2 i::before {
   content: '';
   position: absolute;
   top: 0;
@@ -134,7 +134,7 @@ p {
   left: 20%;
 }
 
-.button2 i::after{
+.button2 i::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -146,20 +146,27 @@ p {
   transition: 0.5s;
 }
 
-.button2:hover i::after  {
+.button2:hover i::after {
   width: 20px;
   left: 80%;
- 
 }
 
-@media only screen and (max-width: 1000px) {
+/* Mobil: görsel üstte, metin altta ortalı; taşma yok. */
+@media only screen and (max-width: 600px) {
   .frame {
-   max-width:900px !important;
+    flex-direction: column;
+    text-align: center;
+    padding: 22px 18px;
   }
-}
-
-@media only screen and (max-width: 450px) {
-  .frame {
-   max-width:400px !important;
+  .success-image {
+    margin: 0 0 16px 0;
+  }
+  .frame p {
+    font-size: 16px;
+  }
+  .button2 {
+    font-size: 1em;
+    letter-spacing: 0.08em;
+    padding: 16px 22px;
   }
 }
