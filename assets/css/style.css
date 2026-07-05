@@ -8186,7 +8186,7 @@ transition: 0.4s;
 }
 /* MAS-92: mobilde hero 400px'e iniyor; alttaki boşluğu da orantılı sıkılaştır. */
 @media only screen and (max-width: 767px) {
-  .my-slider { margin-bottom: 18px; }
+  .my-slider { margin-bottom: -122px; }
 }
 
 /* Slayt içeriğinin tam ekranı kaplaması */
