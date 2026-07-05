@@ -10722,24 +10722,34 @@ margin-top: 16px;
 }
 
 /* ============================================================
-   BLOG GÖRSELLERİ — sabit çerçeve boyutu (yüklenen orijinal boyut ne olursa olsun).
-   object-fit: cover ile her oran aynı çerçeveye kırpılır → hepsi tek tip görünür.
+   BLOG GÖRSELLERİ (blog.php liste) — MAS-101: eskiden object-fit:cover + sabit yükseklik
+   fotoğrafları KIRPIYORDU (kişilerin başı kesiliyordu). Artık tam görsel gösterilir:
+   contain + height:auto + max-height → hiçbir şey kesilmez.
    ============================================================ */
 .blog_page_thumb img {
     width: 100% !important;
-    height: 420px !important;
-    max-width: none !important;
-    max-height: none !important;
-    object-fit: cover !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 520px !important;
+    object-fit: contain !important;
     object-position: center !important;
     border-radius: 16px !important;
     display: block !important;
 }
 @media only screen and (max-width: 991px) {
-    .blog_page_thumb img { height: 340px !important; }
+    .blog_page_thumb img { max-height: 420px !important; }
 }
 @media only screen and (max-width: 767px) {
-    .blog_page_thumb img { height: 240px !important; }
+    .blog_page_thumb img { max-height: 340px !important; }
+}
+
+/* MAS-100: ürün detay fiyat kutusunda kampanyalı üründe orijinal fiyat üstü çizili görünsün
+   (mevcut .old_price kuralı yalnızca .price_box altındaydı; detayda kutu .product_price_box). */
+.product_price_box .old_price {
+    text-decoration: line-through;
+    color: #ABABAB;
+    margin-right: 10px;
+    font-weight: 500;
 }
 
 /* ============================================================

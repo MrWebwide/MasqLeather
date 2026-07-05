@@ -45,8 +45,14 @@ h1 {
     padding-bottom: 1cm;
     font-family: "Montserrat", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 45px;
-    line-height: 20px;
+    line-height: 1.2; /* MAS-94: 20px idi → mobilde başlık 2 satıra sarınca satırlar üst üste biniyordu */
     font-weight: 300;
+}
+
+/* MAS-94: dar ekranda kutu taşmasın, başlık küçülsün */
+@media only screen and (max-width: 480px) {
+    .login-container { padding: 40px 24px 48px 24px; max-width: 92vw; }
+    h1 { font-size: 34px; padding-bottom: 0.6cm; }
 }
 
 form {

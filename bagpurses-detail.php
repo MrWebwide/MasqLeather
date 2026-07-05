@@ -136,6 +136,7 @@ if ($stock >0) {
                                         </h3>
                                     </div>
                                     <div class="product_price_box">
+                                        <?php if ($urunler['kampanya']) { ?><span class="old_price">$<?=$urunler['yazi1']?> CAD</span> <?php } ?>
                                         <span class="current_price">
                                             <?php if ($urunler['kampanya']) { ?>
                                            

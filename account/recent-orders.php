@@ -76,7 +76,9 @@ $pageCSS = [$basePath . 'admin/assets/css/main.min.css'];
 $stmt_orders = $db->prepare("SELECT * FROM mailgelen WHERE adsoyad = :adsoyad ORDER BY id DESC");
 $stmt_orders->execute([':adsoyad' => $adsoyad]);
 $urunlistele = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
-if ($urunlistele->rowCount()) {
+// MAS-95: fetchAll bir DİZİ döndürür; eski kod $urunlistele->rowCount() ile dizide olmayan
+// bir metodu çağırıp fatal error veriyordu → liste hiç dolmuyordu. count() ile düzeltildi.
+if (count($urunlistele)) {
     // Başlangıç değeri için bir numara değişkeni tanımlayalım
     $sira = 1;
     foreach ($urunlistele as $urungoster) {

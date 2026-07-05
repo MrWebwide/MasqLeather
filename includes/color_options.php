@@ -30,10 +30,18 @@ function masq_render_color_options(PDO $db, string $table, string $detailPage, a
         return;
     }
 
-    // Tek sorgu: aktif varyantların CANLI görseli (tek kaynak → bayatlamaz)
-    $place = implode(',', array_fill(0, count($ids), '?'));
-    $stmt  = $db->prepare("SELECT id, resim FROM {$table} WHERE id IN ({$place}) AND durum = 'on'");
-    $stmt->execute($ids);
+    // Tek sorgu: aktif varyantların CANLI görseli (tek kaynak → bayatlamaz).
+    // MAS-96: "Color Options" = aynı ürünün renk varyantı → yalnızca AYNI kategorideki
+    // varyantlar gösterilir (admin yanlışlıkla farklı kategoriden ürün bağlarsa görünmez).
+    $place  = implode(',', array_fill(0, count($ids), '?'));
+    $params = $ids;
+    $catFilter = '';
+    if (!empty($row['kategori'])) {
+        $catFilter = ' AND kategori = ?';
+        $params[]  = $row['kategori'];
+    }
+    $stmt = $db->prepare("SELECT id, resim FROM {$table} WHERE id IN ({$place}) AND durum = 'on'{$catFilter}");
+    $stmt->execute($params);
     $map = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
         $map[(int) $r['id']] = $r['resim'];

@@ -596,37 +596,30 @@ $(document).ready(function() {
                 type: 'GET',
                 data: { adsoyad: adsoyad },
                 success: function(data) {
-                    // AJAX isteği başarılıysa, verileri form alanlarına doldur
+                    // AJAX başarılı → form alanlarını doldur
                     $('input[name="addname"]').val(data.addname);
                     $('input[name="name"]').val(data.name);
                     $('input[name="surname"]').val(data.surname);
                     $('textarea[name="address"]').val(data.address);
                     $('input[name="city"]').val(data.city);
-                    $('input[name="province"]').val(data.province);
+                    // MAS-97: province bir <select> (input değildi → eskiden hiç dolmuyordu)
+                    $('select[name="province"]').val(data.province);
                     $('input[name="postal"]').val(data.postal);
                     $('input[name="phone"]').val(data.phone);
                     $('input[name="email"]').val(data.email);
 
-                    // Ülke bilgisine göre seçili option'u belirle
+                    // Ülke (2=Canada, 3=United States)
                     var countryValue = data.country;
-
-                    // Ülke bilgisine göre doğru option'u seçili hale getir
-                    if (countryValue == 2) {
-                        $('select[name="country"]').val('2'); // Canada seçeneğini seçili yap
-                    } else if (countryValue == 3) {
-                        $('select[name="country"]').val('3'); // United States seçeneğini seçili yap
+                    if (countryValue == 2 || countryValue == 3) {
+                        $('select[name="country"]').val(String(countryValue));
                     }
-                    
-    var countryText = "";
 
-    if (countryValue == 2) {
-        countryText = "Canada";
-    } else if (countryValue == 3) {
-        countryText = "United States";
-    }
-
-    // 'current' class'ına sahip span elementinin metnini güncelle
-    $('.cenk').find('.current').text(countryText);
+                    // MAS-97: nice-select özel dropdown'ları native .val() ile güncellenmez;
+                    // görünen değerin de değişmesi için plugin'in update'ini çağır.
+                    if ($.fn.niceSelect) {
+                        $('select[name="country"]').niceSelect('update');
+                        $('select[name="province"]').niceSelect('update');
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
@@ -642,14 +635,17 @@ $(document).ready(function() {
         $('input[name="surname"]').val('');
         $('textarea[name="address"]').val('');
         $('input[name="city"]').val('');
-        $('input[name="province"]').val('');
+        $('select[name="province"]').val('USA'); // MAS-97: placeholder ("Select Province")
         $('input[name="postal"]').val('');
         $('input[name="phone"]').val('');
         $('input[name="email"]').val('');
-        $('select[name="country"]').val('1'); // Select Country seçeneğini seçili hale getir
+        $('select[name="country"]').val('1'); // Select Country
 
-        $('.cenk').find('.current').text('Select Country');
-
+        // MAS-97: nice-select görünümlerini de sıfırla
+        if ($.fn.niceSelect) {
+            $('select[name="country"]').niceSelect('update');
+            $('select[name="province"]').niceSelect('update');
+        }
     }
 });
 

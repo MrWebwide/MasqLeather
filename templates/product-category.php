@@ -76,11 +76,10 @@ $catHeaderImg = (!empty($catRow['resim']) && $catRow['resim'] !== 'resim-yok') ?
                             ['title' => 'Bags & Purses', 'catTable' => 'urun_kategori',  'prodTable' => 'urunler',     'catPage' => 'bagpurses-category.php'],
                             ['title' => 'Accessories',   'catTable' => 'bolge_kategori', 'prodTable' => 'accessories', 'catPage' => 'accessories-category.php'],
                         ];
+                        require_once __DIR__ . '/../includes/cat_counts.php';
                         foreach ($sidebarGroups as $grp):
-                            $rows = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                                                FROM {$grp['catTable']} AS bk
-                                                LEFT JOIN {$grp['prodTable']} AS b ON bk.adi = b.kategori
-                                                GROUP BY bk.adi");
+                            // MAS-102: sol menü, üst menü ile AYNI sırada olsun (sira ASC) → ortak helper.
+                            $rows = masq_category_counts($db, $grp['catTable'], $grp['prodTable']);
                         ?>
                             <div class="shop_widget_list categories">
                                 <div class="shop_widget_title categories_title">
