@@ -124,7 +124,7 @@ try {
                                                 <?php else: ?>
                                                     <p class="text-muted" style="font-size:13px;">Henüz görsel yok.</p>
                                                 <?php endif; ?>
-                                                <input class="form-control mb-2" type="file" name="resim" accept="image/*">
+                                                <input class="form-control mb-2" type="file" name="resim" accept="image/*" data-crop-ratio="16/5">
                                                 <button class="btn btn-primary btn-sm" name="kaydet" value="1">Kaydet</button>
                                             </form>
                                         </div>
