@@ -11065,3 +11065,18 @@ margin-top: 16px;
     60%  { transform: scale(1.09); }
     100% { transform: scale(1);   opacity: 1; }
 }
+
+/* ============================================================
+   Sayfa geçiş dairesi — MASQ/Mercantile logo & nav'a tıklayınca tık noktasından
+   ekranı TAM kaplayana kadar büyür; ancak ondan sonra gezinilir (main.js).
+   ============================================================ */
+.masq-page-transition {
+    position: fixed;
+    border-radius: 50%;
+    transform: scale(0);
+    z-index: 2147483646;
+    pointer-events: none;
+    will-change: transform;
+    transition: transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.masq-page-transition.grow { transform: scale(1); }

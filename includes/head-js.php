@@ -17,6 +17,33 @@ if (!isset($basePath)) {
     $basePath = '';
 }
 ?>
+    <!-- Sayfa geçiş overlay'i (2. faz): önceki sayfada daire ekranı kapladıktan sonra
+         buraya gelinir; aynı renkte overlay sayfayı örter ve sayfa YÜKLENİNCE açılır
+         → kaplama süresi gerçek yükleme hızıyla senkron. Mümkün olan en erken noktada çalışır. -->
+    <script>
+    (function () {
+        try {
+            if (sessionStorage.getItem('masqTransition') !== '1') { return; }
+            sessionStorage.removeItem('masqTransition');
+            var color = sessionStorage.getItem('masqTransitionColor') || '#241a12';
+            var ov = document.createElement('div');
+            ov.id = 'masq-transition-cover';
+            ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:' + color + ';opacity:1;transition:opacity .55s ease;pointer-events:none;';
+            document.documentElement.appendChild(ov);
+            var revealed = false;
+            function reveal() {
+                if (revealed) { return; } revealed = true;
+                requestAnimationFrame(function () { ov.style.opacity = '0'; });
+                setTimeout(function () { if (ov.parentNode) { ov.parentNode.removeChild(ov); } }, 650);
+            }
+            // Sayfa tamamen yüklenince aç (hızlı=hemen, yavaş=bekler). Takılmasın diye 6sn tavan.
+            if (document.readyState === 'complete') { reveal(); }
+            else { window.addEventListener('load', reveal); }
+            setTimeout(reveal, 6000);
+        } catch (e) {}
+    })();
+    </script>
+
     <!-- MAS-8: Frontend JS hata yakalama → panel içi hata_log (Slack/mail yok).
          Erken yüklenir; aynı hatayı sayfa başına bir kez, en fazla 10 çeşit gönderir. -->
     <script>

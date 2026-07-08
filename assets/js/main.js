@@ -215,85 +215,62 @@
 
 // RippleEffect
 
-function addRippleEffect(link, effectClass) {
+// ============================================================
+// Sayfa geçiş efekti (MASQ / Mercantile logo & nav linkleri).
+// Daire tık noktasından büyüyüp EKRANI TAMAMEN KAPLAR, ANCAK ONDAN SONRA gezinir
+// (eskiden preventDefault yoktu → daire büyürken sayfa değişiyordu = kötü).
+// Sonraki sayfada aynı renkte overlay (head-js.php) kalır ve sayfa yüklenince açılır
+// → kaplama süresi gerçek sayfa yükleme hızıyla senkron olur.
+// ============================================================
+function masqPageTransition(link, color) {
+    if (!link) { return; }
     link.addEventListener('click', function (e) {
-        const rippleEffect = document.createElement('span');
-        rippleEffect.className = `ripple-effect ${effectClass}`;
+        // Yeni sekmede aç / orta tık / modifier → dokunma
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+        var href = link.getAttribute('href');
+        if (!href || href === '#' || href.charAt(0) === '#') { return; }
+        e.preventDefault();
 
-        const diameter = Math.max(link.offsetWidth, link.offsetHeight);
-        const rect = link.getBoundingClientRect();
-        const offsetX = e.clientX - rect.top;
-        const offsetY = e.clientY - rect.top;
-        const centerOffsetX = offsetX - (diameter / 2);
-        const centerOffsetY = offsetY - (diameter / 2);
-        rippleEffect.style.width = `${diameter}px`;
-        rippleEffect.style.height = `${diameter}px`;
-        rippleEffect.style.top = `${centerOffsetY}px`;
-        rippleEffect.style.left = `${centerOffsetX}px`;
+        var x = e.clientX, y = e.clientY;
+        if (!x && !y) { x = window.innerWidth / 2; y = window.innerHeight / 2; }
+        var w = window.innerWidth, h = window.innerHeight;
+        // Tık noktasından en uzak köşeye olan mesafe = ekranı tam kaplayacak yarıçap
+        var radius = Math.sqrt(Math.pow(Math.max(x, w - x), 2) + Math.pow(Math.max(y, h - y), 2));
 
-        document.body.appendChild(rippleEffect);
+        var circle = document.createElement('div');
+        circle.className = 'masq-page-transition';
+        circle.style.background = color;
+        circle.style.left = x + 'px';
+        circle.style.top = y + 'px';
+        circle.style.width = circle.style.height = (radius * 2) + 'px';
+        circle.style.marginLeft = circle.style.marginTop = (-radius) + 'px';
+        document.body.appendChild(circle);
 
-        // Sayfa yüklenme işlemi başlamadan önce efektin oynamaya başlamasını sağla
-        requestAnimationFrame(function () {
-            rippleEffect.style.transform = 'scale(1.5)';
-        });
+        requestAnimationFrame(function () { circle.classList.add('grow'); });
 
-        // Sayfa yüklenme işlemi başladığında efektin kaybolma süresini başlat
-        const pageLoadStart = Date.now();
+        // Hedef sayfayı önceden ısıt (cache) → asıl gezinme daha hızlı olsun
+        try { fetch(href, { credentials: 'same-origin' }).catch(function () {}); } catch (err) {}
 
-        function updateEffect() {
-            const elapsed = Date.now() - pageLoadStart;
-            const speedMultiplier = 0.2; // İstediğiniz hız artışı için uygun bir değer
-
-            if (elapsed < 1000) {
-                requestAnimationFrame(updateEffect);
-            }
-
-            rippleEffect.style.transform = `scale(${1 + speedMultiplier * elapsed / 1000})`;
-        }
-
-        // updateEffect fonksiyonunu burada çağır
-        updateEffect();
-
-        // Sayfa yüklenme işlemi bitince efektin kaybolma süresini güncelle
-        window.addEventListener('load', function () {
-            const pageLoadTime = Date.now() - pageLoadStart;
-            setTimeout(function () {
-                rippleEffect.style.transition = `opacity ${pageLoadTime}ms`;
-                rippleEffect.style.opacity = 0;
-
-                setTimeout(function () {
-                    document.body.removeChild(rippleEffect);
-                    window.location.href = link.href;
-                }, pageLoadTime);
-            }, 0);
-        });
+        // Daire ekranı kapladıktan SONRA gezin (CSS geçiş süresiyle eşleşir)
+        var GROW = 520;
+        setTimeout(function () {
+            try {
+                sessionStorage.setItem('masqTransition', '1');
+                sessionStorage.setItem('masqTransitionColor', color);
+            } catch (err) {}
+            window.location.href = href;
+        }, GROW);
     });
 }
 
-const links = [
-    {
-        element: document.getElementsByClassName('ripple-link')[0],
-        effectClass: 'link1'
-    },
-    {
-        element: document.getElementsByClassName('ripple-link12')[0],
-        effectClass: 'link12'
-    },
-    {
-        element: document.getElementsByClassName('ripple-link2')[0],
-        effectClass: 'link2'
-    },
-    {
-        element: document.getElementsByClassName('ripple-link22')[0],
-        effectClass: 'link22'
-    }
-];
-
-links.forEach(linkInfo => {
-    if (linkInfo.element) {
-        addRippleEffect(linkInfo.element, linkInfo.effectClass);
-    }
+[
+    { sel: 'ripple-link',   color: '#AB6E35' },
+    { sel: 'ripple-link12', color: '#AB6E35' },
+    { sel: 'ripple-link2',  color: 'rgb(48,48,48)' },
+    { sel: 'ripple-link22', color: 'rgb(48,48,48)' }
+].forEach(function (info) {
+    var els = document.getElementsByClassName(info.sel);
+    for (var i = 0; i < els.length; i++) { masqPageTransition(els[i], info.color); }
 });
 
 
