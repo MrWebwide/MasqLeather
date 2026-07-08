@@ -119,6 +119,16 @@
     
     
     $('.select_option').niceSelect();
+
+    /* Tab panelindeki .wow elemanları: WOW.js sadece scroll'da tetiklendiği için
+       gizli tab'a (örn. Best Seller) geçince ürünler görünmez kalıyordu.
+       Tab görünür olur olmaz elemanları göster ve animasyonu başlat. */
+    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+        var $pane = $($(this).attr('href'));
+        $pane.find('.wow').each(function () {
+            $(this).css('visibility', 'visible').addClass('animated');
+        });
+    });
  
     
       /*---  ScrollUp Active ---*/
