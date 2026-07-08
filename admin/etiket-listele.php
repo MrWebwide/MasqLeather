@@ -11,7 +11,7 @@ if($_GET['sil']){
 	$idd=intval($_GET['sil']);
 	 
 	 $resim_sorgu=$db->query("select * from etiket where id='$idd'")->fetch(PDO::FETCH_ASSOC);
-	 unlink('../resimler/'.$resim_sorgu['resim']);
+	 unlink('resimler/'.$resim_sorgu['resim']);
 	$simdi=$db->query("delete from etiket where id='$idd'")->fetch(PDO::FETCH_ASSOC);
 	
 	
@@ -29,7 +29,7 @@ if($_GET['sil']){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Ekip Üstü Listele - <?=$ayar['site_title']?></title>
 
 
@@ -87,7 +87,7 @@ if($_GET['sil']){
 											?>
                                               <tr data-id="<?=$urungoster['id']?>" data-oldorder="<?=$urungoster['sira']?>">
                                                 <th scope="row"><span class="drag-handle">&#9776;</span><?=$urungoster['sira']?></th>
-                                               <td><img src="../resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
+                                               <td><img src="resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
                                                 <td><?=$urungoster['adi']?></td>
                                             
                                                 <td>

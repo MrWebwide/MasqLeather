@@ -49,7 +49,7 @@ if($_POST['kaydet'] and $_GET['islem']==''){
 	
 	
 	
-  $klasorbanka="../resimler/";
+  $klasorbanka="resimler/";
 	$resim_tmpbanka = $_FILES['resim']['tmp_name'];
 	if(empty($resim_tmpbanka))
 	{
@@ -66,7 +66,7 @@ if($_POST['kaydet'] and $_GET['islem']==''){
 			
 			move_uploaded_file($_FILES['resim']['tmp_name'],$klasorbanka."/".$resim1);
 			
-			      	$file = "../resimler/".$resim1;
+			      	$file = "resimler/".$resim1;
 $image = imagecreatefromstring(file_get_contents($file));
 ob_start();
 imagejpeg($image,NULL,100);
@@ -75,11 +75,11 @@ ob_end_clean();
 $randomm=rand(0,965465465465456);
 imagedestroy($image);
 $content = imagecreatefromstring($cont);
-$output = '../resimler/'.$random.'-'.$seo.'.webp';
+$output = 'resimler/'.$random.'-'.$seo.'.webp';
 $resim=$random.'-'.$seo.'.webp';
 imagewebp($content,$output);
 imagedestroy($content);
-	unlink ('../resimler/'.$resim1);
+	unlink ('resimler/'.$resim1);
 		}
 		else
 		{
@@ -122,7 +122,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
-			$klasord="../resimler/";
+			$klasord="resimler/";
 	   $resim_tmpd = $_FILES['resim']['tmp_name'];
 	if(empty($resim_tmpd))
 	{
@@ -139,7 +139,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		    	$ayar_kaydi = $db->query("SELECT * FROM galeri WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
   			if($ayar_kaydi['resim']!="resim-yok")
 			{
-			  unlink("../resimler/".$ayar_kaydi['resim']);	  
+			  unlink("resimler/".$ayar_kaydi['resim']);	  
 			}
 			
 			$random = rand(0,999);
@@ -147,7 +147,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			$resim1 = $random."-".$seo.$_FILES['resim'];
 			
 			move_uploaded_file($_FILES['resim']['tmp_name'],$klasord."/".$resim1);
-			$file = "../resimler/".$resim1;
+			$file = "resimler/".$resim1;
 $image = imagecreatefromstring(file_get_contents($file));
 ob_start();
 imagejpeg($image,NULL,100);
@@ -156,11 +156,11 @@ ob_end_clean();
 
 imagedestroy($image);
 $content = imagecreatefromstring($cont);
-$output = '../resimler/'.$random.'-'.$seo.'.webp';
+$output = 'resimler/'.$random.'-'.$seo.'.webp';
 $resim=$random.'-'.$seo.'.webp';
 imagewebp($content,$output);
 imagedestroy($content);
-unlink ('../resimler/'.$resim1);
+unlink ('resimler/'.$resim1);
 	
 		}
 		else
@@ -233,7 +233,7 @@ if($_GET['islem']=='duzenle'){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Galeri Ekle - <?=$ayar['site_title']?></title>
 
         
@@ -294,7 +294,7 @@ if($_GET['islem']=='duzenle'){
                                         <label for="formFile" class="form-label">Galeri Resmi</label>
                                         <input class="form-control" type="file" name="resim" id="formFile">
                                         
-                                         <img src="../resimler/<?=$guncelle['resim']?>" width="200">
+                                         <img src="resimler/<?=$guncelle['resim']?>" width="200">
                                       </div>
                                       
                                       
@@ -379,7 +379,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }
@@ -407,7 +407,7 @@ if($_GET['islem']=='duzenle'){
 	                    	<div class="col-md-3" data-resim-dis-id="'+say+'">\
 				                    <div class="uploaddis pasif" style="float:left;">\
 				        			  <div class="yuklendi">\
-				        				  <img src="../resimler/'+data+'" width="100%">\
+				        				  <img src="resimler/'+data+'" width="100%">\
 				        				  <div class="icon" data-resim-sil-id="'+say+'"><span class="fa fa-trash"></span></div>\
 				        				  <input type="hidden" name="img[]" value="'+data+'" required="">\
 				        			  </div>\

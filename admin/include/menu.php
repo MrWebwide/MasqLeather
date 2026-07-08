@@ -131,3 +131,10 @@ if($yetki == 'yetkili') {
         </li>
     </ul>
 </div>
+
+<?php // Görsel kırpma editörü (tekli görsel yüklemeleri) — tüm admin sayfalarında otomatik.
+$__cropDir = __DIR__ . '/../assets/plugins/cropper/'; ?>
+<link rel="stylesheet" href="assets/plugins/cropper/cropper.min.css">
+<link rel="stylesheet" href="assets/plugins/cropper/masq-crop.css?v=<?= @filemtime($__cropDir . 'masq-crop.css') ?>">
+<script src="assets/plugins/cropper/cropper.min.js"></script>
+<script src="assets/plugins/cropper/masq-crop.js?v=<?= @filemtime($__cropDir . 'masq-crop.js') ?>"></script>

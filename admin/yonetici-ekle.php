@@ -62,7 +62,7 @@ $hesap = $db->query("select * from yonetici where  id='$id'")->fetch(PDO::FETCH_
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Yönetici Ekle - <?=$ayar['site_title']?></title>
     
 

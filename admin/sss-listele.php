@@ -11,7 +11,7 @@ if($_GET['sil']){
 	$idd=intval($_GET['sil']);
 	 
 	 $resim_sorgu=$db->query("select * from sss where id='$idd'")->fetch(PDO::FETCH_ASSOC);
-	 unlink('../resimler/'.$resim_sorgu['resim']);
+	 unlink('resimler/'.$resim_sorgu['resim']);
 	$simdi=$db->query("delete from sss where id='$idd'")->fetch(PDO::FETCH_ASSOC);
 	
 	
@@ -29,7 +29,7 @@ if($_GET['sil']){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>S.S.S Listele - <?=$ayar['site_title']?></title>
 
         <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,700,800&amp;display=swap" rel="stylesheet">

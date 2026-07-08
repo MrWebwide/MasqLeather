@@ -108,7 +108,7 @@ if(isset($_COOKIE["hatirla"]) && isset($_SESSION["eposta"])){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Tekrar Giriş Yap - <?=$ayar['site_title']?></title>
     
 
@@ -132,7 +132,7 @@ if(isset($_COOKIE["hatirla"]) && isset($_SESSION["eposta"])){
                     <div class="card login-box-container" style="border: solid 1px;">
                         <div class="card-body">
                             <div class="authent-logo">
-                                <img src="../resimler/<?=$ayar['logo']?>" alt="<?=$ayar['site_title']?>" width="100%">
+                                <img src="resimler/<?=$ayar['logo']?>" alt="<?=$ayar['site_title']?>" width="100%">
                             </div>
                             <div class="authent-text">
                                 <p><?=$ayar['site_title']?></p>

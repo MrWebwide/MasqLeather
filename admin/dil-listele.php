@@ -25,7 +25,7 @@ oturumkontrolana();
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Dil Listele | <?=$ayar['site_title']?></title>
 
 
@@ -82,7 +82,7 @@ oturumkontrolana();
 											?>
                                               <tr>
                                                 <th scope="row"><?=$urungoster['id']?></th>
-                                                <td><img src="../resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
+                                                <td><img src="resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
                                                 <td><?=$urungoster['title']?></td>
                                              
                                              

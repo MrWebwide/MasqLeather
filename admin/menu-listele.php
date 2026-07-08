@@ -15,7 +15,7 @@ oturumkontrolana();
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Menü Listele - <?=$ayar['site_title']?></title>
 
 
@@ -72,7 +72,7 @@ oturumkontrolana();
 											?>
                                               <tr>
                                                 <th scope="row"><?=$urungoster['sira']?></th>
-                                                <td><img src="../resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
+                                                <td><img src="resimler/<?=$urungoster['resim']?>" alt="<?=$urungoster['adi']?>"> </td>
                                                 <td><?=$urungoster['adi']?></td>
                                              
                                                 <td><span class="badge bg-primary"><?=$urungoster['eklenme_tarihi']?></span></td>

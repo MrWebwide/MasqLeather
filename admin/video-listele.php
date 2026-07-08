@@ -12,7 +12,7 @@ if($_GET['sil']){
 	$idd=intval($_GET['sil']);
 	 
 	 $resim_sorgu=$db->query("select * from video where id='$idd'")->fetch(PDO::FETCH_ASSOC);
-	 unlink('../resimler/'.$resim_sorgu['resim']);
+	 unlink('resimler/'.$resim_sorgu['resim']);
 	$simdi=$db->query("delete from video where id='$idd'")->fetch(PDO::FETCH_ASSOC);
 	
 	
@@ -30,7 +30,7 @@ if($_GET['sil']){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Video Listele <?=$ayar['site_title']?></title>
 
        
@@ -88,7 +88,7 @@ if($_GET['sil']){
 											?>
                                               <tr>
                                                 <th scope="row"><?=$videogoster['sira']?></th>
-                                                <td><img src="../resimler/<?=$videogoster['resim']?>" alt="<?=$videogoster['adi']?>">  </td>
+                                                <td><img src="resimler/<?=$videogoster['resim']?>" alt="<?=$videogoster['adi']?>">  </td>
                                                 <td><?=$videogoster['adi']?></td>
                                             
                                                 <td>
