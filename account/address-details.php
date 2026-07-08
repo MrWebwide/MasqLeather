@@ -161,7 +161,10 @@ function silAddress(adsoyad) {
 
 function clearFormFields() {
     $('input[name="addname"]').val('');
-    $('input[name="province"]').val('');
+    $('input[name="name"]').val('');
+    $('input[name="surname"]').val('');
+    $('select[name="country"]').val('1').trigger('change');
+    $('select[name="province"]').val('USA');
     $('input[name="city"]').val('');
     $('input[name="postal"]').val('');
     $('input[name="address"]').val('');
@@ -237,23 +240,42 @@ margin-bottom:30px;
 
                                       <div class="form-floating mb-3 col-3">
                                       <label for="floatingInput">Country</label>
-                                        <select class="form-control" name="country">
+                                        <select class="form-control" name="country" id="addr-country">
                                             <option value="1" <?= (!isset($guncelle['country']) || $guncelle['country']==='' || $guncelle['country']=='1') ? 'selected' : '' ?>>Select Country</option>
                                             <option value="2" <?= (($guncelle['country'] ?? '')=='2') ? 'selected' : '' ?>>Canada</option>
                                             <option value="3" <?= (($guncelle['country'] ?? '')=='3') ? 'selected' : '' ?>>United States</option>
                                         </select>
                                       </div>
 
-                                      <div class="form-floating mb-3 col-3">
-                                      <label for="floatingInput">Province/State</label>
-                                        <input type="text" class="form-control" name="province" value="<?=$guncelle['province']?>" required>
-                                   
+                                      <!-- MAS-107: province artık checkout ile aynı dropdown (Kanada illeri).
+                                           ABD seçilince gizlenir, "USA" sentinel'i yazılır (checkout davranışı). -->
+                                      <div class="form-floating mb-3 col-3" id="addr-province-wrap">
+                                      <label for="floatingInput">Province</label>
+                                        <select class="form-control" name="province" id="addr-province">
+                                            <?php
+                                            $provSaved = $guncelle['province'] ?? '';
+                                            $caProvinces = array(
+                                                'AB'=>'Alberta','BC'=>'British Columbia','MB'=>'Manitoba','NB'=>'New Brunswick',
+                                                'NL'=>'Newfoundland and Labrador','NS'=>'Nova Scotia','ON'=>'Ontario',
+                                                'PE'=>'Prince Edward Island','QC'=>'Quebec','SK'=>'Saskatchewan',
+                                                'NT'=>'Northwest Territories','NU'=>'Nunavut','YT'=>'Yukon'
+                                            );
+                                            echo '<option value="USA"' . (($provSaved==='' || $provSaved==='USA') ? ' selected' : '') . '>Select Province</option>';
+                                            foreach ($caProvinces as $pc => $pn) {
+                                                echo '<option value="' . $pc . '"' . ($provSaved===$pc ? ' selected' : '') . '>' . $pn . '</option>';
+                                            }
+                                            // Eski kayıtlar serbest metin olabilir (örn. "Ontario") — listede yoksa koru
+                                            if ($provSaved !== '' && $provSaved !== 'USA' && !isset($caProvinces[$provSaved])) {
+                                                echo '<option value="' . htmlspecialchars($provSaved) . '" selected>' . htmlspecialchars($provSaved) . '</option>';
+                                            }
+                                            ?>
+                                        </select>
                                       </div>
 
                                       <div class="form-floating mb-3 col-3">
-                                      <label for="floatingInput">City</label>
+                                      <label for="floatingInput" id="addr-city-label">City</label>
                                         <input type="text" class="form-control" name="city" value="<?=$guncelle['city']?>" required>
-                       
+
                                       </div>
 
                                       
@@ -298,10 +320,57 @@ margin-bottom:30px;
 <div class="mb-3">
         <input type="submit" name="kaydet" class="btn btn-primary" value="Kaydet">
     </div>
-                                      
-                                      
+
+
                                       </div>
-</form>         
+</form>
+
+<script>
+// MAS-107: checkout ile aynı country/province davranışı
+$(function () {
+    var $country  = $('#addr-country');
+    var $provWrap = $('#addr-province-wrap');
+    var $prov     = $('#addr-province');
+    var $cityLbl  = $('#addr-city-label');
+
+    function applyCountry() {
+        var c = $country.val();
+        if (c === '3') { // ABD: province seçilmez, state şehirle birlikte yazılır
+            $provWrap.hide();
+            $prov.val('USA');
+            $cityLbl.text('State and City');
+        } else {
+            $provWrap.show();
+            $cityLbl.text('City');
+        }
+    }
+    $country.on('change', function () {
+        $country[0].setCustomValidity('');
+        $prov[0].setCustomValidity('');
+        applyCountry();
+    });
+    $prov.on('change', function () { $prov[0].setCustomValidity(''); });
+    applyCountry();
+
+    $country.closest('form').on('submit', function (e) {
+        var c = $country.val();
+        if (c === '1' || !c) {
+            e.preventDefault();
+            $country[0].setCustomValidity('Please select a country.');
+            $country[0].reportValidity();
+            return false;
+        }
+        $country[0].setCustomValidity('');
+        if (c === '2' && ($prov.val() === 'USA' || !$prov.val())) {
+            e.preventDefault();
+            $prov[0].setCustomValidity('Please select a province.');
+            $prov[0].reportValidity();
+            return false;
+        }
+        $prov[0].setCustomValidity('');
+    });
+});
+</script>         
                                       
                                 </div>
                             </div>
