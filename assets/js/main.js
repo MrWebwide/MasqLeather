@@ -74,7 +74,8 @@
 
 
     //Shopping Cart addClass removeClass
-    $('.shopping_cart > a').on('click', function(){
+    $('.shopping_cart > a').on('click', function(e){
+        e.preventDefault(); // <a href="#"> sayfayı en üste kaydırmasın
         $('.mini_cart,.body_overlay').addClass('active')
     });
     $('.mini_cart_close a,.body_overlay').on('click', function(){

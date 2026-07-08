@@ -370,7 +370,7 @@ function getUpdatedCartContentFromSession() {
             // Her bir ürünü sepette listele
             $updatedCartContent .= '<div class="cart_item" data-product-id="' . $productId . '" data-product-category="' . $product['category'] . '" data-product-price="' . $product['price'] . '" data-product-quantity="' . $product['quantity'] . '">';
             $updatedCartContent .= '<div class="cart_img">';
-            $updatedCartContent .= '<a href="#"><img src="<?=$basePath?>admin/resimler/' . $product['image'] . '" alt=""></a>';
+            $updatedCartContent .= '<a href="#"><img src="' . $basePath . 'admin/resimler/' . $product['image'] . '" alt=""></a>';
             $updatedCartContent .= '</div>';
             $updatedCartContent .= '<div class="cart_info">';
             $updatedCartContent .= '<div class="close-sec d-flex">';
