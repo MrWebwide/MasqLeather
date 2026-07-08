@@ -76,7 +76,7 @@ foreach ($hizmetkategori as $hizmetka) {
     <!--offcanvas menu area end-->
 
     <!--header area start-->
-    <header class="header_section mb-30">
+    <header class="header_section">
         <div class="container">
             <div class="row">
                 <div class="col-12">
