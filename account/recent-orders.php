@@ -16,6 +16,15 @@ $pageCSS = [$basePath . 'admin/assets/css/main.min.css'];
     <style>
         .main_menu nav > ul > li > a { color: rgb(245, 245, 245) !important; }
         a { color: unset; }
+        /* MAS-103: mobilde sipariş tablosu taşıyordu → tek parça yatay kaydırılabilir yap,
+           hücreler alt alta sarmasın; padding/font küçült. */
+        .invoice-table { min-width: 520px; }
+        .invoice-table th, .invoice-table td { white-space: nowrap; vertical-align: middle; }
+        @media (max-width: 767px) {
+            .card-body { padding: 12px 10px; }
+            .invoice-table { font-size: 13px; }
+            .invoice-table th, .invoice-table td { padding: 10px 8px; }
+        }
     </style>
     <script src="<?=$basePath?>assets/js/ajax.js"></script>
     <script src="<?=$basePath?>assets/js/handlewindowsize.js"></script>

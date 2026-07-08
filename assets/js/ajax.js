@@ -89,9 +89,15 @@ $(document).ready(function() {
 
                 // Toplam fiyatı güncelleyin
                 subTotal += productPrice * productQuantity;
-                
+
                 // Sadece en son eklenen ürünün altında sub total'i Showin
                 $("#subTotal .price").text('$' + subTotal.toFixed(2));
+            },
+            // MAS-106: eskiden error handler YOKTU → AJAX sessizce başarısız olunca (mobilde
+            // zayıf bağlantı/oturum) ürün eklenmediği halde animasyon "eklendi" gibi görünüyordu.
+            // Artık başarısızlık kullanıcıya bildirilir.
+            error: function() {
+                alert('The product could not be added to your cart. Please check your connection and try again.');
             }
         });
     });

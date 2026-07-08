@@ -20,7 +20,7 @@ if (!isset($_SESSION['id'])) {
   <meta charset="utf-8">
   <title>Thanks for your order!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?>">
   <script src="return.js" defer></script>
 </head>
 <body>

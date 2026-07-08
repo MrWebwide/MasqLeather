@@ -165,6 +165,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
+	 if (!empty($_POST['resim_sil'])) { $resim = 'resim-yok'; } // MAS-86(b): görseli sil
 	 $simdi1 = $db->prepare("update urun_kategori set adi=:adi,sira=:sira,resim=:resim,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,aciklama=:aciklama,seo=:seo,tur=:tur,guncelleme_tarihi=:guncelleme_tarihi where id=:id");
 	$ekle1 = $simdi1->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"kategori"=>$kategori,"aciklama"=>$aciklama,"seo"=>$seo,"tur"=>$tur,"onaciklama"=>$onaciklama,"durum"=>$durum,"guncelleme_tarihi"=>$tarih,"id"=>$id));
 	if($ekle1){
@@ -313,6 +314,7 @@ function updateDurum() {
                                         <input class="form-control" type="file" name="resim" id="formFile">
                                         <?php if (!empty($guncelle['resim']) && $guncelle['resim'] !== 'resim-yok'): ?>
                                             <img src="../resimler/<?=$guncelle['resim']?>" width="200" style="margin-top:8px;">
+                                            <div style="margin-top:6px;"><label style="font-weight:normal;"><input type="checkbox" name="resim_sil" value="1"> Bu görseli sil</label></div>
                                         <?php endif; ?>
                                       </div>
 

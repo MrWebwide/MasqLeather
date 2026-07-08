@@ -76,8 +76,9 @@ $pageKeywords    = '';
     </div>
 </form>
                             <div id="success" class="success" style="text-align:center">
-                            <p class="form-messege" style="font-size:50px; margin-top:50px !important;">Your message has been delivered.</p>
-                            <img src="./assets/shutterstock/confirm.png" width="200px" alt="">
+                            <!-- MAS-105: 50px sabit font mobilde taşıyordu → responsive clamp + padding -->
+                            <p class="form-messege" style="font-size:clamp(22px,5vw,44px); margin-top:40px !important; padding:0 16px; word-wrap:break-word; line-height:1.3;">Your message has been delivered.</p>
+                            <img src="./assets/shutterstock/confirm.png" style="width:160px; max-width:60%; height:auto;" alt="">
                             </div>
                         </div>
                     </div>

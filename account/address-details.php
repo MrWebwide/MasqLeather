@@ -58,6 +58,10 @@ if(isset($_POST['kaydet'])) {
     $address = $_POST['address'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
+    // MAS-97: isim/soyisim/ülke de kaydedilir
+    $name = $_POST['name'] ?? '';
+    $surname = $_POST['surname'] ?? '';
+    $country = $_POST['country'] ?? '';
 
 // İlk önce, veritabanında adsoyad ile eşleşen bir kayıt olup olmadığını kontrol edelim
 $kontrol = $db->prepare("SELECT COUNT(*) FROM useraddress WHERE adsoyad = :adsoyad");
@@ -66,9 +70,12 @@ $sayi = $kontrol->fetchColumn();
 
 if ($sayi > 0) {
     // Kayıt mevcutsa, güncelleme işlemi yap
-    $ekle = $db->prepare("UPDATE useraddress SET addname=:addname, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone WHERE adsoyad=:adsoyad");
+    $ekle = $db->prepare("UPDATE useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone WHERE adsoyad=:adsoyad");
     $simdi = $ekle->execute(array(
         "addname" => $addname,
+        "name" => $name,
+        "surname" => $surname,
+        "country" => $country,
         "province" => $province,
         "city" => $city,
         "postal" => $postal,
@@ -80,9 +87,12 @@ if ($sayi > 0) {
     ));
 } else {
     // Kayıt mevcut değilse, yeni kayıt ekle
-    $ekle = $db->prepare("INSERT INTO useraddress SET addname=:addname, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone, adsoyad=:adsoyad");
+    $ekle = $db->prepare("INSERT INTO useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone, adsoyad=:adsoyad");
     $simdi = $ekle->execute(array(
         "addname" => $addname,
+        "name" => $name,
+        "surname" => $surname,
+        "country" => $country,
         "province" => $province,
         "city" => $city,
         "postal" => $postal,
@@ -210,8 +220,28 @@ margin-bottom:30px;
                                       
                                     <div class="form-floating mb-3 col-3">
                                       <label for="floatingInput">Address Name</label>
-                                        <input type="text" class="form-control" name="addname" value="<?=$guncelle['addname']?>" required>
-                                   
+                                        <input type="text" class="form-control" name="addname" value="<?=$guncelle['addname'] ?? ''?>" required>
+
+                                      </div>
+
+                                      <!-- MAS-97: isim/soyisim/ülke de kaydedilir → checkout'ta saved address seçilince otomatik dolar -->
+                                      <div class="form-floating mb-3 col-3">
+                                      <label for="floatingInput">First Name</label>
+                                        <input type="text" class="form-control" name="name" value="<?=$guncelle['name'] ?? ''?>">
+                                      </div>
+
+                                      <div class="form-floating mb-3 col-3">
+                                      <label for="floatingInput">Last Name</label>
+                                        <input type="text" class="form-control" name="surname" value="<?=$guncelle['surname'] ?? ''?>">
+                                      </div>
+
+                                      <div class="form-floating mb-3 col-3">
+                                      <label for="floatingInput">Country</label>
+                                        <select class="form-control" name="country">
+                                            <option value="1" <?= (!isset($guncelle['country']) || $guncelle['country']==='' || $guncelle['country']=='1') ? 'selected' : '' ?>>Select Country</option>
+                                            <option value="2" <?= (($guncelle['country'] ?? '')=='2') ? 'selected' : '' ?>>Canada</option>
+                                            <option value="3" <?= (($guncelle['country'] ?? '')=='3') ? 'selected' : '' ?>>United States</option>
+                                        </select>
                                       </div>
 
                                       <div class="form-floating mb-3 col-3">

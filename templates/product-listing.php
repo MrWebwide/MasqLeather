@@ -37,8 +37,20 @@ if (!isset($extraStyles)) $extraStyles = '';
 <div class="body_overlay"></div>
 <?php include __DIR__ . "/../layout/$headerFile"; ?>
 
-    <div class="breadcrumbs_area">
-        <div class="container">   
+    <?php
+    // MAS-86(a): grup landing sayfası (Bags & Purses / Accessories / Home Decor / Jewelry)
+    // için opsiyonel başlık arka plan görseli. Panel → "Group Banners" ile yönetilir.
+    // grup_banner tablosu yoksa (prod'a SQL uygulanmadıysa) sessizce eski görünüm kalır.
+    $grupBannerImg = '';
+    try {
+        $gb = $db->prepare("SELECT resim FROM grup_banner WHERE gkey = ?");
+        $gb->execute([$categoryTable]);
+        $gbr = $gb->fetchColumn();
+        if (!empty($gbr) && $gbr !== 'resim-yok') { $grupBannerImg = $gbr; }
+    } catch (\Throwable $e) { $grupBannerImg = ''; }
+    ?>
+    <div class="breadcrumbs_area<?= $grupBannerImg ? ' has-cat-bg' : '' ?>"<?= $grupBannerImg ? ' style="background-image:url(admin/resimler/' . htmlspecialchars($grupBannerImg) . ')"' : '' ?>>
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content text-center">
@@ -47,7 +59,7 @@ if (!isset($extraStyles)) $extraStyles = '';
                     </div>
                 </div>
             </div>
-        </div>         
+        </div>
     </div>
 
     <!-- shop page section start -->

@@ -824,16 +824,19 @@ $(document).ready(function() {
                             var eyalet =$("#eyalet")
             
                             if (selectedCountry === "2") { // Kanada seçildiğinde
-                                
+
                                 provinceLabel.text("City");
                                 postalCodeLabel.text("Postal Code *");
                                 eyalet.show(); // Görünürlüğü kapatmak için
-                                
+                                $("#issiot").prop("required", true);
 
                             } else if (selectedCountry === "3") { // Amerika seçildiğinde
                                 provinceLabel.text("State and City");
                                 postalCodeLabel.text("Zip Code *");
                                 eyalet.hide(); // Görünürlüğü kapatmak için
+                                // MAS-85: US'te province select gizli; 'required' kalırsa tarayıcı
+                                // gizli-zorunlu alan yüzünden "Proceed to Payment"i SESSİZCE bloklar.
+                                $("#issiot").prop("required", false);
 
                             }
                         });
@@ -1108,7 +1111,10 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
         totalEl.textContent = money(orderBase + ship);
     }
 
-    countryEl.addEventListener('change', function () {
+    // MAS-85: #country bir nice-select; seçim jQuery .trigger('change') ile bildiriliyor.
+    // Vanilla addEventListener('change') bunu YAKALAMIYORDU → US seçilince kargo Kanada'da
+    // kalıyordu. jQuery .on('change') nice-select tetiklemesini yakalar.
+    $('#country').on('change', function () {
         var c = this.value;
         if (c === '3') { // United States → panelden yönetilen US kargosu
             fetch('functions/calculate_shipping_us.php', { credentials: 'same-origin' })

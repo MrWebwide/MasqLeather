@@ -10810,17 +10810,19 @@ margin-top: 16px;
    Hepsi aynı genişlik+yükseklik (object-fit:cover) = OUR COLLECTION gibi.
    ============================================================ */
 .blog_thumb img {
+    /* MAS-101: eskiden object-fit:cover + sabit yükseklik fotoğrafları KIRPIYORDU.
+       Artık tam görsel gösterilir (contain + height:auto + max-height) → hiçbir şey kesilmez. */
     width: 100% !important;
-    height: 280px !important;
-    max-width: none !important;
-    max-height: none !important;
-    object-fit: cover !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 340px !important;
+    object-fit: contain !important;
     object-position: center !important;
     display: block !important;
     border-radius: 10px !important;
 }
 @media only screen and (max-width: 991px) {
-    .blog_thumb img { height: 240px !important; }
+    .blog_thumb img { max-height: 300px !important; }
 }
 
 /* ============================================================
@@ -10925,7 +10927,11 @@ margin-top: 16px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding: 90px 0;
+    /* MAS-86(c): banner alanı aşağı doğru büyütüldü (90px → 160px). */
+    padding: 160px 0;
+    min-height: 340px;
+    display: flex;
+    align-items: center;
 }
 .breadcrumbs_area.has-cat-bg::before {
     content: "";
@@ -10943,5 +10949,6 @@ margin-top: 16px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 @media only screen and (max-width: 767px) {
-    .breadcrumbs_area.has-cat-bg { padding: 55px 0; }
+    .breadcrumbs_area.has-cat-bg { padding: 90px 0; min-height: 220px; }
 }
+.breadcrumbs_area.has-cat-bg .container { width: 100%; }

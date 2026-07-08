@@ -27,6 +27,10 @@ if($yetki == 'yetkili') {
         </li>
 
         <li>
+            <a href="grup-banner.php"><i data-feather="image"></i>Group Banners</a>
+        </li>
+
+        <li>
             <a href="bag-purses-kampanya-listele.php"><i data-feather="percent"></i>Campaigns</a>
         </li>
 
