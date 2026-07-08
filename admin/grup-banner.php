@@ -41,7 +41,7 @@ try {
 
         // Silme istendiyse
         if (!empty($_POST['resim_sil'])) {
-            if (!empty($eski) && $eski !== 'resim-yok') { @unlink("../resimler/" . $eski); }
+            if (!empty($eski) && $eski !== 'resim-yok') { @unlink("resimler/" . $eski); }
             $resim = 'resim-yok';
         }
 
@@ -49,10 +49,10 @@ try {
         if (!empty($_FILES['resim']['tmp_name'])) {
             $tip = $_FILES['resim']['type'];
             if (in_array($tip, ['image/gif','image/png','image/jpg','image/jpeg','image/webp'], true)) {
-                if (!empty($eski) && $eski !== 'resim-yok') { @unlink("../resimler/" . $eski); }
+                if (!empty($eski) && $eski !== 'resim-yok') { @unlink("resimler/" . $eski); }
                 $ext = strtolower(pathinfo($_FILES['resim']['name'], PATHINFO_EXTENSION));
                 $resim = 'grup-' . seflink_gb($gruplar[$gkey]) . '-' . rand(100, 999) . '.' . $ext;
-                move_uploaded_file($_FILES['resim']['tmp_name'], "../resimler/" . $resim);
+                move_uploaded_file($_FILES['resim']['tmp_name'], "resimler/" . $resim);
             } else {
                 $mesaj = '<div class="alert alert-danger">Lütfen geçerli bir görsel (.jpg .png .gif .webp) yükleyin.</div>';
             }

@@ -10927,11 +10927,10 @@ margin-top: 16px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* MAS-86(c): banner alanı aşağı doğru büyütüldü (90px → 160px). */
-    padding: 160px 0;
-    min-height: 340px;
-    display: flex;
-    align-items: center;
+    /* MAS-86(c): banner alanı aşağı doğru büyütüldü (90px → 140px). Flex/min-height kaldırıldı
+       (üstte beyaz boşluk/hizalama sorunu yapıyordu) — sade padding. */
+    padding: 140px 0;
+    margin: 0;
 }
 .breadcrumbs_area.has-cat-bg::before {
     content: "";
@@ -10949,9 +10948,8 @@ margin-top: 16px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 @media only screen and (max-width: 767px) {
-    .breadcrumbs_area.has-cat-bg { padding: 90px 0; min-height: 220px; }
+    .breadcrumbs_area.has-cat-bg { padding: 80px 0; }
 }
-.breadcrumbs_area.has-cat-bg .container { width: 100%; }
 
 /* ============================================================
    ADD TO CART butonu — modern/premium yeniden tasarım.
