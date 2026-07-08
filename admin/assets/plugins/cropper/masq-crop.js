@@ -18,6 +18,10 @@
     function isImageInput(input) {
         if (!input || input.type !== 'file') { return false; }
         if (input.hasAttribute('data-no-crop')) { return false; }
+        // ÇOKLU görsel (uploadifive) input'unu ATLA — kullanıcı isteği: yalnız tekli görseller.
+        if (input.closest && input.closest('.uploadifive-button')) { return false; }
+        // Çoklu seçim (multiple) input'larını da atla
+        if (input.hasAttribute('multiple')) { return false; }
         var name = (input.getAttribute('name') || '').toLowerCase();
         if (name.indexOf('video') !== -1) { return false; }
         var accept = (input.getAttribute('accept') || '').toLowerCase();
