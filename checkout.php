@@ -1136,8 +1136,10 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
 
 
-                                <div class="panel-default">
-                                    <p style="text-align:center; color:red;"></p>
+                                <!-- MAS-87: çirkin JS alert yerine siteye uygun inline uyarı -->
+                                <div id="checkout-warning" style="display:none; margin:0 0 16px; padding:14px 16px; border-radius:10px; background:#fff4ec; border:1px solid #e0a878; color:#8a4b12; font-size:14px; line-height:1.5; box-shadow:0 4px 14px rgba(162,98,26,0.12);">
+                                    <strong style="display:block; margin-bottom:2px;">&#9888;&nbsp; Missing information</strong>
+                                    <span id="checkout-warning-text">Please fill in all required fields before proceeding to payment.</span>
                                 </div>
                              
                                
@@ -1172,18 +1174,27 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
                     // ülke/eyalet girmeden butona basınca yanlışlıkla "Order Placed" görüyordu.
                     var country = $('[name="country"]').val();
                     var province = $('[name="province"]').val();
-                    var missing = false;
-                    ['name', 'surname', 'address', 'city', 'postal', 'phone', 'email'].forEach(function (n) {
-                        if (!$.trim($('[name="' + n + '"]').first().val() || '')) { missing = true; }
-                    });
-                    if (!country || country === '1') { missing = true; }            // ülke seçilmemiş
-                    if (country === '2' && (!province || province === 'USA')) { missing = true; } // Kanada eyaleti seçilmemiş
+                    var missing = [];
 
-                    if (missing) {
+                    var labels = { name:'First Name', surname:'Last Name', address:'Address', city:'City', postal:'Postal Code', phone:'Phone', email:'Email' };
+                    Object.keys(labels).forEach(function (n) {
+                        var el = $('[name="' + n + '"]').first();
+                        var ok = $.trim(el.val() || '') !== '';
+                        el.css('border-color', ok ? '' : '#c0392b');
+                        if (!ok) { missing.push(labels[n]); }
+                    });
+                    if (!country || country === '1') { missing.push('Country'); }           // ülke seçilmemiş
+                    if (country === '2' && (!province || province === 'USA')) { missing.push('Province'); } // Kanada eyaleti
+
+                    var $warn = $('#checkout-warning');
+                    if (missing.length) {
                         e.preventDefault();
-                        alert('Please fill in all required fields (country, province and address details) before proceeding to payment.');
+                        $('#checkout-warning-text').text('Please complete: ' + missing.join(', ') + '.');
+                        $warn.stop(true, true).slideDown(180);
+                        if ($warn.offset()) { $('html, body').animate({ scrollTop: $warn.offset().top - 120 }, 300); }
                         return false;
                     }
+                    $warn.slideUp(150);
 
                     let button = $(this);
 
@@ -1194,6 +1205,11 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
                         }, 10000);
                     }
 
+                    });
+
+                    // Alanlar doldurulunca kırmızı kenarlığı temizle
+                    $('[name="name"],[name="surname"],[name="address"],[name="city"],[name="postal"],[name="phone"],[name="email"]').on('input change', function () {
+                        if ($.trim($(this).val() || '') !== '') { $(this).css('border-color', ''); }
                     });
 
 

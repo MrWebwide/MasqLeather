@@ -10952,3 +10952,116 @@ margin-top: 16px;
     .breadcrumbs_area.has-cat-bg { padding: 90px 0; min-height: 220px; }
 }
 .breadcrumbs_area.has-cat-bg .container { width: 100%; }
+
+/* ============================================================
+   ADD TO CART butonu — modern/premium yeniden tasarım.
+   Eski tasarımda butonun ARKASINDA (z-index:0, margin ile kaymış) bir yeşil
+   daire+tik SVG (.icon-loader-check) duruyordu; alttan taşıyor ve hizasız
+   görünüyordu. Tıklayınca da buton küçülüp o tik'i açıyordu (btn-add anim).
+   Hepsi kaldırıldı; renk (peru) korundu, şık hover parlaması + "Added ✓" geri
+   bildirimi eklendi.
+   ============================================================ */
+.icon-loader-check { display: none !important; }          /* eski bozuk yeşil tik/loader tamamen gizli */
+
+.add-to-cart {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 200px !important;
+    max-width: 100% !important;
+    height: 54px !important;
+    padding: 0 22px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #c1823f 0%, #a2621a 100%) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    letter-spacing: 0.03em !important;
+    position: relative !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 16px rgba(162, 98, 26, 0.35) !important;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
+    animation: none !important;                            /* eski shrink (btn-add) animasyonu iptal */
+}
+
+/* Etiketi absolute merkezleme yerine normal akışa al (flex ortalar) */
+.add-to-cart .btn-text {
+    position: relative !important;
+    top: auto !important; left: auto !important; right: auto !important;
+    transform: none !important;
+    line-height: normal !important;
+    white-space: nowrap !important;
+    z-index: 2 !important;
+    transition: opacity .15s ease !important;
+}
+
+/* Sepet ikonu (etiketin soluna) */
+.add-to-cart .btn-text::before {
+    content: "\f07a"; /* fa-shopping-cart */
+    font-family: "FontAwesome", "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 9px;
+    font-size: 15px;
+}
+
+.add-to-cart:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 26px rgba(162, 98, 26, 0.48) !important;
+    filter: brightness(1.06) !important;
+}
+.add-to-cart:active { transform: translateY(0) scale(0.98) !important; }
+.add-to-cart:focus { outline: none !important; }
+
+/* Parlama süpürmesi (shine sweep) hover'da */
+.add-to-cart::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0; left: -80%;
+    width: 55%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+    transform: skewX(-20deg);
+    transition: left .55s ease !important;
+    z-index: 1 !important;
+    pointer-events: none;
+}
+.add-to-cart:hover::before { left: 130%; }
+
+/* Stokta yok (disabled) — sade gri, efektsiz */
+.add-to-cart:disabled,
+.add-to-cart[disabled] {
+    background: #b9b3ab !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    filter: none !important;
+    transform: none !important;
+}
+.add-to-cart:disabled:hover::before,
+.add-to-cart[disabled]:hover::before { left: -80%; }
+.add-to-cart:disabled .btn-text::before,
+.add-to-cart[disabled] .btn-text::before { content: ""; margin: 0; }
+
+/* Tıklanınca (btn-wrapper.add) temiz, ortalı "Added ✓" geri bildirimi */
+.btn-wrapper.add .add-to-cart { animation: none !important; }
+.btn-wrapper.add .add-to-cart .btn-text { opacity: 0 !important; }
+.btn-wrapper.add .add-to-cart::after {
+    content: "\2713  Added";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #fff;
+    z-index: 3;
+    animation: masqAddedPop .32s ease;
+}
+@keyframes masqAddedPop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    60%  { transform: scale(1.09); }
+    100% { transform: scale(1);   opacity: 1; }
+}
