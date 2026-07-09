@@ -59,6 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($query->execute()) {
                 $response['success'] = true;
                 $response['message'] = "Subscription successful!";
+
+                // MAS-110: kayıt olana bir kerelik indirim kuponu üret + mail gönder.
+                // Best-effort — hata olsa bile abonelik başarılı sayılır (akışı bozmaz).
+                require_once __DIR__ . '/../newsletter_discount.php';
+                if (masq_send_newsletter_discount($db, $email)) {
+                    $response['message'] = "Subscription successful! Check your inbox for a discount code.";
+                }
             } else {
                 $response['message'] = "There was an error. Please try again.";
             }

@@ -113,6 +113,7 @@ if($yetki == 'yetkili') {
             <ul class="">
                 <li><a href="mailayarlari.php"><i class="fa fa-circle"></i>User Accounts</a></li>
                 <li><a href="mail-metinleri.php"><i class="fa fa-circle"></i>Mail Texts</a></li>
+                <li><a href="newsletter-indirim.php"><i class="fa fa-circle"></i>Newsletter Discount</a></li>
                 <li><a href="hata-loglari.php"><i class="fa fa-circle"></i>Error Logs
                     <?php try { $__ec = (int) $db->query("SELECT COUNT(*) FROM hata_log WHERE cozuldu = 0")->fetchColumn(); if ($__ec > 0) { echo '<span class="badge bg-danger" style="float:right;">' . $__ec . '</span>'; } } catch (\Throwable $e) {} ?>
                 </a></li>
