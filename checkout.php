@@ -549,52 +549,43 @@ echo "</script>";
                         <h3>Shipping Address Details</h3>
                         <h4 style="font-weight: 700; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">(Please fill all of the fields for a successful shipment) </h4>
                         <?php
-// Önce $adsoyad değişkenini güvenli hale getirin (örneğin htmlspecialchars kullanarak)
+// MAS-109: kullanıcının TÜM kayıtlı adreslerini listele (eskiden tek adres gösteriliyordu).
 $adsoyad = htmlspecialchars($adsoyad);
 
-// Veritabanından 'useraddress' tablosunu sorgula
-$stmt = $db->prepare("SELECT COUNT(*) AS count FROM useraddress WHERE adsoyad = :adsoyad");
-$stmt->bindParam(':adsoyad', $adsoyad);
-$stmt->execute();
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$savedAddrStmt = $db->prepare("SELECT id, addname, city, province FROM useraddress WHERE userid = :userid ORDER BY id DESC");
+$savedAddrStmt->bindParam(':userid', $userId);
+$savedAddrStmt->execute();
+$savedAddrRows = $savedAddrStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// 'useraddress' tablosunda $adsoyad değeri varsa veya yoksa koşullarını kontrol et
-if ($row['count'] > 0) {
-    // Eğer $adsoyad değeri 'useraddress' tablosunda varsa, seçim kutusunu göster
+// Kayıtlı adres varsa seçim kutusunu göster
+if (count($savedAddrRows) > 0) {
 ?>
 <div class="checkout_form_input">
     <h3 for="country" style="color: brown; margin: 5px;">Saved Address:</h3>
     <select class="select_option"  name="saved_address" id="saved_address">
-        <option value="1">Select Address</option>
-        <option value="2">
-            <?php
-            // 'useraddress' tablosundan kullanıcının adını al
-            $addressNameStmt = $db->prepare("SELECT addname FROM useraddress WHERE adsoyad = :adsoyad");
-            $addressNameStmt->bindParam(':adsoyad', $adsoyad);
-            $addressNameStmt->execute();
-            $addressName = $addressNameStmt->fetchColumn();
-
-            // 'addname' değerini seçenek olarak yazdır
-            echo htmlspecialchars($addressName);
-            ?>
-        </option>
-        
+        <option value="0">Select Address</option>
+        <?php foreach ($savedAddrRows as $sa):
+            $label = $sa['addname'] ?: trim(($sa['city'] ?? '') . ' ' . ($sa['province'] ?? ''));
+            if ($label === '') { $label = 'Address #' . $sa['id']; }
+        ?>
+        <option value="<?= (int)$sa['id'] ?>"><?= htmlspecialchars($label) ?></option>
+        <?php endforeach; ?>
     </select>
 </div>
 <script>
 $(document).ready(function() {
     $('#saved_address').change(function() {
-        var selectedValue = $(this).val(); // Seçilen option değeri (1, 2 veya 3)
+        var selectedValue = $(this).val(); // MAS-109: seçilen adresin id'si (0 = seçim yok)
 
-        if (selectedValue == 1) {
-            // Eğer option 1 seçildiyse, tüm form alanlarını temizle
+        if (selectedValue == 0 || selectedValue === '') {
+            // "Select Address" → tüm form alanlarını temizle
             clearFormFields();
         } else {
-            // Diğer durumlarda AJAX isteği gönder
+            // MAS-109: seçilen adresi id ile getir
             $.ajax({
                 url: './functions/get_address_data.php',
                 type: 'GET',
-                data: { adsoyad: adsoyad },
+                data: { id: selectedValue },
                 success: function(data) {
                     // AJAX başarılı → form alanlarını doldur (data string veya object olabilir)
                     if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }

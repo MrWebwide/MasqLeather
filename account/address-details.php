@@ -48,9 +48,12 @@ $pageCSS = [$basePath . 'admin/assets/css/main.min.css'];
     </div>
 
     <?php
-// Check if form is submitted
+// MAS-109: Çoklu adres desteği. Adresler artık `id` ile yönetilir (userid'e bağlı),
+// eskiden `adsoyad` ile tek satır tutuluyordu → kullanıcı yalnızca 1 adres kaydedebiliyordu.
+$mesaj = '';
 if(isset($_POST['kaydet'])) {
     // Retrieve posted values
+    $editId  = isset($_POST['edit_id']) && $_POST['edit_id'] !== '' ? intval($_POST['edit_id']) : 0;
     $addname = $_POST['addname'];
     $province = $_POST['province'];
     $city = $_POST['city'];
@@ -63,65 +66,49 @@ if(isset($_POST['kaydet'])) {
     $surname = $_POST['surname'] ?? '';
     $country = $_POST['country'] ?? '';
 
-// İlk önce, veritabanında adsoyad ile eşleşen bir kayıt olup olmadığını kontrol edelim
-$kontrol = $db->prepare("SELECT COUNT(*) FROM useraddress WHERE adsoyad = :adsoyad");
-$kontrol->execute(array("adsoyad" => $adsoyad));
-$sayi = $kontrol->fetchColumn();
-
-if ($sayi > 0) {
-    // Kayıt mevcutsa, güncelleme işlemi yap
-    $ekle = $db->prepare("UPDATE useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone WHERE adsoyad=:adsoyad");
-    $simdi = $ekle->execute(array(
-        "addname" => $addname,
-        "name" => $name,
-        "surname" => $surname,
-        "country" => $country,
-        "province" => $province,
-        "city" => $city,
-        "postal" => $postal,
-        "address" => $address,
-        "email" => $email,
-        "phone" => $phone,
-        "adsoyad" => $adsoyad,
-        "userid" => $userId
-    ));
-} else {
-    // Kayıt mevcut değilse, yeni kayıt ekle
-    $ekle = $db->prepare("INSERT INTO useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal,userid=:userid, address=:address, email=:email, phone=:phone, adsoyad=:adsoyad");
-    $simdi = $ekle->execute(array(
-        "addname" => $addname,
-        "name" => $name,
-        "surname" => $surname,
-        "country" => $country,
-        "province" => $province,
-        "city" => $city,
-        "postal" => $postal,
-        "address" => $address,
-        "email" => $email,
-        "phone" => $phone,
-        "adsoyad" => $adsoyad,
-        "userid" => $userId
-    ));
-}
-
-    
-    // Check if update was successful
-    if($simdi) {
-        $mesaj = "<div class='alert alert-warning alert-dismissible fade show' id='del' role='alert'>
-                      <strong>Address Updated Successfully!</strong> 
-                      <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>";  
-                 
+    if ($editId > 0) {
+        // MAS-109: mevcut adresi güncelle — yalnızca bu kullanıcının kaydı (güvenlik: userid şartı)
+        $ekle = $db->prepare("UPDATE useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal, address=:address, email=:email, phone=:phone WHERE id=:id AND userid=:userid");
+        $simdi = $ekle->execute(array(
+            "addname" => $addname, "name" => $name, "surname" => $surname, "country" => $country,
+            "province" => $province, "city" => $city, "postal" => $postal, "address" => $address,
+            "email" => $email, "phone" => $phone, "id" => $editId, "userid" => $userId
+        ));
+        $mesajText = 'Address Updated Successfully!';
+    } else {
+        // MAS-109: her zaman YENİ adres ekle (artık üzerine yazmıyor)
+        $ekle = $db->prepare("INSERT INTO useraddress SET addname=:addname, name=:name, surname=:surname, country=:country, province=:province, city=:city, postal=:postal, userid=:userid, address=:address, email=:email, phone=:phone, adsoyad=:adsoyad, eklenme_tarihi=:tarih");
+        $simdi = $ekle->execute(array(
+            "addname" => $addname, "name" => $name, "surname" => $surname, "country" => $country,
+            "province" => $province, "city" => $city, "postal" => $postal, "address" => $address,
+            "email" => $email, "phone" => $phone, "userid" => $userId, "adsoyad" => $adsoyad,
+            "tarih" => date('Y-m-d H:i:s')
+        ));
+        $mesajText = 'Address Added Successfully!';
     }
 
-
-
+    if($simdi) {
+        $mesaj = "<div class='alert alert-warning alert-dismissible fade show' id='del' role='alert'>
+                      <strong>" . $mesajText . "</strong>
+                      <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                  </div>";
+    }
 }
 
-  // Fetch updated record from database
-  $stmt_addr = $db->prepare("SELECT * FROM useraddress WHERE adsoyad = :adsoyad");
-  $stmt_addr->execute([':adsoyad' => $adsoyad]);
-  $guncelle = $stmt_addr->fetch(PDO::FETCH_ASSOC);
+// MAS-109: Kullanıcının TÜM kayıtlı adresleri
+$addrListStmt = $db->prepare("SELECT * FROM useraddress WHERE userid = :userid ORDER BY id DESC");
+$addrListStmt->execute([':userid' => $userId]);
+$savedAddresses = $addrListStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Düzenleme modu: ?edit=<id> geldiyse o adresi forma yükle; yoksa form BOŞ (yeni adres ekleme)
+$editId = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
+$guncelle = [];
+if ($editId > 0) {
+    foreach ($savedAddresses as $a) {
+        if ((int)$a['id'] === $editId) { $guncelle = $a; break; }
+    }
+    if (empty($guncelle)) { $editId = 0; } // başkasının/olmayan id → yeni ekleme moduna düş
+}
 ?>
 
  <div class="page-container">
@@ -137,21 +124,20 @@ if ($sayi > 0) {
                                     <div class="d-flex" >
                             <div class="buta">
                                     <a href="../index.php" class="oval-button" style="margin-right:0.3cm"><span>Home</span></a>
-                                    <button class="oval-button" style="margin-right:0.3cm" onclick="silAddress('<?php echo $adsoyad; ?>')"><span>Delete Address</span></button>
+                                    <!-- MAS-109: yeni adres ekleme formunu temizler (edit modundan çıkar) -->
+                                    <a href="address-details.php" class="oval-button" style="margin-right:0.3cm"><span>+ Add New Address</span></a>
 
-                                    
                                     <script>
-function silAddress(adsoyad) {
-    // Kullanıcı onayladıysa, AJAX kullanarak veritabanından adresi silme işlemi gerçekleştirilecek
+function silAddress(id) {
+    if (!confirm('Delete this address?')) { return; }
+    // MAS-109: adres artık id ile silinir (kullanıcının birden çok adresi olabilir)
     $.ajax({
         type: 'POST',
         url: '../functions/delete_address.php',
-        data: { adsoyad: adsoyad },
+        data: { id: id },
         success: function(response) {
-            $('.alert').removeClass('d-none').addClass('d-flex');
-            $('.alert strong').text('Address Deleted Successfully!');
-            clearFormFields();
-            clearupdateinfo();
+            // Listeyi tazelemek için sayfayı yenile
+            window.location.href = 'address-details.php';
         },
         error: function() {
             alert('There was a problem with deleting address.');
@@ -159,30 +145,15 @@ function silAddress(adsoyad) {
     });
 }
 
-function clearFormFields() {
-    $('input[name="addname"]').val('');
-    $('input[name="name"]').val('');
-    $('input[name="surname"]').val('');
-    $('select[name="country"]').val('1').trigger('change');
-    $('select[name="province"]').val('USA');
-    $('input[name="city"]').val('');
-    $('input[name="postal"]').val('');
-    $('input[name="address"]').val('');
-    $('input[name="email"]').val('');
-    $('input[name="phone"]').val('');
-}
-
 function clearupdateinfo() {
     var element = document.getElementById('del');
-    element.classList.remove('d-flex');
-    element.classList.add('d-none');
+    if (element) { element.classList.remove('d-flex'); element.classList.add('d-none'); }
 }
-
 </script>
 
                                     </div>
 
-                                    
+
                                     </div>
                                     <style>
                .oval-button {
@@ -194,10 +165,10 @@ function clearupdateinfo() {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
-   
+
 }
 .buta{
-margin-bottom:30px;    
+margin-bottom:30px;
 }
 
 .oval-button:hover {
@@ -207,18 +178,50 @@ margin-bottom:30px;
 .oval-button:hover span {
     color: white; /* Hover durumunda içindeki yazının rengini değiştirme */
 }
-                                   </style>      
-                                    
-                           
+/* MAS-109: kayıtlı adres listesi kartları */
+.addr-list { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:26px; }
+.addr-card { border:1px solid #e2d6c8; border-radius:10px; padding:14px 16px; min-width:230px; max-width:300px; background:#fbf8f4; }
+.addr-card.active { border-color:#AB6E35; box-shadow:0 0 0 2px rgba(171,110,53,.15); }
+.addr-card h5 { margin:0 0 6px; font-size:15px; font-weight:700; color:#3d2b1a; }
+.addr-card p { margin:0 0 4px; font-size:13px; color:#5b5b5b; line-height:1.4; }
+.addr-card .addr-actions { margin-top:10px; display:flex; gap:8px; }
+.addr-card .addr-actions a, .addr-card .addr-actions button {
+    font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px;
+    border:none; cursor:pointer; text-decoration:none;
+}
+.addr-edit { background:#AB6E35; color:#fff !important; }
+.addr-del  { background:#c0392b; color:#fff !important; }
+                                   </style>
+
+
+                                    <!-- MAS-109: kullanıcının tüm kayıtlı adresleri -->
+                                    <?php if (!empty($savedAddresses)): ?>
+                                    <div class="addr-list">
+                                        <?php foreach ($savedAddresses as $a):
+                                            $isActive = ($editId > 0 && (int)$a['id'] === $editId);
+                                            $countryLabel = ($a['country']=='2') ? 'Canada' : (($a['country']=='3') ? 'United States' : '');
+                                        ?>
+                                        <div class="addr-card <?= $isActive ? 'active' : '' ?>">
+                                            <h5><?= htmlspecialchars($a['addname'] ?: 'Address') ?></h5>
+                                            <p><?= htmlspecialchars(trim(($a['name'] ?? '') . ' ' . ($a['surname'] ?? ''))) ?></p>
+                                            <p><?= htmlspecialchars($a['address'] ?? '') ?></p>
+                                            <p><?= htmlspecialchars(trim(($a['city'] ?? '') . ' ' . ($a['province'] ?? '') . ' ' . ($a['postal'] ?? ''))) ?></p>
+                                            <p><?= htmlspecialchars($countryLabel) ?></p>
+                                            <div class="addr-actions">
+                                                <a class="addr-edit" href="address-details.php?edit=<?= (int)$a['id'] ?>">Edit</a>
+                                                <button type="button" class="addr-del" onclick="silAddress(<?= (int)$a['id'] ?>)">Delete</button>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <?php endif; ?>
 
                                     <form method="post" enctype="multipart/form-data" >
+                                    <!-- MAS-109: düzenleme modunda id taşınır; boşsa yeni adres eklenir -->
+                                    <input type="hidden" name="edit_id" value="<?= $editId > 0 ? (int)$editId : '' ?>">
 
-                                    <h4 style="color:black ">Address Details  </h4>      
+                                    <h4 style="color:black "><?= $editId > 0 ? 'Edit Address' : 'Add New Address' ?></h4>
                                     <?=$mesaj?>
-                                    <div class='alert alert-warning alert-dismissible fade show d-none' role='alert'>
-                      <strong>Address Deleted Successfully!</strong> 
-                      <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>
 
                                       
                                     <div class="form-floating mb-3 col-3">
