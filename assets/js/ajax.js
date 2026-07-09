@@ -35,6 +35,7 @@ $(document).ready(function() {
     $(".add-to-cart").click(function(e) {
         e.preventDefault(); // Default behavior engellenmesi
 
+        var $btnWrapper = $(this).closest(".btn-wrapper"); // MAS-106: "Added ✓" animasyonu sadece başarıda oynatılacak
         var form = $(this).closest("form"); // Formu bulmak için en yakın formu seçin
         var productId = form.find("input[name='productId']").val();
         var productName = form.find("input[name='productName']").val();
@@ -92,11 +93,17 @@ $(document).ready(function() {
 
                 // Sadece en son eklenen ürünün altında sub total'i Showin
                 $("#subTotal .price").text('$' + subTotal.toFixed(2));
+
+                // MAS-106: "Added ✓" animasyonu YALNIZCA ürün gerçekten eklendiğinde oynatılır.
+                // Eskiden animasyon touchstart'ta ayrı tetikleniyordu → mobilde dokunuş scroll'a
+                // dönüşünce click (dolayısıyla AJAX) hiç çalışmadan "eklendi" görünüyordu.
+                $btnWrapper.addClass('add');
+                setTimeout(function () { $btnWrapper.removeClass('add'); }, 2200);
             },
-            // MAS-106: eskiden error handler YOKTU → AJAX sessizce başarısız olunca (mobilde
-            // zayıf bağlantı/oturum) ürün eklenmediği halde animasyon "eklendi" gibi görünüyordu.
-            // Artık başarısızlık kullanıcıya bildirilir.
+            // MAS-106: AJAX sessizce başarısız olunca (mobilde zayıf bağlantı/oturum)
+            // kullanıcıya bildirilir; animasyon oynatılmaz.
             error: function() {
+                $btnWrapper.removeClass('add');
                 alert('The product could not be added to your cart. Please check your connection and try again.');
             }
         });

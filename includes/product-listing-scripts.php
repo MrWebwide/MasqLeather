@@ -18,13 +18,12 @@
         if (message) { message.style.display = 'none'; }
     }, 6000);
 
-    // Add-to-cart button animation
+    // MAS-106: "Added ✓" animasyonu artık ajax.js'te AJAX BAŞARISINDA oynatılıyor
+    // (touchstart'ta erken tetikleme kaldırıldı → mobilde yanlış "eklendi" görüntüsü giderildi).
+    // Burada sadece tıklamanın ürün linkine yayılmasını engelliyoruz.
     $(document).ready(function () {
-        $('.add-to-cart').on('click touchstart', function (event) {
+        $('.add-to-cart').on('click', function (event) {
             event.stopPropagation();
-            var $btnWrapper = $(this).closest('.btn-wrapper');
-            $btnWrapper.addClass('add');
-            setTimeout(function () { $btnWrapper.removeClass('add'); }, 2200);
         });
     });
 </script>

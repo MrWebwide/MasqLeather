@@ -826,7 +826,9 @@ $(document).ready(function () {
         $btnWrapper.addClass('add');
         setTimeout(function () { $btnWrapper.removeClass('add'); }, 2200);
     }
-    $('.add-to-cart').on('click touchstart', handleButtonClick);
+    // MAS-106: sadece 'click' — mobilde touchstart, dokunuş scroll'a dönse bile
+    // "eklendi" animasyonunu yanlışlıkla oynatıyordu.
+    $('.add-to-cart').on('click', handleButtonClick);
 });
 </script>
 JSEOF;
