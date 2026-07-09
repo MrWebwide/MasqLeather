@@ -25,6 +25,15 @@ $pageCSS = [$basePath . 'admin/assets/css/main.min.css'];
             .invoice-table { font-size: 13px; }
             .invoice-table th, .invoice-table td { padding: 10px 8px; }
         }
+        /* MAS-104: "View Items" butonu — siparişin ürünlerini açtığını netleştirir */
+        .view-items-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 50px;
+            background: #AB6E35; color: #fff !important;
+            font-size: 13px; font-weight: 600; white-space: nowrap;
+            transition: background .2s ease;
+        }
+        .view-items-btn:hover { background: #8a561f; color: #fff !important; }
     </style>
     <script src="<?=$basePath?>assets/js/ajax.js"></script>
     <script src="<?=$basePath?>assets/js/handlewindowsize.js"></script>
@@ -100,12 +109,13 @@ if (count($urunlistele)) {
             <td>$<?= $urungoster['totalAmount'] ?> CAD</td>
             <td><span class="badge bg-primary"><?= $urungoster['eklenme_tarihi'] ?></span></td>
             <td>
-             
-                <a href="order-detail.php?islem=duzenle&id=<?= $urungoster['id'] ?>" >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                <!-- MAS-104: sipariş detayına (satın alınan ürünler) gitmek için net buton -->
+                <a href="order-detail.php?islem=duzenle&id=<?= $urungoster['id'] ?>" class="view-items-btn" title="View purchased items">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
+                    <span>View Items</span>
                 </a>
             </td>
         </tr>

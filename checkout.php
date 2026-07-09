@@ -596,23 +596,28 @@ $(document).ready(function() {
                 type: 'GET',
                 data: { adsoyad: adsoyad },
                 success: function(data) {
-                    // AJAX başarılı → form alanlarını doldur
-                    $('input[name="addname"]').val(data.addname);
-                    $('input[name="name"]').val(data.name);
-                    $('input[name="surname"]').val(data.surname);
-                    $('textarea[name="address"]').val(data.address);
-                    $('input[name="city"]').val(data.city);
-                    // MAS-97: province bir <select> (input değildi → eskiden hiç dolmuyordu)
-                    $('select[name="province"]').val(data.province);
-                    $('input[name="postal"]').val(data.postal);
-                    $('input[name="phone"]').val(data.phone);
-                    $('input[name="email"]').val(data.email);
+                    // AJAX başarılı → form alanlarını doldur (data string veya object olabilir)
+                    if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
 
-                    // Ülke (2=Canada, 3=United States)
+                    // MAS-97: isim/soyisim TEXT input (name="name"/"surname") — otomatik dolar
+                    $('input[name="name"]').val(data.name || '');
+                    $('input[name="surname"]').val(data.surname || '');
+                    $('input[name="addname"]').val(data.addname || '');
+                    $('textarea[name="address"]').val(data.address || '');
+                    $('input[name="city"]').val(data.city || '');
+                    $('input[name="postal"]').val(data.postal || '');
+                    $('input[name="phone"]').val(data.phone || '');
+                    $('input[name="email"]').val(data.email || '');
+
+                    // MAS-97: Ülke (2=Canada, 3=United States) — önce set, sonra change ile
+                    // province göster/gizle + etiket mantığı çalışsın.
                     var countryValue = data.country;
                     if (countryValue == 2 || countryValue == 3) {
                         $('select[name="country"]').val(String(countryValue));
                     }
+
+                    // MAS-97: province bir <select> (input değildi → eskiden hiç dolmuyordu)
+                    $('select[name="province"]').val(data.province || 'USA');
 
                     // MAS-97: nice-select özel dropdown'ları native .val() ile güncellenmez;
                     // görünen değerin de değişmesi için plugin'in update'ini çağır.
@@ -620,6 +625,9 @@ $(document).ready(function() {
                         $('select[name="country"]').niceSelect('update');
                         $('select[name="province"]').niceSelect('update');
                     }
+
+                    // MAS-97: ülkeye bağlı province göster/gizle + City/State etiketleri güncellensin
+                    $('#country').trigger('change');
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
