@@ -20,7 +20,7 @@ $id = 1;
 	
 	
 	
-$klasor="../resimler/";
+$klasor="resimler/";
 	
 
 	
@@ -100,7 +100,7 @@ $klasor="../resimler/";
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Alt Banner Alanı | <?=$ayar['site_title']?></title>
 
         
@@ -160,7 +160,7 @@ $klasor="../resimler/";
                                         <label for="formFile" class="form-label">Haber Resmi</label>
                                         <input class="form-control" type="file" name="resim4" id="formFile">
                                         
-                                         <img src="../resimler/<?=$guncelle['resim4']?>" width="200">
+                                         <img src="resimler/<?=$guncelle['resim4']?>" width="200">
                                       </div>
                                       
                                     

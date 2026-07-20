@@ -1,4 +1,4 @@
-﻿
+
 <?php
 $basePath = '';
 $noExzoom = false;
@@ -18,9 +18,7 @@ $pageKeywords = '';
 <?php include __DIR__ . '/includes/head-css.php'; ?>
 <?php include __DIR__ . '/includes/head-js.php'; ?>
 
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>window.STRIPE_PK = "<?=STRIPE_PUBLISHABLE_KEY?>";</script>
-    <script src="./stripe/checkout.js" defer></script>
+    <!-- Stripe ödeme akışı stripe/pay.php sayfasına taşındı (MAS-10). Adres formu Stripe yüklemez. -->
 
     <style>
         #exzoom {
@@ -547,88 +545,80 @@ echo "</script>";
         <div class="checkout_form">
             <div class="row">
                 <div class="col-lg-7 col-md-6">
-                <form action="functions/control.php" method="post">
+                <form action="functions/control.php" method="post" id="checkoutForm">
                         <h3>Shipping Address Details</h3>
                         <h4 style="font-weight: 700; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">(Please fill all of the fields for a successful shipment) </h4>
                         <?php
-// Önce $adsoyad değişkenini güvenli hale getirin (örneğin htmlspecialchars kullanarak)
+// MAS-109: kullanıcının TÜM kayıtlı adreslerini listele (eskiden tek adres gösteriliyordu).
 $adsoyad = htmlspecialchars($adsoyad);
 
-// Veritabanından 'useraddress' tablosunu sorgula
-$stmt = $db->prepare("SELECT COUNT(*) AS count FROM useraddress WHERE adsoyad = :adsoyad");
-$stmt->bindParam(':adsoyad', $adsoyad);
-$stmt->execute();
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$savedAddrStmt = $db->prepare("SELECT id, addname, city, province FROM useraddress WHERE userid = :userid ORDER BY id DESC");
+$savedAddrStmt->bindParam(':userid', $userId);
+$savedAddrStmt->execute();
+$savedAddrRows = $savedAddrStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// 'useraddress' tablosunda $adsoyad değeri varsa veya yoksa koşullarını kontrol et
-if ($row['count'] > 0) {
-    // Eğer $adsoyad değeri 'useraddress' tablosunda varsa, seçim kutusunu göster
+// Kayıtlı adres varsa seçim kutusunu göster
+if (count($savedAddrRows) > 0) {
 ?>
 <div class="checkout_form_input">
     <h3 for="country" style="color: brown; margin: 5px;">Saved Address:</h3>
     <select class="select_option"  name="saved_address" id="saved_address">
-        <option value="1">Select Address</option>
-        <option value="2">
-            <?php
-            // 'useraddress' tablosundan kullanıcının adını al
-            $addressNameStmt = $db->prepare("SELECT addname FROM useraddress WHERE adsoyad = :adsoyad");
-            $addressNameStmt->bindParam(':adsoyad', $adsoyad);
-            $addressNameStmt->execute();
-            $addressName = $addressNameStmt->fetchColumn();
-
-            // 'addname' değerini seçenek olarak yazdır
-            echo htmlspecialchars($addressName);
-            ?>
-        </option>
-        
+        <option value="0">Select Address</option>
+        <?php foreach ($savedAddrRows as $sa):
+            $label = $sa['addname'] ?: trim(($sa['city'] ?? '') . ' ' . ($sa['province'] ?? ''));
+            if ($label === '') { $label = 'Address #' . $sa['id']; }
+        ?>
+        <option value="<?= (int)$sa['id'] ?>"><?= htmlspecialchars($label) ?></option>
+        <?php endforeach; ?>
     </select>
 </div>
 <script>
 $(document).ready(function() {
     $('#saved_address').change(function() {
-        var selectedValue = $(this).val(); // Seçilen option değeri (1, 2 veya 3)
+        var selectedValue = $(this).val(); // MAS-109: seçilen adresin id'si (0 = seçim yok)
 
-        if (selectedValue == 1) {
-            // Eğer option 1 seçildiyse, tüm form alanlarını temizle
+        if (selectedValue == 0 || selectedValue === '') {
+            // "Select Address" → tüm form alanlarını temizle
             clearFormFields();
         } else {
-            // Diğer durumlarda AJAX isteği gönder
+            // MAS-109: seçilen adresi id ile getir
             $.ajax({
                 url: './functions/get_address_data.php',
                 type: 'GET',
-                data: { adsoyad: adsoyad },
+                data: { id: selectedValue },
                 success: function(data) {
-                    // AJAX isteği başarılıysa, verileri form alanlarına doldur
-                    $('input[name="addname"]').val(data.addname);
-                    $('input[name="name"]').val(data.name);
-                    $('input[name="surname"]').val(data.surname);
-                    $('textarea[name="address"]').val(data.address);
-                    $('input[name="city"]').val(data.city);
-                    $('input[name="province"]').val(data.province);
-                    $('input[name="postal"]').val(data.postal);
-                    $('input[name="phone"]').val(data.phone);
-                    $('input[name="email"]').val(data.email);
+                    // AJAX başarılı → form alanlarını doldur (data string veya object olabilir)
+                    if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
 
-                    // Ülke bilgisine göre seçili option'u belirle
+                    // MAS-97: isim/soyisim TEXT input (name="name"/"surname") — otomatik dolar
+                    $('input[name="name"]').val(data.name || '');
+                    $('input[name="surname"]').val(data.surname || '');
+                    $('input[name="addname"]').val(data.addname || '');
+                    $('textarea[name="address"]').val(data.address || '');
+                    $('input[name="city"]').val(data.city || '');
+                    $('input[name="postal"]').val(data.postal || '');
+                    $('input[name="phone"]').val(data.phone || '');
+                    $('input[name="email"]').val(data.email || '');
+
+                    // MAS-97: Ülke (2=Canada, 3=United States) — önce set, sonra change ile
+                    // province göster/gizle + etiket mantığı çalışsın.
                     var countryValue = data.country;
-
-                    // Ülke bilgisine göre doğru option'u seçili hale getir
-                    if (countryValue == 2) {
-                        $('select[name="country"]').val('2'); // Canada seçeneğini seçili yap
-                    } else if (countryValue == 3) {
-                        $('select[name="country"]').val('3'); // United States seçeneğini seçili yap
+                    if (countryValue == 2 || countryValue == 3) {
+                        $('select[name="country"]').val(String(countryValue));
                     }
-                    
-    var countryText = "";
 
-    if (countryValue == 2) {
-        countryText = "Canada";
-    } else if (countryValue == 3) {
-        countryText = "United States";
-    }
+                    // MAS-97: province bir <select> (input değildi → eskiden hiç dolmuyordu)
+                    $('select[name="province"]').val(data.province || 'USA');
 
-    // 'current' class'ına sahip span elementinin metnini güncelle
-    $('.cenk').find('.current').text(countryText);
+                    // MAS-97: nice-select özel dropdown'ları native .val() ile güncellenmez;
+                    // görünen değerin de değişmesi için plugin'in update'ini çağır.
+                    if ($.fn.niceSelect) {
+                        $('select[name="country"]').niceSelect('update');
+                        $('select[name="province"]').niceSelect('update');
+                    }
+
+                    // MAS-97: ülkeye bağlı province göster/gizle + City/State etiketleri güncellensin
+                    $('#country').trigger('change');
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
@@ -644,14 +634,17 @@ $(document).ready(function() {
         $('input[name="surname"]').val('');
         $('textarea[name="address"]').val('');
         $('input[name="city"]').val('');
-        $('input[name="province"]').val('');
+        $('select[name="province"]').val('USA'); // MAS-97: placeholder ("Select Province")
         $('input[name="postal"]').val('');
         $('input[name="phone"]').val('');
         $('input[name="email"]').val('');
-        $('select[name="country"]').val('1'); // Select Country seçeneğini seçili hale getir
+        $('select[name="country"]').val('1'); // Select Country
 
-        $('.cenk').find('.current').text('Select Country');
-
+        // MAS-97: nice-select görünümlerini de sıfırla
+        if ($.fn.niceSelect) {
+            $('select[name="country"]').niceSelect('update');
+            $('select[name="province"]').niceSelect('update');
+        }
     }
 });
 
@@ -772,7 +765,7 @@ $(document).ready(function() {
                         <input type="hidden" name="siparis" id="siparis" value='<?php echo json_encode($groupedItems); ?>'>
 
                         <div class="checkout_form_input">
-                            <input type="checkbox" id="campaign" checked>
+                            <input type="checkbox" id="campaign" name="campaign" value="1" checked>
                             <label for="campaign">I would like to receive e-mails about future sales and campaigns.</label>
                         </div>
                         <div class="checkout_form_input">
@@ -787,11 +780,11 @@ $(document).ready(function() {
 
                             <div class="checkout_form_input">
                                 <label>First Name <span>*</span></label>
-                                <input type="text" name="namebill" required>
+                                <input type="text" name="namebill">
                             </div>
                             <div class="checkout_form_input">
                                 <label>Last Name <span>*</span></label>
-                                <input type="text" name="surnamebill" required>
+                                <input type="text" name="surnamebill">
                             </div>
                             <div class="checkout_form_input">
                                 <label>Address <span>*</span></label>
@@ -830,16 +823,19 @@ $(document).ready(function() {
                             var eyalet =$("#eyalet")
             
                             if (selectedCountry === "2") { // Kanada seçildiğinde
-                                
+
                                 provinceLabel.text("City");
                                 postalCodeLabel.text("Postal Code *");
                                 eyalet.show(); // Görünürlüğü kapatmak için
-                                
+                                $("#issiot").prop("required", true);
 
                             } else if (selectedCountry === "3") { // Amerika seçildiğinde
                                 provinceLabel.text("State and City");
                                 postalCodeLabel.text("Zip Code *");
                                 eyalet.hide(); // Görünürlüğü kapatmak için
+                                // MAS-85: US'te province select gizli; 'required' kalırsa tarayıcı
+                                // gizli-zorunlu alan yüzünden "Proceed to Payment"i SESSİZCE bloklar.
+                                $("#issiot").prop("required", false);
 
                             }
                         });
@@ -1093,6 +1089,44 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
 <input type="hidden" name="cargo_transfer" id="cargo_transfer" value="<?php echo $maxCargo; ?>">
 
+<!-- MAS-85: Ülke US seçilince kargoyu panelden yönetilen US oranıyla yeniden hesapla.
+     Eskiden US seçilince kargo değişmiyordu (Kanada kargosu ödeniyordu). -->
+<script>
+(function () {
+    var shipEl  = document.getElementById('shipping_id');
+    var cargoEl = document.getElementById('cargo_transfer');
+    var totalEl = document.getElementById('order_id');
+    var countryEl = document.getElementById('country');
+    if (!shipEl || !cargoEl || !totalEl || !countryEl) { return; }
+
+    function money(n) { return '$' + (parseFloat(n) || 0).toFixed(2); }
+    var canadaShipping = parseFloat(cargoEl.value) || 0; // sayfa yükünde Kanada kargosu
+    var orderBase = (parseFloat((totalEl.textContent || '').replace(/[^0-9.]/g, '')) || 0) - canadaShipping;
+
+    function applyShipping(ship) {
+        ship = parseFloat(ship) || 0;
+        shipEl.textContent = money(ship);
+        cargoEl.value = ship;
+        totalEl.textContent = money(orderBase + ship);
+    }
+
+    // MAS-85: #country bir nice-select; seçim jQuery .trigger('change') ile bildiriliyor.
+    // Vanilla addEventListener('change') bunu YAKALAMIYORDU → US seçilince kargo Kanada'da
+    // kalıyordu. jQuery .on('change') nice-select tetiklemesini yakalar.
+    $('#country').on('change', function () {
+        var c = this.value;
+        if (c === '3') { // United States → panelden yönetilen US kargosu
+            fetch('functions/calculate_shipping_us.php', { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { applyShipping(d.maxCargo); })
+                .catch(function () { /* hata olursa mevcut değer kalır */ });
+        } else if (c === '2') { // Canada → sayfa yükündeki Kanada kargosuna dön
+            applyShipping(canadaShipping);
+        }
+    });
+})();
+</script>
+
 
 
       
@@ -1101,8 +1135,10 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
 
 
-                                <div class="panel-default">
-                                    <p style="text-align:center; color:red;"></p>
+                                <!-- MAS-87: çirkin JS alert yerine siteye uygun inline uyarı -->
+                                <div id="checkout-warning" style="display:none; margin:0 0 16px; padding:14px 16px; border-radius:10px; background:#fff4ec; border:1px solid #e0a878; color:#8a4b12; font-size:14px; line-height:1.5; box-shadow:0 4px 14px rgba(162,98,26,0.12);">
+                                    <strong style="display:block; margin-bottom:2px;">&#9888;&nbsp; Missing information</strong>
+                                    <span id="checkout-warning-text">Please fill in all required fields before proceeding to payment.</span>
                                 </div>
                              
                                
@@ -1131,16 +1167,48 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
                                 </div>
                                   <script>
                                     $('.order').click(function(e) {
-                    
+
+                    // MAS-87: Zorunlu alanlar dolu değilse "Order Placed" animasyonunu OYNATMA
+                    // ve gönderimi engelle. Eskiden animasyon koşulsuz oynuyordu → kullanıcı
+                    // ülke/eyalet girmeden butona basınca yanlışlıkla "Order Placed" görüyordu.
+                    var country = $('[name="country"]').val();
+                    var province = $('[name="province"]').val();
+                    var missing = [];
+
+                    var labels = { name:'First Name', surname:'Last Name', address:'Address', city:'City', postal:'Postal Code', phone:'Phone', email:'Email' };
+                    Object.keys(labels).forEach(function (n) {
+                        var el = $('[name="' + n + '"]').first();
+                        var ok = $.trim(el.val() || '') !== '';
+                        el.css('border-color', ok ? '' : '#c0392b');
+                        if (!ok) { missing.push(labels[n]); }
+                    });
+                    if (!country || country === '1') { missing.push('Country'); }           // ülke seçilmemiş
+                    if (country === '2' && (!province || province === 'USA')) { missing.push('Province'); } // Kanada eyaleti
+
+                    var $warn = $('#checkout-warning');
+                    if (missing.length) {
+                        e.preventDefault();
+                        $('#checkout-warning-text').text('Please complete: ' + missing.join(', ') + '.');
+                        $warn.stop(true, true).slideDown(180);
+                        if ($warn.offset()) { $('html, body').animate({ scrollTop: $warn.offset().top - 120 }, 300); }
+                        return false;
+                    }
+                    $warn.slideUp(150);
+
                     let button = $(this);
-                    
+
                     if(!button.hasClass('animate')) {
                         button.addClass('animate');
                         setTimeout(() => {
                             button.removeClass('animate');
                         }, 10000);
                     }
-                    
+
+                    });
+
+                    // Alanlar doldurulunca kırmızı kenarlığı temizle
+                    $('[name="name"],[name="surname"],[name="address"],[name="city"],[name="postal"],[name="phone"],[name="email"]').on('input change', function () {
+                        if ($.trim($(this).val() || '') !== '') { $(this).css('border-color', ''); }
                     });
 
 
@@ -1152,12 +1220,16 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
 
                         </form>
                         <?php
-$taxRates = [
-    'AB' => 5, 'BC' => 5, 'MB' => 5,
-    'NB' => 15, 'NL' => 15, 'NS' => 15,
-    'ON' => 13, 'PE' => 15, 'QC' => 5,
-    'SK' => 5, 'NT' => 5, 'NU' => 5, 'YT' => 5,
-];
+// MAS-25: Province vergi oranları artık panelden (province_tax tablosu) yönetilir.
+$taxRates = [];
+try {
+    $rs = $db->query("SELECT code, rate FROM province_tax", PDO::FETCH_ASSOC);
+    foreach ($rs as $r) {
+        $taxRates[$r['code']] = (float) $r['rate'];
+    }
+} catch (\Throwable $e) {
+    // Tablo yoksa/sorun varsa vergi gösterimi yapılmaz (checkout yine çalışır).
+}
 ?>
 
 <script>
@@ -1224,8 +1296,6 @@ $(document).ready(function() {
 
     <?php
     $pageInlineJS = '';
-    // Initialize (Stripe/checkout related)
-    $pageInlineJS .= "<script>initialize();</script>\n";
     // Exzoom init
     $pageInlineJS .= <<<'JSEOF'
 <script>
@@ -1258,18 +1328,38 @@ JSEOF;
     // Form submit + country validation
     $pageInlineJS .= <<<'JSEOF'
 <script>
-$(document).ready(function() {
-    $('#submit-button').click(function(e) { $('form').submit(); });
-});
-document.getElementById('submit-button').addEventListener('click', function(event) {
-    var countrySelect = document.getElementById('country');
-    var selectedCountry = countrySelect.options[countrySelect.selectedIndex].value;
-    if (selectedCountry == "1") {
-        event.preventDefault();
-        alert("Please select a country before proceeding to payment.");
-        location.reload();
-    }
-});
+(function () {
+    var countrySel  = document.getElementById('country');
+    var provinceSel = document.getElementById('issiot');
+
+    // Seçim değişince eski özel uyarıyı temizle
+    if (countrySel)  countrySel.addEventListener('change',  function () { countrySel.setCustomValidity(''); });
+    if (provinceSel) provinceSel.addEventListener('change', function () { provinceSel.setCustomValidity(''); });
+
+    document.getElementById('submit-button').addEventListener('click', function (event) {
+        var country = countrySel ? countrySel.value : '';
+
+        // Country zorunlu (default "Select Country" = "1")
+        if (country === "1") {
+            event.preventDefault();
+            countrySel.setCustomValidity('Please select a country.');
+            countrySel.reportValidity();
+            return;
+        }
+        countrySel.setCustomValidity('');
+
+        // Kanada (2) ise province zorunlu. ABD (3) için province gizli ve "USA" sentinel'i geçerli.
+        if (country === "2" && provinceSel && (provinceSel.value === "USA" || provinceSel.value === "")) {
+            event.preventDefault();
+            provinceSel.setCustomValidity('Please select a province.');
+            provinceSel.reportValidity();
+            return;
+        }
+        if (provinceSel) provinceSel.setCustomValidity('');
+
+        // Aksi halde native submit devam eder; tarayıcı diğer zorunlu alanları (email vb.) doğrular.
+    });
+})();
 </script>
 JSEOF;
     include __DIR__ . '/includes/footer-scripts.php';

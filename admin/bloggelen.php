@@ -15,7 +15,7 @@ $messagee = $_POST['messagee'];
 $durum = $_POST['durum'];
 $tur = $_POST['tur'];
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -45,7 +45,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from bloggelen where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }

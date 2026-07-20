@@ -1,7 +1,8 @@
-﻿<?php
+<?php
 session_start();
 include("../admin/include/baglan.php");
 include("../admin/include/fonksiyonlar.php");
+include("../admin/include/product_options.php");
 
 
 
@@ -18,30 +19,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['addToCart'])) {
     $productCategory = $_POST['productCategory'];
     $productCargo = $_POST['productCargo'];
     $productCargos = $_POST['productCargos']; 
-    $producttur = $_POST['producttur']; 
+    $producttur = $_POST['producttur'];
+
+    // MAS-46: müşterinin seçtiği selector değerlerini SUNUCUDA doğrula ve çöz (tamper-proof)
+    $secimPost = isset($_POST['secim']) && is_array($_POST['secim']) ? $_POST['secim'] : [];
+    $secimResolved = masq_resolve_selections($db, (int) $productId, (string) $producttur, $secimPost);
+    if ($secimResolved['error'] !== null) {
+        http_response_code(422);
+        echo $secimResolved['error'];
+        exit;
+    }
+    $secimlerJson = $secimResolved['json']; // null ya da JSON snapshot
 
     // Kullanıcı kimliğini oturumdan alın
     $userId = isset($_SESSION['id']) ? $_SESSION['id'] : null;
 
     if ($userId !== null) {
-        // Ürünün zaten sepette olup olmadığını kontrol et
-        $stmt = $db->prepare("SELECT * FROM sepet WHERE KullaniciID = ? AND UrunID = ? AND UrunAdi = ?");
-        $stmt->execute([$userId, $productId ,$productName]);
+        // Ürünün zaten sepette olup olmadığını kontrol et (aynı seçimlerle — farklı seçim = ayrı satır)
+        $stmt = $db->prepare("SELECT * FROM sepet WHERE KullaniciID = ? AND UrunID = ? AND UrunAdi = ? AND secimler <=> ?");
+        $stmt->execute([$userId, $productId, $productName, $secimlerJson]);
         $existingProduct = $stmt->fetch();
 
         if ($existingProduct) {
-            // Ürün sepette zaten var, miktarı artır
+            // Ürün (aynı seçimlerle) sepette zaten var, miktarı artır
             $newQuantity = $existingProduct['UrunMiktari'] + $productQuantity;
             $newTotalPrice = $existingProduct['FiyatToplam'] + ($productPrice * $productQuantity);
 
-            $stmt = $db->prepare("UPDATE sepet SET UrunMiktari = ?, FiyatToplam = ? WHERE KullaniciID = ? AND UrunID = ? AND UrunAdi = ?");
-            $stmt->execute([$newQuantity, $newTotalPrice, $userId, $productId ,$productName]);
+            $stmt = $db->prepare("UPDATE sepet SET UrunMiktari = ?, FiyatToplam = ? WHERE SepetID = ?");
+            $stmt->execute([$newQuantity, $newTotalPrice, $existingProduct['SepetID']]);
         } else {
             // Ürün sepette yok, yeni giriş yap
             $totalPrice = $productPrice * $productQuantity;
 
-            $stmt = $db->prepare("INSERT INTO sepet (KullaniciID, UrunID, UrunAdi, UrunFiyati, UrunMiktari, FiyatToplam, urun_resim, urun_category, cargo, cargo_us, tur) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$userId, $productId, $productName, $productPrice, $productQuantity, $totalPrice, $productImage, $productCategory, $productCargo, $productCargos, $producttur]);
+            $stmt = $db->prepare("INSERT INTO sepet (KullaniciID, UrunID, UrunAdi, UrunFiyati, UrunMiktari, FiyatToplam, urun_resim, urun_category, cargo, cargo_us, tur, secimler) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$userId, $productId, $productName, $productPrice, $productQuantity, $totalPrice, $productImage, $productCategory, $productCargo, $productCargos, $producttur, $secimlerJson]);
         }
 
         // Sepet içeriğini güncelleyin ve geri döndürün
@@ -58,21 +69,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['addToCart'])) {
     
         $cart = &$_SESSION['cart'];
     
-        // Ürünün sepette olup olmadığını kontrol etmek için id ve 'tur' değerlerini kullan
+        // Ürünün sepette olup olmadığını kontrol et: id + 'tur' + seçimler (farklı seçim = ayrı satır)
         $found = false;
         foreach ($cart as $key => $item) {
-            if ($item['id'] === $productId && $item['tur'] === $producttur) {
-                // Ürün zaten sepette var, miktarı artır
+            if ($item['id'] === $productId && $item['tur'] === $producttur && (($item['secimler'] ?? null) === $secimlerJson)) {
+                // Ürün (aynı seçimlerle) zaten sepette var, miktarı artır
                 $cart[$key]['quantity'] += $productQuantity;
                 $cart[$key]['totalPrice'] += $productPrice * $productQuantity;
                 $found = true;
                 break;
             }
         }
-    
+
         if (!$found) {
-            // Ürün sepette yok, yeni giriş yap
-            $cart[$productId . '_' . $producttur] = [
+            // Ürün sepette yok, yeni giriş yap (seçimler anahtarın parçası olur)
+            $cartKey = $productId . '_' . $producttur . ($secimlerJson ? '_' . md5($secimlerJson) : '');
+            $cart[$cartKey] = [
                 'id' => $productId,
                 'name' => $productName,
                 'price' => $productPrice,
@@ -82,7 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['addToCart'])) {
                 'category' => $productCategory,
                 'cargo' => $productCargo,
                 'cargo_us' => $productCargos,
-                'tur' => $producttur
+                'tur' => $producttur,
+                'secimler' => $secimlerJson
             ];
         }
     
@@ -122,22 +135,24 @@ function getUpdatedCartContent($userId) {
            $productPrice = $row['UrunFiyati'];
            $productImage = $row['urun_resim'];
            $productCategory = $row['urun_category']; // Ürünün kategorisini alın
+           $productSecimler = $row['secimler']; // MAS-46: seçim snapshot'ı (JSON ya da null)
 
            // Categoriese göre gruplanmış ürünleri diziye ekleyin
            if (!isset($groupedItems[$productCategory])) {
                $groupedItems[$productCategory] = [];
            }
 
-           // Eğer aynı ürün daha önce eklenmişse, miktarı artırın
+           // Aynı ürün + aynı seçimler daha önce eklenmişse miktarı artır (farklı seçim = ayrı satır)
            $found = false;
            foreach ($groupedItems[$productCategory] as &$item) {
-               if ($item['id'] === $productId) {
+               if ($item['id'] === $productId && ($item['secimler'] ?? null) === $productSecimler) {
                    $item['quantity'] += $productQuantity;
                    $item['totalPrice'] += $productPrice * $productQuantity;
                    $found = true;
                    break;
                }
            }
+           unset($item);
 
            // Yeni bir ürün ise, gruplanmış ürünlere ekleyin
            if (!$found) {
@@ -148,6 +163,7 @@ function getUpdatedCartContent($userId) {
                    'price' => $productPrice,
                    'totalPrice' => $productPrice * $productQuantity,
                    'image' => $productImage,
+                   'secimler' => $productSecimler,
                ];
            }
        }
@@ -168,6 +184,7 @@ function getUpdatedCartContent($userId) {
             echo ' <a href="#">' . $product['name'] . '</a>';
             echo '<a href="#" class="delete_item" data-product-id="' . $product['id'] . '" data-product-category="' . $category . '" data-product-price="' . $product['price'] . '" data-product-quantity="' . $product['quantity'] . '"  style="padding-left: 5.5em;"><i class="ion-ios-trash" style="font-size: 20px;"></i></a>';
             echo ' </div>';
+            echo masq_format_selections($product['secimler'] ?? null);
             echo '    <p>' . $product['quantity'] . ' x <span> $' . $product['price'] . '</span></p>';
             echo '  </div>';
             echo '  <div class="cart_remove">';
@@ -224,22 +241,24 @@ function getUpdatedCartContentFromSession() {
             $productPrice = $product['price'];
             $productImage = $product['image'];
             $productCategory = $product['category']; // Ürünün kategorisini alın
+            $productSecimler = $product['secimler'] ?? null; // MAS-46: seçim snapshot'ı
 
             // Categoriese göre gruplanmış ürünleri diziye ekleyin
             if (!isset($groupedItems[$productCategory])) {
                 $groupedItems[$productCategory] = [];
             }
 
-            // Eğer aynı ürün daha önce eklenmişse, miktarı artırın
+            // Aynı ürün + aynı seçimler daha önce eklenmişse miktarı artır (farklı seçim = ayrı satır)
             $found = false;
             foreach ($groupedItems[$productCategory] as &$item) {
-                if ($item['id'] === $productId) {
+                if ($item['id'] === $productId && ($item['secimler'] ?? null) === $productSecimler) {
                     $item['quantity'] += $productQuantity;
                     $item['totalPrice'] += $productPrice * $productQuantity;
                     $found = true;
                     break;
                 }
             }
+            unset($item);
 
             // Yeni bir ürün ise, gruplanmış ürünlere ekleyin
             if (!$found) {
@@ -250,6 +269,7 @@ function getUpdatedCartContentFromSession() {
                     'price' => $productPrice,
                     'totalPrice' => $productPrice * $productQuantity,
                     'image' => $productImage,
+                    'secimler' => $productSecimler,
                 ];
             }
         }
@@ -266,6 +286,7 @@ function getUpdatedCartContentFromSession() {
                 $updatedCartContent .= '<a href="#">' . $product['name'] . '</a>';
                 $updatedCartContent .= '<a href="#" class="delete_item" data-product-id="' . $product['id'] . '" data-product-category="' . $category . '" data-product-price="' . $product['price'] . '" data-product-quantity="' . $product['quantity'] . '" style="padding-left: 5.5em;"><i class="ion-ios-trash" style="font-size: 20px;"></i></a>';
                 $updatedCartContent .= '</div>';
+                $updatedCartContent .= masq_format_selections($product['secimler'] ?? null);
                 $updatedCartContent .= '<p>' . $product['quantity'] . ' x <span> $' . $product['price'] . '</span></p>';
                 $updatedCartContent .= '</div>';
                 $updatedCartContent .= '<div class="cart_remove">';

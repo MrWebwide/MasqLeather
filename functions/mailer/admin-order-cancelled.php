@@ -3,6 +3,10 @@
 
 // Gerekli dosyaları dahil edin
 require_once '../../admin/include/baglan.php'; // Veritabanı bağlantısı
+
+// Guvenlik (prod): yalnizca giris yapmis admin. (MAS-17 devami)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION["eposta"])) { http_response_code(403); exit("forbidden"); }
 require_once '../../admin/include/fonksiyonlar.php'; // Gerekli fonksiyonlar
 require_once '../../PHPMailer/src/Exception.php';
 require_once '../../PHPMailer/src/PHPMailer.php';
@@ -16,9 +20,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $siparisid = $_POST['siparisid'];
     $reason = $_POST['reason'];
     
-    // E-posta gönderimi
-    $konu = "Order Cancelled";
-    $icerik = "Dear <strong>$name $surname</strong>, <br><br>Sadly your order with order number of <strong>$siparisid</strong> has been cancelled.<br><br><strong> Order cancellation reason is :</strong><br><br> <strong> $reason </strong> <br><br>Best regards,<br><strong> Masq Leather </strong> ";
+    // E-posta gönderimi (MAS-83: metin panelden düzenlenebilir; yoksa aşağıdaki default kullanılır)
+    require_once __DIR__ . '/../mail_templates.php';
+    $tpl = masq_mail_template($db, 'order_cancelled',
+        ['name' => $name, 'surname' => $surname, 'order_no' => $siparisid, 'reason' => $reason],
+        ['konu' => "Order Cancelled",
+         'icerik' => "Dear <strong>$name $surname</strong>, <br><br>Sadly your order with order number of <strong>$siparisid</strong> has been cancelled.<br><br><strong> Order cancellation reason is :</strong><br><br> <strong> $reason </strong> <br><br>Best regards,<br><strong> Masq Leather </strong> "]);
+    $konu = $tpl['konu'];
+    $icerik = $tpl['icerik'];
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
     try {

@@ -1,4 +1,5 @@
-﻿<?php if (!isset($basePath)) $basePath = ''; ?>
+<?php
+require_once __DIR__ . '/../includes/cat_counts.php'; if (!isset($basePath)) $basePath = ''; ?>
 <div class="offcanvas_menu">
     <div class="container">
         <div class="row">
@@ -17,10 +18,7 @@
                                 <ul class="sub-menu">
 
                                 <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM mer_kategori AS bk
-                             LEFT JOIN homedecor AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'mer_kategori', 'homedecor'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
     $adi = $hizmetka['adi'];
@@ -40,10 +38,7 @@ foreach ($hizmetkategori as $hizmetka) {
                             <ul class="sub-menu">
 
                             <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM jewe_kategori AS bk
-                             LEFT JOIN jewe AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'jewe_kategori', 'jewe'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
     $adi = $hizmetka['adi'];
@@ -105,10 +100,7 @@ foreach ($hizmetkategori as $hizmetka) {
                                 <ul class="sub_menu">
                                    
                                 <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM mer_kategori AS bk
-                             LEFT JOIN homedecor AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'mer_kategori', 'homedecor'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
     $adi = $hizmetka['adi'];
@@ -125,10 +117,7 @@ foreach ($hizmetkategori as $hizmetka) {
 
                                 <ul class="sub_menu">
                                     <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM jewe_kategori AS bk
-                             LEFT JOIN jewe AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
+$hizmetkategori = masq_category_counts($db, 'jewe_kategori', 'jewe'); // MAS-21
 
 foreach ($hizmetkategori as $hizmetka) {
     $adi = $hizmetka['adi'];
@@ -172,14 +161,14 @@ foreach ($hizmetkategori as $hizmetka) {
 if (isset($_SESSION['adsoyad'])) {
     echo '<div class="dropdown_menu">';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/address-details.php">Saved Address</a>';
+    echo '<a href="' . $basePath . 'account/address-details.php">Saved Address</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/recent-orders.php">Recent Orders</a>';
+    echo '<a href="' . $basePath . 'account/recent-orders.php">Recent Orders</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
     // Önceki sayfanın URL'sini hidden input ile alın
-    echo '<form action="<?=$basePath?>auth/cikis.php" method="post">';
+    echo '<form action="' . $basePath . 'auth/cikis.php" method="post">';
     echo '<input type="hidden" name="previous_page" value="' . $_SERVER['REQUEST_URI'] . '">';
     echo '<button type="submit">Log-Out</button>';
     echo '</form>';
@@ -226,10 +215,10 @@ if (isset($_SESSION['adsoyad'])) {
 if (isset($_SESSION['adsoyad'])) {
     echo '<div class="dropdown_menu">';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/address-details.php">Saved Address</a>';
+    echo '<a href="' . $basePath . 'account/address-details.php">Saved Address</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
-    echo '<a href="<?=$basePath?>account/recent-orders.php">Recent Orders</a>';
+    echo '<a href="' . $basePath . 'account/recent-orders.php">Recent Orders</a>';
     echo '</div>';
     echo '<div class="dropdown_menu_item">';
     // Önceki sayfanın URL'sini hidden input ile alın
@@ -358,7 +347,7 @@ if (isset($_SESSION['id'])) {
             // Her bir ürünü sepette listeleyin
             echo '<div class="cart_item" data-product-id="' . $productId . '" data-product-category="' . $productCategory . '" data-product-price="' . $productPrice . '" data-product-quantity="' . $productQuantity . '">';
             echo '<div class="cart_img">';
-            echo '<a href="#"><img src="<?=$basePath?>admin/resimler/' . $productImage . '" alt=""></a>';
+            echo '<a href="#"><img src="' . $basePath . 'admin/resimler/' . $productImage . '" alt=""></a>';
             echo '</div>';
             echo '<div class="cart_info">';
             echo '<div class="close-sec d-flex">';
@@ -414,7 +403,7 @@ function getUpdatedCartContentFromSession() {
             // Her bir ürünü sepette listele
             $updatedCartContent .= '<div class="cart_item" data-product-id="' . $productId . '" data-product-category="' . $product['category'] . '" data-product-price="' . $product['price'] . '" data-product-quantity="' . $product['quantity'] . '">';
             $updatedCartContent .= '<div class="cart_img">';
-            $updatedCartContent .= '<a href="#"><img src="<?=$basePath?>admin/resimler/' . $product['image'] . '" alt=""></a>';
+            $updatedCartContent .= '<a href="#"><img src="' . $basePath . 'admin/resimler/' . $product['image'] . '" alt=""></a>';
             $updatedCartContent .= '</div>';
             $updatedCartContent .= '<div class="cart_info">';
             $updatedCartContent .= '<div class="close-sec d-flex">';
@@ -466,7 +455,7 @@ function getUpdatedCartContentFromSession() {
         </div>
         <form class="border-bottom" action="<?=$basePath?>product-mercantile.php" method="GET">
             <input class="border-0" name="search_query" placeholder="Search products..." type="text">
-            <button type="submit"><i class="icofont-search"></i></button>
+            <button type="submit"><i class="fa fa-search"></i></button>
         </form>
     </div>
     <!--header area end-->

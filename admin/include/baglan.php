@@ -8,6 +8,18 @@ ini_set('log_errors', 1);
 // Load central config
 require_once __DIR__ . '/../../config.php';
 
+// ─── Session cookie sertleştirme (MAS-17) ───
+// session_start()'tan önce çalışır (admin sayfaları baglan'ı session_start'tan önce include eder).
+if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+        || (($_SERVER['SERVER_PORT'] ?? '') == 443);
+    ini_set('session.cookie_httponly', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.cookie_samesite', 'Lax');
+    ini_set('session.cookie_secure', $isHttps ? '1' : '0');
+}
+
 $site = SITE_URL;
 $targetFolder = UPLOAD_FOLDER;
 
@@ -19,4 +31,8 @@ catch(PDOException $exception){
  error_log("DB Connection Error: " . $exception->getMessage());
  die("A database error occurred. Please try again later.");
 }
+
+// ─── Panel içi hata izleme (MAS-8 / INF-4) — tüm sayfalarda aktif ───
+require_once __DIR__ . '/error_handler.php';
+masq_register_error_handlers();
 ?>

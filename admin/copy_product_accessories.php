@@ -8,7 +8,7 @@ session_start();
 oturumkontrolana();
 
 // Mevcut ürünün ID'sini alıyoruz
-$productId = $_GET['id'];
+$productId = intval($_GET['id']);
 
 // Mevcut ürünün bilgilerini veritabanından alıyoruz
 $statement = $db->prepare("SELECT * FROM accessories WHERE id = :id");

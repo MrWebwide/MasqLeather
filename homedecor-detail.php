@@ -1,6 +1,26 @@
-﻿<?php
+<?php
 $basePath = '';
 require_once __DIR__ . '/includes/init.php';
+
+$email = $_SESSION['email'] ?? '';
+$id = $_GET['id'];
+
+// Ürünü, görsellerini ve stoğunu yükle
+$stmt = $db->prepare("SELECT * FROM homedecor WHERE id = ?");
+$stmt->execute([$id]);
+$urunler = $stmt->fetch();
+
+$stmt = $db->prepare("SELECT * FROM home_img WHERE urun_id = ?");
+$stmt->execute([$id]);
+$resimler = $stmt->fetchAll();
+
+// Stok bilgisi $urunler'de zaten var (gereksiz ekstra sorgu kaldırıldı — MAS-23)
+$stock = $urunler['stock'] ?? 0;
+$needsAjaxComment = true; // sepet + yorum AJAX'ı (ajax.js) yüklensin — MAS-82
+
+// MAS-46: müşterinin seçeceği yapılandırılabilir seçenekler (selector'lar)
+require_once __DIR__ . '/admin/include/product_options.php';
+$productOptions = masq_get_product_options($db, (int) $id, 'homedecor');
 
 $pageTitle       = $yazi['yazi5'] ?? 'Home Decor';
 $pageDescription = $urunler['yazi21'] ?? '';
@@ -59,29 +79,7 @@ $pageKeywords    = $urunler['yazi22'] ?? '';
     <div class="product-section" style="padding-left: 15vw;">
         <!-- product gallery section start -->
         <div class="col-lg-6">
-            <div class="producter">
-                <div class="product-details-tab">
-                    <div class="pro-dec-big-img-slider">
-                        <?php foreach ($resimler as $resim): ?>
-                        <div class="easyzoom-style">
-                            <img src="admin/resimler/<?= $resim['img'] ?>" style="display:inline;" />
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="product-dec-slider-small product-dec-small-style1">
-
-                        <?php foreach ($resimler as $resim): ?>
-
-                        <div class="product-dec-small">
-
-                            <img src="admin/resimler/<?= $resim['img'] ?>"/>
-                        </div>
-                        <?php endforeach; ?>
-
-                    </div>
-
-                </div>
-            </div>
+            <?php include __DIR__ . '/includes/product_gallery.php'; ?>
         </div>
 
         <!-- product gallery section end -->
@@ -136,6 +134,7 @@ if ($haberg) {
                                         </h3>
                                     </div>
                                     <div class="product_price_box">
+                                        <?php if ($urunler['kampanya']) { ?><span class="old_price">$<?=$urunler['yazi1']?> CAD</span> <?php } ?>
                                         <span class="current_price">
                                         <?php if ($urunler['kampanya']) { ?>
                                             $
@@ -163,7 +162,7 @@ if ($haberg) {
 
                                         Product ID: 274</span>
                                 </div>
-                                <form method="POST" action="functions/add-comment.php" id="addToCartForm">
+                                <form method="POST" action="functions/addToCart.php" id="addToCartForm">
                                     <input type="hidden" name="productId" value="<?=$urunler['id']?>">
                                     <input type="hidden" name="productName" value="<?=$urunler['adi']?>">
                                     <input type="hidden" name="productPrice"
@@ -173,6 +172,7 @@ if ($haberg) {
                                     <input type="hidden" name="productCargo" value="<?=$urunler['cargo']?>">
                                     <input type="hidden" name="productCargos" value="<?=$urunler['cargo_us']?>">
                                     <input type="hidden" name="producttur" value="<?=$urunler['tur']?>">
+                                    <?php echo masq_render_options_storefront($productOptions); ?>
 
 
 
@@ -245,41 +245,10 @@ if ($haberg) {
                             </div>
 
                         </div>
-                        <div class="product_details_title" style="<?php echo (empty($urunler['yazi10']) && empty($urunler['yazi11']) && empty($urunler['yazi12']) && empty($urunler['yazi13']) && empty($urunler['yazi14'])) ? 'display: none;' : ''; ?>">
-    <h3>
-        Color Options
-    </h3>
-
-    <?php
-// Ürün durumunu kontrol eden fonksiyon
-function getDurumById($urun_id) {
-    global $db; // Veritabanı bağlantısı
-    $stmt = $db->prepare("SELECT durum FROM homedecor WHERE id = ?");
-    $stmt->execute([$urun_id]);
-    $result = $stmt->fetch();
-    return $result ? $result['durum'] : null;
-}
-?>
-
-<div class="coloropt d-flex">
-    <?php if (!empty($urunler['yazi10']) && getDurumById($urunler['yazi10']) === 'on'): ?>
-        <a href="./homedecor-detail.php?id=<?=$urunler['yazi10']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi15']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi11']) && getDurumById($urunler['yazi11']) === 'on'): ?>
-        <a href="./homedecor-detail.php?id=<?=$urunler['yazi11']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi16']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi12']) && getDurumById($urunler['yazi12']) === 'on'): ?>
-        <a href="./homedecor-detail.php?id=<?=$urunler['yazi12']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi17']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi13']) && getDurumById($urunler['yazi13']) === 'on'): ?>
-        <a href="./homedecor-detail.php?id=<?=$urunler['yazi13']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi18']?>" alt=""></a>
-    <?php endif; ?>
-    <?php if (!empty($urunler['yazi14']) && getDurumById($urunler['yazi14']) === 'on'): ?>
-        <a href="./homedecor-detail.php?id=<?=$urunler['yazi14']?>" class="color_option"><img src="./admin/resimler/<?=$urunler['yazi19']?>" alt=""></a>
-    <?php endif; ?>
-</div>
-
-</div>
+                        <?php
+                        require_once __DIR__ . '/includes/color_options.php';
+                        masq_render_color_options($db, 'homedecor', 'homedecor-detail.php', $urunler);
+                        ?>
                     </div>
                 </div>
             </div>
@@ -353,9 +322,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <a id="video-tab" data-toggle="tab" href="#video" role="tab" aria-controls="video" aria-selected="false">Product Video</a>
                             </li>
                             <li>
-                                <a id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Product Detailed Image</a>
-                            </li>
-                            <li>
                                 <a id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews (<?=$yorumSayisi?>)</a>
                             </li>
                         </ul>
@@ -403,35 +369,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?php else: ?>
                                     <video controls src="admin/videolar/<?=$urunler['video']?>"></video>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
-                            <!-- Detailed Image Content -->
-                            <div class="product-info-button" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div class="product-hover">
-                                    <div class="hover-content">
-                                        <p>You can hover your mouse on the image to get a detailed look.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product_info__flex d-flex">
-                                <div class="product-slider">
-                                    <div class="exzoom hidden" id="exzoom">
-                                        <div class="exzoom_img_box">
-                                            <ul class='exzoom_img_ul'>
-                                                <?php foreach ($resimler as $resim): ?>
-                                                    <li><img src="admin/resimler/<?= $resim['img'] ?>" /></li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </div>
-                                        <div class="exzoom_nav"></div>
-                                        <p class="exzoom_btn">
-                                            <a href="javascript:void(0);" class="exzoom_prev_btn"><</a>
-                                            <a href="javascript:void(0);" class="exzoom_next_btn">></a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="memo"></div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
@@ -517,7 +454,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $kategori = $urun['kategori'];
 
                 // İlgili kategorideki diğer ürünleri al
-                $hizmett = $db->prepare("SELECT * FROM homedecor WHERE kategori = ? AND id != ? ORDER BY RAND() LIMIT 4");
+                $hizmett = $db->prepare("SELECT * FROM homedecor WHERE kategori = ? AND id != ? AND durum = 'on' ORDER BY RAND() LIMIT 4");
                 $hizmett->execute([$kategori, $id]);
                 $relatedProducts = $hizmett->fetchAll();
 

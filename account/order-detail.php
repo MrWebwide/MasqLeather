@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $basePath = '../';
 require_once __DIR__ . '/../includes/init.php';
 
@@ -47,9 +47,9 @@ $pageCSS = [$basePath . 'admin/assets/css/main.min.css'];
         </div>         
     </div>
 
-    <?php 
-    $userid = $_POST['userid'];
-    $gid = intval($_GET['id']);
+    <?php
+    $userid = $_POST['userid'] ?? '';
+    $gid = intval($_GET['id'] ?? 0);
     $id = $gid;
     $stmt_order = $db->prepare("SELECT * FROM mailgelen WHERE id = :id");
     $stmt_order->execute([':id' => $gid]);

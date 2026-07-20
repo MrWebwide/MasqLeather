@@ -1,5 +1,8 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/u2613154/public_html
-    - /bin/cp -R * $DEPLOYPATH
+    # GÜVENLİK: public_html'e SADECE prod reposundan (repositories/MasqLeather) deploy edilir.
+    # Dev reposu (dev.masqleather.com) docroot'un KENDİSİ olduğu için burada no-op'tur;
+    # dev güncellemesi "Update from Remote" (git pull) ile yapılır.
+    # Böylece dev reposunda Deploy'a bassan bile dev kodu ASLA prod'a (public_html) gitmez.
+    - if [ "$(pwd)" = "/home/u2613154/repositories/MasqLeather" ]; then /bin/cp -R * /home/u2613154/public_html/; fi

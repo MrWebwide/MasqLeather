@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Product Category Template
  * 
@@ -20,10 +20,13 @@ if (!isset($extraStyles)) $extraStyles = '';
 
 // Get category from URL
 $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : '';
-$statement = $db->prepare("SELECT adi FROM $categoryTable WHERE adi = :kategori");
+// MAS-86: kategori başlığı + (opsiyonel) başlık arka plan görseli (resim kolonu) çekilir.
+$statement = $db->prepare("SELECT adi, resim FROM $categoryTable WHERE adi = :kategori");
 $statement->bindParam(':kategori', $kategori, PDO::PARAM_STR);
 $statement->execute();
-$kategoriisim = $statement->fetchColumn();
+$catRow = $statement->fetch(PDO::FETCH_ASSOC);
+$kategoriisim = $catRow['adi'] ?? $kategori;
+$catHeaderImg = (!empty($catRow['resim']) && $catRow['resim'] !== 'resim-yok') ? $catRow['resim'] : '';
 ?>
 <!DOCTYPE html>
 <html lang="en" class="no-js">
@@ -42,17 +45,13 @@ $kategoriisim = $statement->fetchColumn();
 <div class="body_overlay"></div>
 <?php include __DIR__ . "/../layout/$headerFile"; ?>
 
-    <div class="breadcrumbs_area">
-        <div class="container">   
+    <div class="breadcrumbs_area<?= $catHeaderImg ? ' has-cat-bg' : '' ?>"<?= $catHeaderImg ? ' style="background-image:url(admin/resimler/' . htmlspecialchars($catHeaderImg) . ')"' : '' ?>>
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content text-center">
                         <h2><?= htmlspecialchars($kategoriisim) ?></h2>
-                        <ul class="d-flex justify-content-center">
-                            <li><a href="<?=$homeLink?>">Home</a></li>
-                            <li>></li>
-                            <li><a><?=$sectionTitle?></a></li>
-                        </ul>
+                        <!-- breadcrumb navigasyonu kaldırıldı (sadece başlık kalsın) -->
                     </div>
                 </div>
             </div>
@@ -66,57 +65,53 @@ $kategoriisim = $statement->fetchColumn();
                 <div class="col-12">
                     <div class="shop_page_inner d-flex ">
                         <div class="shop_sidebar_widget">
-                            
+                        <?php
+                        // Marka'ya göre sidebar kategorileri: Mercantile (Jewelry + Home Decor)
+                        // vs Leather (Bags & Purses + Accessories). Önceden Bags/Accessories sabitti.
+                        $isMercantile = (isset($headerFile) && strpos($headerFile, 'mer') !== false);
+                        $sidebarGroups = $isMercantile ? [
+                            ['title' => 'Jewelry',    'catTable' => 'jewe_kategori', 'prodTable' => 'jewe',      'catPage' => 'jewelry-category.php'],
+                            ['title' => 'Home Decor', 'catTable' => 'mer_kategori',  'prodTable' => 'homedecor', 'catPage' => 'homedecor-category.php'],
+                        ] : [
+                            ['title' => 'Bags & Purses', 'catTable' => 'urun_kategori',  'prodTable' => 'urunler',     'catPage' => 'bagpurses-category.php'],
+                            ['title' => 'Accessories',   'catTable' => 'bolge_kategori', 'prodTable' => 'accessories', 'catPage' => 'accessories-category.php'],
+                        ];
+                        require_once __DIR__ . '/../includes/cat_counts.php';
+                        foreach ($sidebarGroups as $grp):
+                            // MAS-102: sol menü, üst menü ile AYNI sırada olsun (sira ASC) → ortak helper.
+                            $rows = masq_category_counts($db, $grp['catTable'], $grp['prodTable']);
+                        ?>
                             <div class="shop_widget_list categories">
                                 <div class="shop_widget_title categories_title">
-                                    <h3>Bags & Purses</h3>
+                                    <h3><?= $grp['title'] ?></h3>
                                 </div>
                                 <div class="widget_categories">
                                     <ul>
-                                    <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM urun_kategori AS bk
-                             LEFT JOIN urunler AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
-foreach ($hizmetkategori as $hizmetka) { ?>
-                                    <li><a href="bagpurses-category.php?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
-                                    <?php } ?>
+                                    <?php foreach ($rows as $hizmetka): ?>
+                                    <li><a href="<?= $grp['catPage'] ?>?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
+                                    <?php endforeach; ?>
                                     </ul>
                                 </div>
                             </div>
-                           
-                            <div class="shop_widget_list categories">
-                                <div class="shop_widget_title categories_title">
-                                    <h3>Accessories</h3>
-                                </div>
-                                <div class="widget_categories">
-                                    <ul>
-                                    <?php
-$hizmetkategori = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                             FROM bolge_kategori AS bk
-                             LEFT JOIN accessories AS b ON bk.adi = b.kategori
-                             GROUP BY bk.adi");
-foreach ($hizmetkategori as $hizmetka) { ?>
-                                    <li><a href="accessories-category.php?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
-                                    <?php } ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        
+                        <?php endforeach; ?>
                         </div>
                         <div class="shop_right_sidaber">
                             <div class="shop_gallery">
                                 <div class="row">
                                 <?php
-        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        // MAS-35: sayfa hesabı — page [1, totalPages] aralığına sıkıştırılır (boş sayfa olmasın)
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
         $productsPerPage = 9;
-        $startIndex = ($page - 1) * $productsPerPage;
 
         $totalProducts = $db->prepare("SELECT COUNT(*) as total FROM $productTable WHERE kategori = :kategori AND durum = 'on'");
         $totalProducts->bindParam(':kategori', $kategori);
         $totalProducts->execute();
-        $totalProductsCount = $totalProducts->fetchColumn();
-        $totalPages = ceil($totalProductsCount / $productsPerPage);
+        $totalProductsCount = (int) $totalProducts->fetchColumn();
+        $totalPages = max(1, (int) ceil($totalProductsCount / $productsPerPage));
+
+        // İstenen sayfa toplam sayfadan büyükse son sayfaya çek (boş son sayfa bug'ı)
+        if ($page > $totalPages) { $page = $totalPages; }
+        $startIndex = ($page - 1) * $productsPerPage;
 
         $stmt = $db->prepare("SELECT * FROM $productTable WHERE durum = 'on' AND kategori = :kategori ORDER BY sira ASC LIMIT $startIndex, $productsPerPage");
         $stmt->bindParam(':kategori', $kategori);
@@ -156,17 +151,24 @@ foreach ($urunler as $urun) {
                             <div class="loding_bar">
                                 <ul class="d-flex justify-content-center">
                                 <?php
-    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    // MAS-35: $page yukarıda zaten [1, totalPages] aralığına sıkıştırıldı.
+    $currentPage = $page;
     $encodedKategori = str_replace('&', '%26', $kategori);
-    for ($i = 1; $i <= $totalPages; $i++) {
-        $activeClass = ($i == $currentPage) ? 'active' : '';
-        echo '<li><a class="' . $activeClass . '" href="?kategori=' . $encodedKategori . '&page=' . $i . '">' . $i . '</a></li>';
-    }
-    $nextPage = $currentPage + 1;
-    if ($currentPage >= $totalPages) {
-        echo '<li><a style="border:initial !important; font-size:xxx-large; padding-top: 4px;" href="#"><i class="ion-ios-close-outline"></i></a></li>';
-    } else {
-        echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . $nextPage . '"><i class="ion-ios-arrow-right"></i></a></li>';
+    // Tek sayfa varsa pagination çubuğu gösterme.
+    if ($totalPages > 1) {
+        // Önceki
+        if ($currentPage > 1) {
+            echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . ($currentPage - 1) . '"><i class="ion-ios-arrow-left"></i></a></li>';
+        }
+        // Sayfa numaraları
+        for ($i = 1; $i <= $totalPages; $i++) {
+            $activeClass = ($i == $currentPage) ? 'active' : '';
+            echo '<li><a class="' . $activeClass . '" href="?kategori=' . $encodedKategori . '&page=' . $i . '">' . $i . '</a></li>';
+        }
+        // Sonraki (son sayfada gösterilmez; eski bozuk "x" ikonu kaldırıldı)
+        if ($currentPage < $totalPages) {
+            echo '<li><a href="?kategori=' . $encodedKategori . '&page=' . ($currentPage + 1) . '"><i class="ion-ios-arrow-right"></i></a></li>';
+        }
     }
     ?>
                                 </ul>

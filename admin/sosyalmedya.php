@@ -21,7 +21,7 @@ $s = $db->query("select * from sosyalmedya where id='1'")->fetch(PDO::FETCH_ASSO
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Sosyal Medya -  <?=$ayar['site_title']?></title>
         <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,700,800&amp;display=swap" rel="stylesheet">
         <link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">

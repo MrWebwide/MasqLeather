@@ -30,7 +30,7 @@ $seo= seflink($adi);
 
 $tur = "portfoy";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -114,7 +114,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from portfoy where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -298,7 +298,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }

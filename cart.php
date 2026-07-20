@@ -371,6 +371,32 @@ function checkEmptyTable() {
                                         </div>
     <button class="btn btn-primary" style="background-color: peru; border-color: peru;" type="submit">apply code</button>
  </form>
+ <script>
+ /* MAS-98: kupon mesajı boş sayfada değil, alanın ALTINDA inline gösterilir. */
+ (function () {
+     var f = document.getElementById('couponf');
+     if (!f) return;
+     var box = document.getElementById('message-container');
+     f.addEventListener('submit', function (e) {
+         e.preventDefault();
+         if (box) { box.textContent = ''; }
+         fetch('functions/cupon.php', { method: 'POST', body: new FormData(f) })
+             .then(function (r) { return r.json(); })
+             .then(function (d) {
+                 if (d && d.success) { window.location.reload(); return; }
+                 if (box) {
+                     box.textContent = (d && d.message) ? d.message : 'Invalid Coupon Code or Gift Card.';
+                     box.style.color = '#c0392b';
+                     box.style.marginTop = '8px';
+                     box.style.fontSize = '14px';
+                 }
+             })
+             .catch(function () {
+                 if (box) { box.textContent = 'An error occurred, please try again.'; box.style.color = '#c0392b'; box.style.marginTop = '8px'; }
+             });
+     });
+ })();
+ </script>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-8" style="">
@@ -800,7 +826,9 @@ $(document).ready(function () {
         $btnWrapper.addClass('add');
         setTimeout(function () { $btnWrapper.removeClass('add'); }, 2200);
     }
-    $('.add-to-cart').on('click touchstart', handleButtonClick);
+    // MAS-106: sadece 'click' — mobilde touchstart, dokunuş scroll'a dönse bile
+    // "eklendi" animasyonunu yanlışlıkla oynatıyordu.
+    $('.add-to-cart').on('click', handleButtonClick);
 });
 </script>
 JSEOF;

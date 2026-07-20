@@ -16,7 +16,7 @@ $width = $_POST['width'];
 $alt = $_POST['alt'];
 
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -24,7 +24,7 @@ if($_POST['kaydet'] and $_GET['islem']==''){
 	
 	
 	
-$klasord="../resimler/";
+$klasord="resimler/";
 	$resim_tmpd = $_FILES['resim']['tmp_name'];
 	if(empty($resim_tmpd))
 	{
@@ -81,13 +81,13 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
-			$klasor="../resimler/";
+			$klasor="resimler/";
 	
 	$resim_tmp = $_FILES['resim']['tmp_name'];
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM bolge_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -99,7 +99,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			$ayar_kaydi = $db->query("SELECT * FROM bolge_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
   			if($ayar_kaydi['resim']!="resim-yok")
 			{
-			  unlink("../resimler/".$ayar_kaydi['resim']);	  
+			  unlink("resimler/".$ayar_kaydi['resim']);	  
 			}
 			
 			$random = rand(0,999);
@@ -158,7 +158,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from dil where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -178,7 +178,7 @@ if($_GET['islem']=='duzenle'){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Dil Ekle | <?=$ayar['site_title']?></title>
 
         
@@ -231,7 +231,7 @@ if($_GET['islem']=='duzenle'){
                                         <label for="formFile" class="form-label">Dil Resmi</label>
                                         <input class="form-control" type="file" name="resim" id="formFile">
                                         
-                                         <img src="../resimler/<?=$guncelle['resim']?>" width="200">
+                                         <img src="resimler/<?=$guncelle['resim']?>" width="200">
                                       </div>
                                       
                                         <div class="form-floating mb-3">

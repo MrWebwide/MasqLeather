@@ -1,4 +1,4 @@
-﻿<?php if (!isset($basePath)) $basePath = ''; ?>
+<?php if (!isset($basePath)) $basePath = ''; ?>
 <footer class="footer_section footer_bg">
     <div class="container">
         <div class="row">
@@ -89,7 +89,7 @@
                                 <h3>Sign up for newsletter</h3>
                             </div>
                             <div class="newsletter_subscribe">
-                                <form id="newsletter_form">
+                                <form id="newsletter_form" action="<?=$basePath?>functions/mailer/newsletter.php" method="post">
                                     <input type="email" name="email" autocomplete="off" placeholder="Email address... "
                                         required>
                                     <button type="submit">Subscribe</button>

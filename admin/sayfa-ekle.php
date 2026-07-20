@@ -48,7 +48,7 @@ $seo= seflink($adi);
 
 $tur = "sayfalar";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -265,7 +265,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -299,7 +299,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim1 = $ayar_kaydi['resim1'];
 	}
@@ -333,7 +333,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim2 = $ayar_kaydi['resim2'];
 	}
@@ -367,7 +367,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim3 = $ayar_kaydi['resim3'];
 	}
@@ -401,7 +401,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim4 = $ayar_kaydi['resim4'];
 	}
@@ -435,7 +435,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM sayfalar WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim5 = $ayar_kaydi['resim5'];
 	}
@@ -519,7 +519,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from sayfalar where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -822,7 +822,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }
@@ -850,7 +850,7 @@ if($_GET['islem']=='duzenle'){
 	                    	<div class="col-md-3" data-resim-dis-id="'+say+'">\
 				                    <div class="uploaddis pasif" style="float:left;">\
 				        			  <div class="yuklendi">\
-				        				  <img src="../resimler/'+data+'" width="100%">\
+				        				  <img src="resimler/'+data+'" width="100%">\
 				        				  <div class="icon" data-resim-sil-id="'+say+'"><span class="fa fa-trash"></span></div>\
 				        				  <input type="hidden" name="img[]" value="'+data+'" required="">\
 				        			  </div>\

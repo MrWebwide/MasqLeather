@@ -76,7 +76,7 @@ $i = $db->query("select * from iletisimbilgileri where id='1'")->fetch(PDO::FETC
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>İletişim Bilgileri - <?=$ayar['site_title']?></title>
 
 

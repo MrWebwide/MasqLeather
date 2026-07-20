@@ -26,7 +26,7 @@ $aciklama4 = $_POST['aciklama4'];
 $id = 1;
 
 	
-$klasor="../resimler/";
+$klasor="resimler/";
 	
 	$resim_tmp = $_FILES['logo']['tmp_name'];
 	
@@ -201,7 +201,7 @@ $klasor="../resimler/";
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Ekstra Alan | <?=$ayar['site_title']?></title>
 
         
@@ -247,7 +247,7 @@ $klasor="../resimler/";
                                     <div class="mb-3">
                                      <label for="formFile" class="form-label">Resim</label>
                                      <input class="form-control" type="file" name="resim3" id="formFile">
-                                     <img src="../resimler/<?=$guncelle['resim3']?>" width="200">
+                                     <img src="resimler/<?=$guncelle['resim3']?>" width="200">
                                     </div>
                                       
                                       

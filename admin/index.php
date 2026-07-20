@@ -154,6 +154,25 @@ oturumkontrolana();
               <div class="card">
                 <div class="card-body" style="overflow:scroll;">
                   <h5 class="card-title">Sales</h5>
+                  <?php
+                    // MAS-24: tarih aralığı filtresi (eklenme_tarihi DATETIME, NOW())
+                    $f_bas = isset($_GET['bas']) ? trim($_GET['bas']) : '';
+                    $f_bit = isset($_GET['bit']) ? trim($_GET['bit']) : '';
+                    // Sadece YYYY-MM-DD formatını kabul et
+                    $dateOk = function ($d) { return $d !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) === 1; };
+                    $valBas = $dateOk($f_bas) ? $f_bas : '';
+                    $valBit = $dateOk($f_bit) ? $f_bit : '';
+                  ?>
+                  <form method="get" class="form-inline mb-3" style="gap:8px; flex-wrap:wrap;">
+                    <label class="mr-1 mb-0">Start</label>
+                    <input type="date" name="bas" class="form-control mr-2" value="<?= htmlspecialchars($valBas) ?>">
+                    <label class="mr-1 mb-0">End</label>
+                    <input type="date" name="bit" class="form-control mr-2" value="<?= htmlspecialchars($valBit) ?>">
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                    <?php if ($valBas !== '' || $valBit !== '') { ?>
+                      <a href="index.php" class="btn btn-secondary">Clear</a>
+                    <?php } ?>
+                  </form>
                   <div class="form-group">
                     <input type="text" class="form-control" id="searchInput" placeholder="Search by Order Number">
                 </div>
@@ -177,7 +196,17 @@ oturumkontrolana();
                  
 
                       <?php
-    $urunlistele = $db->query("select * from mailgelen order by id desc", PDO::FETCH_ASSOC);
+    // MAS-24: tarih aralığı filtresi uygulanır (yukarıda doğrulanan $valBas/$valBit)
+    $where = [];
+    $params = [];
+    if ($valBas !== '') { $where[] = "DATE(eklenme_tarihi) >= ?"; $params[] = $valBas; }
+    if ($valBit !== '') { $where[] = "DATE(eklenme_tarihi) <= ?"; $params[] = $valBit; }
+    $sql = "select * from mailgelen";
+    if ($where) { $sql .= " where " . implode(' and ', $where); }
+    $sql .= " order by id desc";
+    $urunlistele = $db->prepare($sql);
+    $urunlistele->execute($params);
+    $urunlistele->setFetchMode(PDO::FETCH_ASSOC);
     if ($urunlistele->rowCount()) {
         foreach ($urunlistele as $urungoster) {
          

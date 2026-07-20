@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $basePath = '../';
 require_once __DIR__ . '/../includes/init.php';
 ?>
@@ -82,7 +82,7 @@ font-size:20px;
     <script src="../assets/js/images-loaded.min.js"></script>
     <script src="../assets/js/jquery.nice-select.js"></script>
     <script src="../assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="../assets/js/mailchimp-ajax.js"></script>
+    <script src="../assets/js/newsletter.js"></script>
     <script src="../assets/js/jquery.counterup.min.js"></script>
     <script src="../assets/js/jquery-waypoints.js"></script>
     <script src="../assets/js/jquery-ui.min.js"></script>

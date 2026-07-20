@@ -1,6 +1,10 @@
 <?php
 include("include/baglan.php");
 include("include/fonksiyonlar.php");
+include("include/product_options.php");
+include("include/img_helpers.php");
+require_once __DIR__ . "/../includes/image.php";
+include("include/post_helper.php");
 
 
 ob_start();
@@ -9,39 +13,41 @@ oturumkontrolana();
 
 
 
-$adi = $_POST['adi'];
-$sira=$_POST['sira'];
-$aciklama = $_POST['aciklama'];
-$onaciklama = $_POST['onaciklama'];
-$durum = $_POST['durum'];
-$kategori = $_POST['kategori'];
-$yazi1 = $_POST['yazi1'];
-$yazi3 = $_POST['yazi3'];
-$yazi2 = $_POST['yazi2'];
-$yazi4 = $_POST['yazi4'];
-$yazi5 = $_POST['yazi5'];
-$yazi6 = $_POST['yazi6'];
-$yazi7 = $_POST['yazi7'];
-$yazi8 = $_POST['yazi8'];
-$yazi9 = $_POST['yazi9'];
-$yazi10 = $_POST['yazi10'];
-$yazi11 = $_POST['yazi11'];
-$yazi12 = $_POST['yazi12'];
-$yazi13 = $_POST['yazi13'];
-$yazi14 = $_POST['yazi14'];
-$yazi15 = $_POST['yazi15'];
-$yazi16 = $_POST['yazi16'];
-$yazi17 = $_POST['yazi17'];
-$yazi18 = $_POST['yazi18'];
-$yazi19 = $_POST['yazi19'];
-$yazi20 = $_POST['yazi20'];
-$yazi21 = $_POST['yazi21'];
-$yazi22 = $_POST['yazi22'];
+$adi = post_str('adi');
+$sira = post_str('sira');
+$aciklama = post_str('aciklama');
+$onaciklama = post_str('onaciklama');
+$durum = post_str('durum');
+$kategori = post_str('kategori');
+$yazi1 = post_str('yazi1');
+$yazi3 = post_str('yazi3');
+$yazi2 = post_str('yazi2');
+$yazi4 = post_str('yazi4');
+$yazi5 = post_str('yazi5');
+$yazi6 = post_str('yazi6');
+$yazi7 = post_str('yazi7');
+$yazi8 = post_str('yazi8');
+$yazi9 = post_str('yazi9');
+$yazi10 = post_str('yazi10');
+$yazi11 = post_str('yazi11');
+$yazi12 = post_str('yazi12');
+$yazi13 = post_str('yazi13');
+$yazi14 = post_str('yazi14');
+// yazi15..19: eski color-variant görsel kopyaları — artık kullanılmıyor (MAS-28).
+// Detail sayfası görseli varyantın canlı resim'inden çekiyor; bu kolonlar boş bırakılır.
+$yazi15 = '';
+$yazi16 = '';
+$yazi17 = '';
+$yazi18 = '';
+$yazi19 = '';
+$yazi20 = post_str('yazi20');
+$yazi21 = post_str('yazi21');
+$yazi22 = post_str('yazi22');
 
 
-$cargo = $_POST['cargo'];
-$stock = $_POST['stock'];
-$cargo_us = $_POST['cargo_us'];
+$cargo = post_str('cargo');
+$stock = post_str('stock');
+$cargo_us = post_str('cargo_us');
 
 
 
@@ -65,7 +71,9 @@ $seo= seflink($adi);
 
 $tur = "bagpurses";
 
-$id = $_GET['id'];
+$productOptions = array(); // MAS-46: düzenleme modunda aşağıda doldurulur
+
+$id = intval($_GET['id']);
 
 
 
@@ -120,6 +128,7 @@ if(empty($resim_tmpd)) {
         $random = rand(0,99999);
         $resim = $random . "-" . $seo . "." . substr($_FILES['resim']['name'], -3);
         move_uploaded_file($_FILES['resim']['tmp_name'], $klasord . "/" . $resim);
+        masq_compress_image($klasord . "/" . $resim); // MAS-18
     } else {
         $bilgi = '<div class="alert alert-error">
                                 <button class="close" data-dismiss="alert">×</button>
@@ -136,6 +145,7 @@ if(empty($resim_tmpd1)) {
         $random = rand(0,99999);
         $resim1 = $random . "-" . $seo . "." . substr($_FILES['resim1']['name'], -3);
         move_uploaded_file($_FILES['resim1']['tmp_name'], $klasord . "/" . $resim1);
+        masq_compress_image($klasord . "/" . $resim1); // MAS-18
     } else {
         $bilgi = '<div class="alert alert-error">
                                 <button class="close" data-dismiss="alert">×</button>
@@ -156,14 +166,12 @@ if(empty($resim_tmpd1)) {
 		
 		
 		
-		  $sonid=$db->query("select * from urunler order by id desc")->fetch(PDO::FETCH_ASSOC);
-				
-$yeni =$sonid['id'];
-    if(isset($_POST['img'])){
-    	foreach ($_POST['img'] as $img) {
-    		$islem = $db->prepare("INSERT INTO urun_img SET urun_id = ?, img = ?,tur=?");
-        	$islem = $islem->execute(array($yeni,$img,$tur));
-    	}}
+		  $yeni = (int) $db->lastInsertId(); // MAS-30: order-by-id-desc yerine
+
+	// MAS-46: ürün seçeneklerini kaydet (yeni ürün)
+	masq_save_product_options($db, (int)$yeni, $tur, isset($_POST['options']) ? $_POST['options'] : array());
+    // MAS-30: tek (multi-row) INSERT
+    masq_save_product_images($db, 'urun_img', (int)$yeni, $_POST['img'] ?? array(), $tur);
 		
 		
 		$mesaj = "
@@ -207,7 +215,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			}
 		} else {
 			// No new video uploaded, keep the existing one
-			$duzenlenecek_id = $_GET['id'];
+			$duzenlenecek_id = intval($_GET['id']);
 			$ayar_kaydi = $db->query("SELECT * FROM urunler WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 			$video = $ayar_kaydi['video'];
 		}
@@ -220,7 +228,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	 $resim_tmp = $_FILES['resim']['tmp_name'];
 
     if(empty($resim_tmp)) {
-        $duzenlenecek_id = $_GET['id'];
+        $duzenlenecek_id = intval($_GET['id']);
         $ayar_kaydi = $db->query("SELECT * FROM urunler WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
         $resim = $ayar_kaydi['resim'];
     } else {
@@ -228,6 +236,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
             $random = rand(0, 99999);
             $resim = $random . "-" . $_FILES['resim']['name']; // Dosya adını rastgele bir sayı ile birleştirerek oluşturuyoruz
             move_uploaded_file($_FILES['resim']['tmp_name'], $klasor . "/" . $resim);
+            masq_compress_image($klasor . "/" . $resim); // MAS-18
         } else {
             $bilgi = '<div class="alert alert-error">
                                     <button class="close" data-dismiss="alert">×</button>
@@ -239,7 +248,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
     $resim_tmp1 = $_FILES['resim1']['tmp_name'];
 
     if(empty($resim_tmp1)) {
-        $duzenlenecek_id = $_GET['id'];
+        $duzenlenecek_id = intval($_GET['id']);
         $ayar_kaydi = $db->query("SELECT * FROM urunler WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
         $resim1 = $ayar_kaydi['resim1'];
     } else {
@@ -247,6 +256,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
             $random = rand(0, 99999);
             $resim1 = $random . "-" . $_FILES['resim1']['name']; // Dosya adını rastgele bir sayı ile birleştirerek oluşturuyoruz
             move_uploaded_file($_FILES['resim1']['tmp_name'], $klasor . "/" . $resim1);
+            masq_compress_image($klasor . "/" . $resim1); // MAS-18
         } else {
             $bilgi = '<div class="alert alert-error">
                                     <button class="close" data-dismiss="alert">×</button>
@@ -261,16 +271,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	
 		
-		  $deleteee = $db->exec("DELETE FROM urun_img WHERE urun_id = '$id' ");
-        
-	if(isset($_POST['img'])){
-    	foreach ($_POST['img'] as $img) {
-			
-	
-    		$islem = $db->prepare("INSERT INTO urun_img SET urun_id = ?, img = ?,tur=?");
-        	$islem = $islem->execute(array($id,$img,$tur));
-    	}
-    }
+		  masq_save_product_images($db, 'urun_img', (int)$id, $_POST['img'] ?? array(), $tur); // MAS-30
 	
 
 		
@@ -278,6 +279,9 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 	 $simdi1 = $db->prepare("update urunler set video=:video, adi=:adi,sira=:sira,resim=:resim,resim1=:resim1,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,yazi1=:yazi1,yazi3=:yazi3,yazi2=:yazi2,yazi4=:yazi4,yazi5=:yazi5,yazi6=:yazi6,yazi7=:yazi7,yazi8=:yazi8,yazi9=:yazi9,yazi10=:yazi10,yazi11=:yazi11,yazi12=:yazi12,yazi13=:yazi13,yazi14=:yazi14,yazi15=:yazi15,yazi16=:yazi16,yazi17=:yazi17,yazi18=:yazi18,yazi19=:yazi19,yazi20=:yazi20,yazi21=:yazi21,yazi22=:yazi22,cargo=:cargo,stock=:stock,aciklama=:aciklama,cargo_us=:cargo_us,seo=:seo,tur=:tur,guncelleme_tarihi=:guncelleme_tarihi where id=:id");
 	$ekle1 = $simdi1->execute(array("video"=>$video,"adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"resim1"=>$resim1,"kategori"=>$kategori,"aciklama"=>$aciklama,"seo"=>$seo,"tur"=>$tur,"onaciklama"=>$onaciklama,"durum"=>$durum,"yazi1"=>$yazi1,"yazi3"=>$yazi3,"yazi2"=>$yazi2,"yazi4"=>$yazi4,"yazi5"=>$yazi5,"yazi6"=>$yazi6,"yazi7"=>$yazi7,"yazi8"=>$yazi8,"yazi9"=>$yazi9,"yazi10"=>$yazi10,"yazi11"=>$yazi11,"yazi12"=>$yazi12,"yazi13"=>$yazi13,"yazi14"=>$yazi14,"yazi15"=>$yazi15,"yazi16"=>$yazi16,"yazi17"=>$yazi17,"yazi18"=>$yazi18,"yazi19"=>$yazi19,"yazi20"=>$yazi20,"yazi21"=>$yazi21,"yazi22"=>$yazi22,"cargo"=>$cargo,"cargo_us"=>$cargo_us,"stock"=>$stock,"guncelleme_tarihi"=>$tarih,"id"=>$id));
+
+	// MAS-46: ürün seçeneklerini kaydet (düzenleme)
+	masq_save_product_options($db, (int)$id, $tur, isset($_POST['options']) ? $_POST['options'] : array());
 	if($ekle1){
 		
 		
@@ -310,9 +314,10 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from urunler where id='$gid'")->fetch(PDO::FETCH_ASSOC);
+	$productOptions = masq_get_product_options($db, (int)$gid, $tur);
 }
 
 // 1. Son 'sira' değerini al
@@ -524,179 +529,20 @@ $durum = $result['durum'];
     </select>
 </div>
 
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi10" onchange="updateImage(this)">
-        <option value="" <?php if(empty($guncelle['yazi10'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM urunler ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi10']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi15" id="yazi15" value="<?=$guncelle['yazi15']?>">
-</div>
-
-<script>
-    function updateImage(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi15").value = resim;
-        } else {
-            document.getElementById("yazi15").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi11" onchange="updateImage1(this)">
-        <option value="" <?php if(empty($guncelle['yazi11'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM urunler ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi11']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi16" id="yazi16" value="<?=$guncelle['yazi16']?>">
-</div>
-
-<script>
-    function updateImage1(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi16").value = resim;
-        } else {
-            document.getElementById("yazi16").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi12" onchange="updateImage2(this)">
-        <option value="" <?php if(empty($guncelle['yazi12'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM urunler ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi12']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi17" id="yazi17" value="<?=$guncelle['yazi17']?>">
-</div>
-
-<script>
-    function updateImage2(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi17").value = resim;
-        } else {
-            document.getElementById("yazi17").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi13" onchange="updateImage3(this)">
-        <option value="" <?php if(empty($guncelle['yazi13'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM urunler ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi13']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi18" id="yazi18" value="<?=$guncelle['yazi18']?>">
-</div>
-
-<script>
-    function updateImage3(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi18").value = resim;
-        } else {
-            document.getElementById("yazi18").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
-
-<div class="mb-3">
-    <h5>Color Variant</h5>
-    <p>(If the product doesn't have any color variants, don't choose anything)</p>
-    <select class="form-select" name="yazi14" onchange="updateImage4(this)">
-        <option value="" <?php if(empty($guncelle['yazi14'])) echo "selected"; ?>>Choose One</option>
-        <?php
-        $urun_kategori = $db->query("SELECT * FROM urunler ORDER BY id DESC", PDO::FETCH_ASSOC);
-        if ($urun_kategori->rowCount()) {
-            foreach ($urun_kategori as $urunkat) {
-                ?>
-                <option value="<?=$urunkat['id']?>" data-resim="<?=$urunkat['resim']?>" <?php if($urunkat['id'] == $guncelle['yazi14']) echo "selected"; ?>>
-                    <?=$urunkat['adi']?>
-                </option>
-                <?php
-            }
-        }
-        ?>
-    </select>
-    <input type="hidden" name="yazi19" id="yazi19" value="<?=$guncelle['yazi19']?>">
-</div>
-
-<script>
-    function updateImage4(select) {
-        var selectedOption = select.options[select.selectedIndex];
-        var resim = selectedOption.getAttribute('data-resim');
-        if (select.value !== "0" && resim !== null) {
-            document.getElementById("yazi19").value = resim;
-        } else {
-            document.getElementById("yazi19").value = ""; // 0 seçildiğinde değeri temizle
-        }
-    }
-</script>
+<?php
+// Renk varyantı seçicileri — ortak modül (MAS-28/MAS-29).
+$cvTable = 'urunler';
+include __DIR__ . '/include/color_variants_form.php';
+?>
 
 
 							
 
 
 									 
-							 <h5>Product Details</h5>
+							 <?php echo masq_render_options_repeater($productOptions); ?>
+
+								 <h5>Product Details</h5>
 									
 							 <div class=" mb-3">
                                             <label for="floatingInput">Product Short Info</label>
@@ -954,7 +800,7 @@ $durum = $result['durum'];
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }

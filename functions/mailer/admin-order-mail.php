@@ -4,6 +4,10 @@ ini_set('display_errors', 0);
 
 // Gerekli dosyaları dahil edin
 require_once '../../admin/include/baglan.php'; // Veritabanı bağlantısı
+
+// Guvenlik (prod): yalnizca giris yapmis admin. (MAS-17 devami)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION["eposta"])) { http_response_code(403); exit("forbidden"); }
 require_once '../../admin/include/fonksiyonlar.php'; // Gerekli fonksiyonlar
 require_once '../../PHPMailer/src/Exception.php';
 require_once '../../PHPMailer/src/PHPMailer.php';
@@ -17,9 +21,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $siparisid = $_POST['siparisid'];
     
-    // E-posta gönderimi
-    $konu = "Order Shipment";
-    $icerik = "Dear <strong>$name $surname</strong>, <br><br>Your products with order number <strong>$siparisid</strong> has been shipped. This is your tracking number : <strong>$trackingid</strong>. <br><br>Best regards,<br><strong> Masq Leather </strong> ";
+    // E-posta gönderimi (MAS-83: metin panelden düzenlenebilir; yoksa aşağıdaki default kullanılır)
+    require_once __DIR__ . '/../mail_templates.php';
+    $tpl = masq_mail_template($db, 'order_shipment',
+        ['name' => $name, 'surname' => $surname, 'order_no' => $siparisid, 'tracking_no' => $trackingid],
+        ['konu' => "Order Shipment",
+         'icerik' => "Dear <strong>$name $surname</strong>, <br><br>Your products with order number <strong>$siparisid</strong> has been shipped. This is your tracking number : <strong>$trackingid</strong>. <br><br>Best regards,<br><strong> Masq Leather </strong> "]);
+    $konu = $tpl['konu'];
+    $icerik = $tpl['icerik'];
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
     try {

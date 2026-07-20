@@ -40,8 +40,8 @@ if (!isset($basePath)) {
     <script src="<?=$basePath?>assets/js/jquery-waypoints.js"></script>
     <script src="<?=$basePath?>assets/js/jquery-ui.min.js"></script>
 
-    <!-- Newsletter -->
-    <script src="<?=$basePath?>assets/js/mailchimp-ajax.js"></script>
+    <!-- Newsletter (footer subscribe, site-wide) -->
+    <script src="<?=$basePath?>assets/js/newsletter.js"></script>
 
     <!-- Product Detail extras -->
 <?php if (!empty($needsEasyzoom)): ?>
@@ -49,7 +49,7 @@ if (!isset($basePath)) {
 <?php endif; ?>
 
 <?php if (!empty($needsAjaxComment)): ?>
-    <script src="<?=$basePath?>assets/js/ajax.js"></script>
+    <script src="<?=$basePath?>assets/js/ajax.js?v=<?=@filemtime(__DIR__ . '/../assets/js/ajax.js')?>"></script>
 <?php endif; ?>
 
     <!-- Page-specific scripts -->
@@ -59,8 +59,8 @@ if (!isset($basePath)) {
     <?php endforeach; ?>
 <?php endif; ?>
 
-    <!-- Main JS -->
-    <script src="<?=$basePath?>assets/js/main.js"></script>
+    <!-- Main JS (cache-bust: dosya değişince ?v otomatik değişir) -->
+    <script src="<?=$basePath?>assets/js/main.js?v=<?=@filemtime(__DIR__ . '/../assets/js/main.js')?>"></script>
 
     <!-- AOS init -->
     <script>AOS.init();</script>

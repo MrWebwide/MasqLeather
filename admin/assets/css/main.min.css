@@ -1669,11 +1669,11 @@ tr.group{
     right:0;
     height:100%;
     width:50%;
-    background:url(http://phantom-themes.com/circl/theme/assets/images/500.svg) center center no-repeat;
+    background:none center center no-repeat;
     background-size:contain
 }
 body.err-500 .error-image{
-    background:url(http://phantom-themes.com/circl/theme/assets/images/500.svg) center center no-repeat;
+    background:none center center no-repeat;
     background-size:contain
 }
 body.error-page .container{

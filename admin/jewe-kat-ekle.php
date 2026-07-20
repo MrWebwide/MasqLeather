@@ -31,7 +31,7 @@ $seo= seflink($adi);
 
 $tur = "bolge_kategori";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -48,7 +48,7 @@ if($_POST['kaydet'] and $_GET['islem']==''){
 	
 	
 	
-$klasord="../resimler/";
+$klasord="resimler/";
 	$resim_tmpd = $_FILES['resim']['tmp_name'];
 	if(empty($resim_tmpd))
 	{
@@ -113,13 +113,13 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
-			$klasor="../resimler/";
+			$klasor="resimler/";
 	
 	$resim_tmp = $_FILES['resim']['tmp_name'];
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM jewe_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -131,13 +131,13 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 			$ayar_kaydi = $db->query("SELECT * FROM jewe_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
   			if($ayar_kaydi['resim']!="resim-yok")
 			{
-			  unlink("../resimler/".$ayar_kaydi['resim']);	  
+			  unlink("resimler/".$ayar_kaydi['resim']);	  
 			}
 			
 			$random = rand(0,999);
 			
-			$resim = $random."-".$adii.".".substr($_FILES['resim']['name'], -3);
-			
+			$resim = $random."-".$seo.".".substr($_FILES['resim']['name'], -3);
+
 			move_uploaded_file($_FILES['resim']['tmp_name'],$klasor."/".$resim);
 		}
 		else
@@ -165,6 +165,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
+	 if (!empty($_POST['resim_sil'])) { $resim = 'resim-yok'; } // MAS-86(b): görseli sil
 	 $simdi1 = $db->prepare("update jewe_kategori set adi=:adi,sira=:sira,resim=:resim,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,aciklama=:aciklama,seo=:seo,tur=:tur,guncelleme_tarihi=:guncelleme_tarihi where id=:id");
 	$ekle1 = $simdi1->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"kategori"=>$kategori,"aciklama"=>$aciklama,"seo"=>$seo,"tur"=>$tur,"onaciklama"=>$onaciklama,"durum"=>$durum,"guncelleme_tarihi"=>$tarih,"id"=>$id));
 	if($ekle1){
@@ -199,7 +200,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from jewe_kategori where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -219,7 +220,7 @@ if($_GET['islem']=='duzenle'){
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>Bölge Kategori Ekle - <?=$ayar['site_title']?></title>
 
 
@@ -265,6 +266,21 @@ if($_GET['islem']=='duzenle'){
                                         <input type="text" class="form-control" id="floatingInput" name="adi" placeholder="Kategori Adı" value="<?=$guncelle['adi']?>">
                                         <label for="floatingInput">Bölge Kategori Adı</label>
                                       </div>
+
+                                      <!-- MAS-86: Kategori başlık arka plan görseli (opsiyonel — boş bırakılabilir) -->
+                                      <div class="mb-3">
+                                        <label for="formFile" class="form-label">Kategori Başlık Arka Plan Görseli (opsiyonel — kategori sayfasında başlığın arkasında görünür, boş bırakılabilir)</label>
+                                        <input class="form-control" type="file" name="resim" id="formFile" data-crop-ratio="16/5">
+                                        <?php if (!empty($guncelle['resim']) && $guncelle['resim'] !== 'resim-yok'): ?>
+                                            <img src="resimler/<?=$guncelle['resim']?>" width="200" style="margin-top:8px;">
+                                            <div style="margin-top:6px;"><label style="font-weight:normal;"><input type="checkbox" name="resim_sil" value="1"> Bu görseli sil</label></div>
+                                        <?php endif; ?>
+                                      </div>
+                                      <!-- MAS-86: bu alanlar formda görünmüyor; düzenlemede mevcut değerleri koru (veri kaybı olmasın) -->
+                                      <input type="hidden" name="durum" value="<?= htmlspecialchars($guncelle['durum'] ?? '', ENT_QUOTES) ?>">
+                                      <input type="hidden" name="kategori" value="<?= htmlspecialchars($guncelle['kategori'] ?? '', ENT_QUOTES) ?>">
+                                      <input type="hidden" name="aciklama" value="<?= htmlspecialchars($guncelle['aciklama'] ?? '', ENT_QUOTES) ?>">
+                                      <input type="hidden" name="onaciklama" value="<?= htmlspecialchars($guncelle['onaciklama'] ?? '', ENT_QUOTES) ?>">
                                       
                                       
                                   
@@ -277,9 +293,9 @@ if($_GET['islem']=='duzenle'){
                                        
                                         <div class="mb-3">
                                         <label for="formFile" class="form-label">Kategori Resmi</label>
-                                        <input class="form-control" type="file" name="resim" id="formFile">
+                                        <input class="form-control" type="file" name="resim" id="formFile" data-crop-ratio="16/5">
                                         
-                                         <img src="../resimler/<?=$guncelle['resim']?>" width="200">
+                                         <img src="resimler/<?=$guncelle['resim']?>" width="200">
                                       </div>
                                       
                                       
@@ -336,7 +352,7 @@ if($_GET['islem']=='duzenle'){
 												echo '<div class="col-md-3" data-resim-dis-id="'.$i.'">
 									                    <div class="uploaddis pasif" style="float:left;">
 									        			  <div class="yuklendi">
-									        				  <img src="../resimler/'.$c['img'].'" width="100%">
+									        				  <img src="resimler/'.$c['img'].'" width="100%">
 									        				  <div class="icon" data-resim-sil-id="'.$i.'"><span class="fa fa-trash"></span></div>
 									        				  <input type="hidden" name="img[]" value="'.$c['img'].'" required="">
 									        			  </div>
@@ -435,7 +451,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }
@@ -463,7 +479,7 @@ if($_GET['islem']=='duzenle'){
 	                    	<div class="col-md-3" data-resim-dis-id="'+say+'">\
 				                    <div class="uploaddis pasif" style="float:left;">\
 				        			  <div class="yuklendi">\
-				        				  <img src="../resimler/'+data+'" width="100%">\
+				        				  <img src="resimler/'+data+'" width="100%">\
 				        				  <div class="icon" data-resim-sil-id="'+say+'"><span class="fa fa-trash"></span></div>\
 				        				  <input type="hidden" name="img[]" value="'+data+'" required="">\
 				        			  </div>\

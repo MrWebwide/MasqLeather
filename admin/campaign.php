@@ -42,67 +42,36 @@ $string = str_replace(' ', '-', $string);
 return $string;
 }
 
-$seo= seflink($site_title);
+$seo= seflink($ayarlar['site_title'] ?? 'campaign'); // MAS-77: $site_title tanımsızdı
 
 
 
 
 
 
-	$klasor="resimler/";
-	
-	$resim_tmp = $_FILES['logo']['tmp_name'];
-	
-	if(empty($resim_tmp))
-	{
-		$duzenlenecek_id = 1;
-		$ayar_kaydi = $db->query("SELECT * FROM campaign WHERE id = '$duzenlenecek_id'")->fetch(PDO::FETCH_ASSOC);
-		$logo = $ayar_kaydi['logo'];
-	}
-	else
-	{
-		if ($_FILES["logo"]["type"] =="image/gif" || $_FILES["logo"]["type"] =="image/png"|| $_FILES["logo"]["type"] =="image/jpg"|| $_FILES["logo"]["type"] =="image/jpeg") 
-		{
-			
-			$ayar_kaydi = $db->query("SELECT * FROM campaign WHERE id = '$duzenlenecek_id'")->fetch(PDO::FETCH_ASSOC);
-  			if($ayar_kaydi['logo']!="resim-yok")
-			{
-			  unlink("resimler/".$ayar_kaydi['logo']);	  
+	$klasor = "resimler/";
+
+	// MAS-77: mevcut kaydi bir kez cek (logo/resim korunmasi icin)
+	$ayar_kaydi = $db->query("SELECT * FROM campaign WHERE id = 1")->fetch(PDO::FETCH_ASSOC);
+	$logo  = $ayar_kaydi['logo'] ?? '';
+	$resim = $ayar_kaydi['resim'] ?? '';
+
+	$resim_tmp = $_FILES['logo']['tmp_name'] ?? '';
+	if (!empty($resim_tmp)) {
+		$ext = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
+		$izinli = array('jpg','jpeg','png','gif','webp');
+		if (in_array($ext, $izinli, true)) {
+			if (!empty($ayar_kaydi['logo']) && $ayar_kaydi['logo'] != "resim-yok" && file_exists("resimler/".$ayar_kaydi['logo'])) {
+				@unlink("resimler/".$ayar_kaydi['logo']);
 			}
-			
-			$random = rand(0,995959999);
-			
-			$logo = $random."-".$seo.".".substr($_FILES['logo']['name'], -3);
-			
-			move_uploaded_file($_FILES['logo']['tmp_name'],$klasor."/".$logo);
-			
-			
-		
-
-
-
-
-			
-		}
-		else
-		{
-			$bilgi = '<div class="alert alert-error">
-										<button class="close" data-dismiss="alert">×</button>
-										<strong>Hata !</strong> Lütfen  Uygun Formatta Bir Resim Dosyası Seçiniz ( .jpg - .gif - .png ).
-			</div>';
+			$random = rand(0, 995959999);
+			$logo = $random."-".$seo.".".$ext;
+			move_uploaded_file($_FILES['logo']['tmp_name'], $klasor."/".$logo);
+		} else {
+			$bilgi = '<div class="alert alert-error"><strong>Hata!</strong> Lutfen uygun formatta bir resim seciniz ( .jpg .jpeg .png .gif .webp ).</div>';
 		}
 	}
-	
 
-	
-	
-	
-
-	
-
-
-	
-	
 	$ekle  = $db->prepare("update campaign set adi=:adi,sira=:sira,resim=:resim,logo=:logo,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,yazi1=:yazi1,yazi3=:yazi3,yazi2=:yazi2,yazi4=:yazi4 where id=:id");
 	
 	$simdi = $ekle->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"logo"=>$logo,"kategori"=>$kategori,"durum"=>$durum,"onaciklama"=>$onaciklama,"yazi1"=>$yazi1,"yazi3"=>$yazi3,"yazi2"=>$yazi2,"yazi4"=>$yazi4,"id"=>$id));

@@ -34,7 +34,7 @@ $seo= seflink($adi);
 
 $tur = "cargo_kategori";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -122,7 +122,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM cargo_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -202,7 +202,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from cargo_kategori where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -386,7 +386,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }

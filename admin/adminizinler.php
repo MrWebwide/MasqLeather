@@ -74,7 +74,7 @@ $guncelle = $db->query("select * from izinler where id='1'")->fetch(PDO::FETCH_A
         <meta name="description" content="<?=$ayar['site_description']?>">
         <meta name="keywords" content="<?=$ayar['site_keyword']?>">
         <meta name="author" content="<?=$ayar['site_author']?>">
-        <link rel="icon" type="image/png" href="../resimler/<?=$ayar['favicon']?>">
+        <link rel="icon" type="image/png" href="resimler/<?=$ayar['favicon']?>">
         <title>İzinler - <?=$ayar['site_title']?></title>
 
 

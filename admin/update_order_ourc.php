@@ -1,6 +1,10 @@
 <?php
 // Veritabanı bağlantısı
 include './include/baglan.php';
+
+// Guvenlik (prod): yalnizca giris yapmis admin. (MAS-17 devami)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (empty($_SESSION["eposta"])) { http_response_code(403); exit("forbidden"); }
 error_reporting(0);
 ini_set('display_errors', 0);
 

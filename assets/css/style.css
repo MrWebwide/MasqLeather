@@ -10,8 +10,7 @@
     07. about css here
     08. services page css here
 */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap');
+/* Google Fonts @import kaldırıldı → head-css.php içinde <link>+preconnect ile paralel yükleniyor (perf). */
 
 * {
   box-sizing: border-box;
@@ -30,8 +29,8 @@
 
 html, body {
   height: 100%;
+  margin: 0; /* UA default body margin (8px) üstte/yanda beyaz boşluk yapıyordu — sıfırla */
   padding: 0;
- 
 }
 
 body {
@@ -8180,10 +8179,14 @@ transition: 0.4s;
 .my-slider {
   width: 100%;
   top: 0;
-  margin-bottom: 2cm;
+  margin-bottom: 40px; /* MAS-92: 2cm (~75px) slider ile ürünler arasında fazla boşluk yapıyordu */
   height: 100vh; /* Ekran yüksekliği kadar kapla */
   position: relative;
   z-index: 1;
+}
+/* MAS-92: mobilde hero 400px'e iniyor; alttaki boşluğu da orantılı sıkılaştır. */
+@media only screen and (max-width: 767px) {
+  .my-slider { margin-bottom: -122px; }
 }
 
 /* Slayt içeriğinin tam ekranı kaplaması */
@@ -10547,4 +10550,547 @@ margin-top: 16px;
 .ripple-link2 img{
   background-color: rgba(0, 0, 0, 0.4); box-shadow: 0 0 0 12px rgba(0, 0, 0, 0.4);
   border-radius: 6px;
+}
+
+.masq-gallery {
+    margin-left: auto !important;
+    margin-right: 10rem !important;
+}
+/* Mobil/tablet: galeri sağ margin'i (10rem) içeriği sağa itip taşma yapıyordu → ortala, tam genişlik */
+@media only screen and (max-width: 991px) {
+    /* MAS-91: detay sayfası kabı masaüstü için inline padding-left:15vw ile ortalanıyordu;
+       mobilde bu sola devasa indent + daralma yapıyordu. Sıfırla, kolonları tam genişlik yap. */
+    .product-section { padding-left: 0 !important; padding-right: 0 !important; }
+    .product-section > .col-lg-6,
+    .product-section .detail.col-lg-6 { flex: 0 0 100% !important; max-width: 100% !important; }
+    .masq-gallery {
+        margin: 0 auto !important;
+        max-width: 100% !important;
+    }
+    /* MAS-91: mobilde görseli genişliğe göre ölçekle (ince-uzun görsel fix; asıl kurallar product_gallery.php içinde) */
+    .masq-gallery-top .swiper-slide { height: auto !important; }
+    .masq-gallery-top img { width: 100% !important; height: auto !important; max-height: 80vh !important; }
+}
+
+/* ============================================================
+   SEPET (cart) — mobil kompakt düzen. Eskiden tüm hücreler alt alta (column)
+   diziliyordu; artık görsel SOLDA, bilgiler SAĞDA grid ile yan yana.
+   ============================================================ */
+@media only screen and (max-width: 767px) {
+    .cart_page_tabel table tbody tr {
+        display: grid !important;
+        grid-template-columns: 96px 1fr 1fr !important;
+        column-gap: 12px !important;
+        row-gap: 6px !important;
+        align-items: center !important;
+        text-align: left !important;
+        padding: 14px 0 !important;
+        border-top: 1px solid #eee !important;
+    }
+    .cart_page_tabel table tbody tr td {
+        padding: 2px 0 !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+    /* Görsel: sol sütun, 3 satır boyunca */
+    .cart_page_tabel table tbody tr td:nth-child(1) {
+        grid-column: 1 !important;
+        grid-row: 1 / span 3 !important;
+        width: 96px !important;
+    }
+    .cart_page_tabel table tbody tr td:nth-child(1) img { width: 100% !important; height: auto !important; border-radius: 8px !important; }
+    /* İsim + kategori: üst, 2 sütun boyunca */
+    .cart_page_tabel table tbody tr td:nth-child(2) {
+        grid-column: 2 / 4 !important;
+        grid-row: 1 !important;
+        display: block !important;
+        padding-left: 0 !important;
+    }
+    /* Fiyat | Adet (2. satır) */
+    .cart_page_tabel table tbody tr td:nth-child(3) { grid-column: 2 !important; grid-row: 2 !important; }
+    .cart_page_tabel table tbody tr td.product_quantity,
+    .cart_page_tabel table tbody tr td:nth-child(4) { grid-column: 3 !important; grid-row: 2 !important; }
+    /* Toplam | Sil (3. satır) */
+    .cart_page_tabel table tbody tr td:nth-child(5) { grid-column: 2 !important; grid-row: 3 !important; font-weight: 600 !important; }
+    .cart_page_tabel table tbody tr td:nth-child(6) { grid-column: 3 !important; grid-row: 3 !important; text-align: right !important; }
+    /* Etiketler (thead gizli olduğu için) */
+    .cart_page_tabel table tbody tr td:nth-child(3)::before { content: "Price: "; font-weight: 600; color: #888; }
+    .cart_page_tabel table tbody tr td:nth-child(5)::before { content: "Total: "; font-weight: 600; color: #888; }
+}
+
+/* ============================================================
+   SHIPPING / "OUR PROMISE" PANELLERİ — yapışık TÜP düzeni (overlap fix)
+   Eski padding/margin + komşuya taşan ::before hack'lerini ezer.
+   style.css en sonda ve bloke yüklendiği için bu blok kazanır.
+   Masaüstü: 3 panel yan yana yapışık. Mobil: alt alta yapışık (dikey tüp).
+   ============================================================ */
+.shipping_section .shipping_inner {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+}
+.shipping_section .single_shipping {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 380px !important;
+    margin: 0 !important;
+    padding: 45px 35px !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    overflow: hidden !important;
+}
+/* Arka plan görseli paneli TAM doldurur, komşuya taşmaz */
+.shipping_section .single_shipping::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-size: cover !important;
+    background-position: center !important;
+    opacity: 0.7 !important;
+    z-index: 0 !important;
+}
+/* Dış köşeler yuvarlak (tüpün uçları), orta panel düz */
+.shipping_section .single_shipping.shipping1,
+.shipping_section .single_shipping.shipping1::before { border-radius: 20px 0 0 20px !important; }
+.shipping_section .single_shipping.shipping3,
+.shipping_section .single_shipping.shipping3::before { border-radius: 0 20px 20px 0 !important; }
+.shipping_section .single_shipping.shipping2,
+.shipping_section .single_shipping.shipping2::before { border-radius: 0 !important; }
+/* Yazılar görselin üstünde kalsın */
+.shipping_section .single_shipping .shipping_title,
+.shipping_section .single_shipping .shipping_desc {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+.shipping_section .single_shipping .shipping_title { margin-bottom: 12px !important; }
+
+/* TABLET + MOBİL (<992px): dikey tüp — 3 panel alt alta TAM GENİŞLİK, yapışık,
+   her biri kendi görseli, uçlar yuvarlak. Yazılar ekrana göre küçülür.
+   (Eskiden 768px'e kadar 3 panel yan yana kalıp daralıyor, yazı taşıyordu.) */
+@media only screen and (max-width: 991px) {
+    .shipping_section .shipping_inner {
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+    }
+    .shipping_section .single_shipping {
+        width: 100% !important;
+        flex: 0 0 auto !important;
+        max-width: 100% !important;
+        min-height: 160px !important;
+        padding: 28px 22px !important;
+        text-align: left !important;
+        align-items: flex-start !important;
+    }
+    /* Yazılar küçülsün, taşmasın */
+    .shipping_section .single_shipping .shipping_title h3 {
+        font-size: 20px !important;
+        line-height: 1.3 !important;
+    }
+    .shipping_section .single_shipping .shipping_desc p {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        word-break: break-word !important;
+    }
+    /* Tüpün uçları: sadece ilk üst, son alt yuvarlak */
+    .shipping_section .single_shipping,
+    .shipping_section .single_shipping::before { border-radius: 0 !important; }
+    .shipping_section .single_shipping.shipping1,
+    .shipping_section .single_shipping.shipping1::before { border-radius: 20px 20px 0 0 !important; }
+    .shipping_section .single_shipping.shipping3,
+    .shipping_section .single_shipping.shipping3::before { border-radius: 0 0 20px 20px !important; }
+}
+/* Küçük telefonlar: biraz daha kompakt */
+@media only screen and (max-width: 480px) {
+    .shipping_section .single_shipping { padding: 24px 18px !important; min-height: 140px !important; }
+    .shipping_section .single_shipping .shipping_title h3 { font-size: 18px !important; }
+    .shipping_section .single_shipping .shipping_desc p { font-size: 13px !important; }
+}
+
+/* ============================================================
+   BLOG GÖRSELLERİ (blog.php liste) — MAS-101: eskiden object-fit:cover + sabit yükseklik
+   fotoğrafları KIRPIYORDU (kişilerin başı kesiliyordu). Artık tam görsel gösterilir:
+   contain + height:auto + max-height → hiçbir şey kesilmez.
+   ============================================================ */
+.blog_page_thumb img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 520px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    border-radius: 16px !important;
+    display: block !important;
+}
+@media only screen and (max-width: 991px) {
+    .blog_page_thumb img { max-height: 420px !important; }
+}
+@media only screen and (max-width: 767px) {
+    .blog_page_thumb img { max-height: 340px !important; }
+}
+
+/* MAS-100: ürün detay fiyat kutusunda kampanyalı üründe orijinal fiyat üstü çizili görünsün
+   (mevcut .old_price kuralı yalnızca .price_box altındaydı; detayda kutu .product_price_box). */
+.product_price_box .old_price {
+    text-decoration: line-through;
+    color: #ABABAB;
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+/* ============================================================
+   PAGINATION — ok/numara yuvarlağın TAM ortasında.
+   Eskiden line-height ile ortalanıyordu; ionicons ok glyph'i kendi baseline'ı
+   yüzünden yukarı kayıyordu. Flexbox ile her içerik (numara/ikon) ortalanır.
+   ============================================================ */
+.loding_bar ul li a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+.loding_bar ul li a i {
+    line-height: 1 !important;
+    display: block !important;
+}
+
+/* ============================================================
+   OUR COLLECTION slider — slide görselleri büyük & tek tip (büyük ekran fix).
+   Sorun: slick kurulunca .col-lg-4 (bootstrap max-width:33.33%) artık flex .row
+   içinde olmadığından slide'ın 1/3'üne sıkışıyor, görsel de doğal (küçük) boyutta
+   kalıyordu. Slide'ı tam genişlik yapıp görseli sabit çerçeveye oturtuyoruz.
+   ============================================================ */
+.choice_slick .slick-slide > div,
+.choice_slick .col-lg-4 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+.choice_slick .choice_thumb {
+    display: block !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+}
+.choice_slick .choice_thumb img {
+    width: 100% !important;
+    height: 320px !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+}
+@media only screen and (max-width: 991px) {
+    .choice_slick .choice_thumb img { height: 260px !important; }
+}
+@media only screen and (max-width: 575px) {
+    .choice_slick .choice_thumb img { height: 300px !important; }
+}
+
+/* ============================================================
+   ANASAYFA "LATEST BLOGS" kartları — kompakt & tek tip boyut.
+   Eskiden .blog_thumb img'de boyut kuralı yoktu → görseller doğal (devasa).
+   Hepsi aynı genişlik+yükseklik (object-fit:cover) = OUR COLLECTION gibi.
+   ============================================================ */
+.blog_thumb img {
+    /* MAS-101: eskiden object-fit:cover + sabit yükseklik fotoğrafları KIRPIYORDU.
+       Artık tam görsel gösterilir (contain + height:auto + max-height) → hiçbir şey kesilmez. */
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 340px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    display: block !important;
+    border-radius: 10px !important;
+}
+@media only screen and (max-width: 991px) {
+    .blog_thumb img { max-height: 300px !important; }
+}
+
+/* ============================================================
+   ÜRÜN KARTLARI — her ekranda TÜM kutular aynı boyut (Bags/Accessories/
+   Jewelry/Home Decor + anasayfa + arama). Eskiden .product_thumb img
+   max-height:320px + object-fit:contain ile yüksekliği orana göre değişiyordu
+   → kartlar farklı boy → küçük ekranda kayma. Sabit oranlı kutu + contain.
+   ============================================================ */
+.single_product .product_thumb {
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 3 / 4 !important;   /* tüm kutular aynı oran → aynı boy */
+    height: auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+}
+.single_product .product_thumb > a {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+.single_product .product_thumb img,
+.single_product .product_thumb .second_image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;   /* ürünün tamamı görünür, kutu sabit kalır */
+    object-position: center !important;
+}
+.single_product .product_thumb .second_image {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+}
+/* Kart içeriği eşit hizalansın (başlık 1-2 satır farkı kaymasın) */
+.single_product { height: auto; }
+.single_product .product_content h4 {
+    min-height: 42px;   /* ~2 satır başlık yüksekliği */
+}
+
+/* ============================================================
+   ÜRÜN DETAY — color options düzgün swatch + mobil/tablet hizalama.
+   Color options 100px kutuda 50px görselle minik/dağınıktı; detay içeriği
+   iç içe .container + .row'suz col'lar yüzünden mobil/tablette daralıp
+   sola yatıyordu.
+   ============================================================ */
+.coloropt {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+.color_option {
+    width: 64px !important;
+    height: 64px !important;
+    margin: 0 !important;
+    border: 1px solid #e2e2e2 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    display: block !important;
+}
+.color_option img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+.product_details_title h3 { margin-bottom: 12px; }
+
+/* Mobil + tablet: detay içeriği tam genişlik, tutarlı boşluk (sola yatma fix) */
+@media only screen and (max-width: 991px) {
+    .product_details_section .detailer.container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    .product_details_section .right { padding-top: 20px !important; }
+    .product_details_section .product-writing.col-lg-8,
+    .product_details_section .col-lg-5 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .product_details_section .product_d_meta { margin-top: 10px; }
+}
+/* ============================================================
+   KATEGORİ BAŞLIK ARKA PLAN GÖRSELİ (MAS-86) — opsiyonel, per-kategori.
+   Kategoriye görsel eklenirse başlık (breadcrumbs) o görselin üstünde görünür;
+   okunabilirlik için koyu overlay + beyaz başlık. Görsel yoksa eski görünüm.
+   ============================================================ */
+.breadcrumbs_area.has-cat-bg {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* MAS-86(c): banner alanı aşağı doğru büyütüldü (90px → 140px). Flex/min-height kaldırıldı
+       (üstte beyaz boşluk/hizalama sorunu yapıyordu) — sade padding. */
+    padding: 140px 0;
+    margin: 0;
+}
+.breadcrumbs_area.has-cat-bg::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
+}
+.breadcrumbs_area.has-cat-bg .breadcrumb_content {
+    position: relative;
+    z-index: 1;
+}
+.breadcrumbs_area.has-cat-bg .breadcrumb_content h2 {
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+@media only screen and (max-width: 767px) {
+    .breadcrumbs_area.has-cat-bg { padding: 80px 0; }
+}
+
+/* ============================================================
+   ADD TO CART butonu — modern/premium yeniden tasarım.
+   Eski tasarımda butonun ARKASINDA (z-index:0, margin ile kaymış) bir yeşil
+   daire+tik SVG (.icon-loader-check) duruyordu; alttan taşıyor ve hizasız
+   görünüyordu. Tıklayınca da buton küçülüp o tik'i açıyordu (btn-add anim).
+   Hepsi kaldırıldı; renk (peru) korundu, şık hover parlaması + "Added ✓" geri
+   bildirimi eklendi.
+   ============================================================ */
+.icon-loader-check { display: none !important; }          /* eski bozuk yeşil tik/loader tamamen gizli */
+
+.add-to-cart {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 200px !important;
+    max-width: 100% !important;
+    height: 54px !important;
+    padding: 0 22px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #c1823f 0%, #a2621a 100%) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    letter-spacing: 0.03em !important;
+    position: relative !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 16px rgba(162, 98, 26, 0.35) !important;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
+    animation: none !important;                            /* eski shrink (btn-add) animasyonu iptal */
+}
+
+/* Etiketi absolute merkezleme yerine normal akışa al (flex ortalar) */
+.add-to-cart .btn-text {
+    position: relative !important;
+    top: auto !important; left: auto !important; right: auto !important;
+    transform: none !important;
+    line-height: normal !important;
+    white-space: nowrap !important;
+    z-index: 2 !important;
+    transition: opacity .15s ease !important;
+}
+
+/* Sepet ikonu (etiketin soluna) */
+.add-to-cart .btn-text::before {
+    content: "\f07a"; /* fa-shopping-cart */
+    font-family: "FontAwesome", "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 9px;
+    font-size: 15px;
+}
+
+.add-to-cart:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 26px rgba(162, 98, 26, 0.48) !important;
+    filter: brightness(1.06) !important;
+}
+.add-to-cart:active { transform: translateY(0) scale(0.98) !important; }
+.add-to-cart:focus { outline: none !important; }
+
+/* Parlama süpürmesi (shine sweep) hover'da */
+.add-to-cart::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0; left: -80%;
+    width: 55%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+    transform: skewX(-20deg);
+    transition: left .55s ease !important;
+    z-index: 1 !important;
+    pointer-events: none;
+}
+.add-to-cart:hover::before { left: 130%; }
+
+/* Stokta yok (disabled) — sade gri, efektsiz */
+.add-to-cart:disabled,
+.add-to-cart[disabled] {
+    background: #b9b3ab !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    filter: none !important;
+    transform: none !important;
+}
+.add-to-cart:disabled:hover::before,
+.add-to-cart[disabled]:hover::before { left: -80%; }
+.add-to-cart:disabled .btn-text::before,
+.add-to-cart[disabled] .btn-text::before { content: ""; margin: 0; }
+
+/* Tıklanınca (btn-wrapper.add) temiz, ortalı "Added ✓" geri bildirimi */
+.btn-wrapper.add .add-to-cart { animation: none !important; }
+.btn-wrapper.add .add-to-cart .btn-text { opacity: 0 !important; }
+.btn-wrapper.add .add-to-cart::after {
+    content: "\2713  Added";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #fff;
+    z-index: 3;
+    animation: masqAddedPop .32s ease;
+}
+@keyframes masqAddedPop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    60%  { transform: scale(1.09); }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ============================================================
+   Sayfa geçiş dairesi — MASQ/Mercantile logo & nav'a tıklayınca tık noktasından
+   ekranı TAM kaplayana kadar büyür; ancak ondan sonra gezinilir (main.js).
+   ============================================================ */
+.masq-page-transition {
+    position: fixed;
+    border-radius: 50%;
+    transform: scale(0);
+    z-index: 2147483646;
+    pointer-events: none;
+    will-change: transform;
+    transition: transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.masq-page-transition.grow { transform: scale(1); }
+
+/* ============================================================
+   MAS-108: Best Seller sekmesi ürünleri görünmüyordu.
+   WOW.js, .wow elemanlarına inline "visibility:hidden" verip yalnızca SCROLL olayında
+   görünür yapıyor. Best Seller sekmesi başlangıçta gizli (display:none) olduğundan
+   içindeki ürünler hiç tetiklenmiyor; sekmeye basınca da scroll olmadığı için görünmez
+   kalıyordu (özellikle mobilde). Ürün sekmelerindeki kartları WOW'dan BAĞIMSIZ, her
+   zaman görünür yapıyoruz (JS event'ine bağlı kalmadan — kesin çözüm).
+   Not: !important, WOW'un inline visibility:hidden'ını ezer.
+   ============================================================ */
+.product_container .wow,
+.product_section .product_gallery .wow,
+.product_style2 .product_gallery .wow {
+    visibility: visible !important;
+    animation-name: fadeInUp !important;
 }

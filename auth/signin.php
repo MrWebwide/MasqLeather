@@ -34,7 +34,7 @@ if(isset($_COOKIE['memet'])) {
     <title>Log-In</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/responsive.css">
-    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <!-- jqueryscript.net junk linki kaldirildi (template kalintisi, gereksiz 3rd-party istek) - perf -->
     <link href="https://fonts.googleapis.com/css?family=Muli:400,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/minty/bootstrap.min.css">
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css'>

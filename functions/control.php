@@ -1,173 +1,164 @@
 <?php
-session_start();
-include("../admin/include/baglan.php");
-include("../admin/include/fonksiyonlar.php");
+/**
+ * control.php — Checkout formunu işler ve Stripe ödeme sayfasına yönlendirir. (MAS-10)
+ *
+ * Eskiden üye/misafir için ~80'er satırlık İKİ kopya bloktu. Artık tek yol:
+ *   1) Form alanlarını al + zorunlu alan kontrolü
+ *   2) Sipariş kalemlerini OTORİTER kaynaktan topla (sepet / noid cart — tur garantili)
+ *   3) Tek bir $payload kur ve session'a koy ($_SESSION['masq_order_payload'])
+ *   4) Stripe ödeme sayfasına (pay.php) yönlendir
+ *
+ * Sipariş artık burada DB'ye YAZILMAZ; ödeme onayı geldikten sonra
+ * stripe/webhook.php -> masq_create_order() ile yazılır.
+ */
 
+session_start();
+require_once __DIR__ . '/../admin/include/baglan.php';   // $db (+ config.php)
+require_once __DIR__ . '/order_payload.php';
 
 error_reporting(0);
 ini_set('display_errors', 0);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['id'])) {
-    // Adres bilgilerini al
-    $name = isset($_POST['name']) ? $_POST['name'] : '';
-    $surname = isset($_POST['surname']) ? $_POST['surname'] : '';
-    $address = isset($_POST['address']) ? $_POST['address'] : '';
-    $city = isset($_POST['city']) ? $_POST['city'] : '';
-    $province = isset($_POST['province']) ? $_POST['province'] : '';
-    $postal = isset($_POST['postal']) ? $_POST['postal'] : '';
-    $phone = isset($_POST['phone']) ? $_POST['phone'] : '';
-    $email = isset($_POST['email']) ? $_POST['email'] : '';
-    $country = isset($_POST['country']) ? $_POST['country'] : '';
-    $namebill = isset($_POST['namebill']) ? $_POST['namebill'] : '';
-    $surnamebill = isset($_POST['surnamebill']) ? $_POST['surnamebill'] : '';
-    $addressbill = isset($_POST['addressbill']) ? $_POST['addressbill'] : '';
-    $citybill = isset($_POST['citybill']) ? $_POST['citybill'] : '';
-    $provincebill = isset($_POST['provincebill']) ? $_POST['provincebill'] : '';
-    $postalbill = isset($_POST['postalbill']) ? $_POST['postalbill'] : '';
-    $userId = isset($_POST['userid']) ? $_POST['userid'] : '';
-    $totalAmount = isset($_SESSION['totalAmount']) ? $_SESSION['totalAmount'] : '';
-    $adsoyad = isset($_SESSION['adsoyad']) ? $_SESSION['adsoyad'] : '';
-    $addname = isset($_POST['addname']) ? $_POST['addname'] : '';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../checkout.php');
+    exit;
+}
 
-    // Tüm gerekli alanları kontrol et
-    if (empty($name) || empty($surname) || empty($address) || empty($city) || empty($province) || empty($postal) || empty($phone) || empty($email) || empty($country) || empty($userId) || empty($adsoyad)|| empty($addname)) {
-     
-      
+$isLoggedIn = isset($_SESSION['id']);
 
-        // Diğer eksik alan kontrolü
-        echo header("Location: ../checkout.php");
+// --- Form alanları ---
+$textFields = [
+    'name', 'surname', 'address', 'city', 'province', 'postal', 'phone', 'email', 'country',
+    'namebill', 'surnamebill', 'addressbill', 'citybill', 'provincebill', 'postalbill', 'addname',
+];
+$in = [];
+foreach ($textFields as $f) {
+    $in[$f] = isset($_POST[$f]) ? trim($_POST[$f]) : '';
+}
 
-    } else {
-        // Eksik alan yoksa, diğer işlemleri devam ettirin ve formu işleyin.
-        $_SESSION['name'] = $name;
-        $_SESSION['surname'] = $surname;
-        $_SESSION['address'] = $address;
-        $_SESSION['city'] = $city;
-        $_SESSION['province'] = $province;
-        $_SESSION['postal'] = $postal;
-        $_SESSION['phone'] = $phone;
-        $_SESSION['email'] = $email;
-        $_SESSION['country'] = $country;
-        $_SESSION['namebill'] = $namebill;
-        $_SESSION['surnamebill'] = $surnamebill;
-        $_SESSION['addressbill'] = $addressbill;
-        $_SESSION['citybill'] = $citybill;
-        $_SESSION['provincebill'] = $provincebill;
-        $_SESSION['postalbill'] = $postalbill;
-        $_SESSION['userId'] = $userId;
-        $_SESSION['totalAmount'] = $totalAmount;
-        $_SESSION['adsoyad'] = $adsoyad;
-        $_SESSION['addname'] = $addname;
+$adsoyad  = $isLoggedIn ? ($_SESSION['adsoyad'] ?? '') : 'No account';
+$userId   = $isLoggedIn ? $_SESSION['id'] : 'No account';
+$maxCargo = isset($_POST['cargo_transfer']) ? floatval($_POST['cargo_transfer']) : 0;
 
+// Sipariş kalemlerini OTORİTER kaynaktan topla (sepet / noid cart — tur garantili)
+$items = masq_collect_order_items($db);
 
-        // Benzersiz bir sipariş ID'si oluştur
-        $siparisId = time() . '_' . $userId;
-        $_SESSION['siparisId'] = $siparisId; // Sipariş ID'sini session'a kaydedin
+// Tutarı kalemlerden HESAPLA. Misafirde $_SESSION['huso'] noid session'da kalıp boş
+// gelebildiği için session tutarına güvenmiyoruz; tek otoriter kaynak sepet kalemleri.
+$subtotal  = 0.0;
+foreach ($items as $it) {
+    $subtotal += (float) $it['totalPrice'];
+}
+$couponPct = isset($_SESSION['cupon_fiyat']) ? (float) $_SESSION['cupon_fiyat'] : 0;
+$gift      = isset($_SESSION['gift_card_amount']) ? (float) $_SESSION['gift_card_amount'] : 0;
+$total     = max(0, $subtotal - ($subtotal * $couponPct / 100) + $maxCargo - $gift);
+$totalAmount = number_format($total, 2, '.', '');
 
-        // Sepet verilerini gizli alandan alın
-    $cartData = isset($_POST['cart']) ? json_decode($_POST['cart'], true) : [];
-    $accessoriesCartData = isset($_POST['accessories_cart']) ? json_decode($_POST['accessories_cart'], true) : [];
-    $jewelryCartData = isset($_POST['jewelry_cart']) ? json_decode($_POST['jewelry_cart'], true) : [];
-    $homedecorCartData = isset($_POST['homedecor_cart']) ? json_decode($_POST['homedecor_cart'], true) : [];
-    $siparis = json_decode($_POST['siparis'], true);
-    
-    // MaxCargo değerini al
-    $maxCargo = floatval($_POST['cargo_transfer']);
-
-        // Diğer gizli inputlardan gelen değerleri session'a kaydedin
-        $_SESSION['maxCargo'] = $maxCargo;
-        $_SESSION['userId'] = $userId;
-        $_SESSION['cart'] = $cartData;
-        $_SESSION['accessories_cart'] = $accessoriesCartData;
-        $_SESSION['jewelry_cart'] = $jewelryCartData;
-        $_SESSION['homedecor_cart'] = $homedecorCartData;
-        $_SESSION['siparis'] = $siparis; // JSON olarak gelen tüm sipariş verilerini de sessiona kaydedin
-        
-        // Ödeme sayfasına yönlendir
-        header("Location: ../stripe/checkout.html");
-        exit;
-    }
-}else {
-
-
-
-
-    $name = isset($_POST['name']) ? $_POST['name'] : '';
-    $surname = isset($_POST['surname']) ? $_POST['surname'] : '';
-    $address = isset($_POST['address']) ? $_POST['address'] : '';
-    $city = isset($_POST['city']) ? $_POST['city'] : '';
-    $province = isset($_POST['province']) ? $_POST['province'] : '';
-    $postal = isset($_POST['postal']) ? $_POST['postal'] : '';
-    $phone = isset($_POST['phone']) ? $_POST['phone'] : '';
-    $email = isset($_POST['email']) ? $_POST['email'] : '';
-    $country = isset($_POST['country']) ? $_POST['country'] : '';
-    $namebill = isset($_POST['namebill']) ? $_POST['namebill'] : '';
-    $surnamebill = isset($_POST['surnamebill']) ? $_POST['surnamebill'] : '';
-    $addressbill = isset($_POST['addressbill']) ? $_POST['addressbill'] : '';
-    $citybill = isset($_POST['citybill']) ? $_POST['citybill'] : '';
-    $provincebill = isset($_POST['provincebill']) ? $_POST['provincebill'] : '';
-    $postalbill = isset($_POST['postalbill']) ? $_POST['postalbill'] : '';
-    $totalAmount = isset($_SESSION['huso']) ? $_SESSION['huso'] : '';
-    $addname = isset($_POST['addname']) ? $_POST['addname'] : '';
-
-    // Tüm gerekli alanları kontrol et
-    if (empty($name) || empty($surname) || empty($address) || empty($city) || empty($province) || empty($postal) || empty($phone) || empty($email) || empty($country) || empty($totalAmount) ) {
-     
-      
-
-        // Diğer eksik alan kontrolü
-        echo header("Location: ../checkout.php");
-
-    } else {
-
-        
-        // Eksik alan yoksa, diğer işlemleri devam ettirin ve formu işleyin.
-        $_SESSION['name'] = $name;
-        $_SESSION['surname'] = $surname;
-        $_SESSION['address'] = $address;
-        $_SESSION['city'] = $city;
-        $_SESSION['province'] = $province;
-        $_SESSION['postal'] = $postal;
-        $_SESSION['phone'] = $phone;
-        $_SESSION['email'] = $email;
-        $_SESSION['country'] = $country;
-        $_SESSION['namebill'] = $namebill;
-        $_SESSION['surnamebill'] = $surnamebill;
-        $_SESSION['addressbill'] = $addressbill;
-        $_SESSION['citybill'] = $citybill;
-        $_SESSION['provincebill'] = $provincebill;
-        $_SESSION['postalbill'] = $postalbill;
-        $_SESSION['huso'] = $totalAmount;
-        $_SESSION['addname'] = $addname;
-
-
-        // Benzersiz bir sipariş ID'si oluştur
-        $siparisId = time() . '_' . mt_rand(0, 9999);
-        $_SESSION['siparisId'] = $siparisId; // Sipariş ID'sini session'a kaydedin
-
-        // Sepet verilerini gizli alandan alın
-    $cartData = isset($_POST['cart']) ? json_decode($_POST['cart'], true) : [];
-    $accessoriesCartData = isset($_POST['accessories_cart']) ? json_decode($_POST['accessories_cart'], true) : [];
-    $jewelryCartData = isset($_POST['jewelry_cart']) ? json_decode($_POST['jewelry_cart'], true) : [];
-    $homedecorCartData = isset($_POST['homedecor_cart']) ? json_decode($_POST['homedecor_cart'], true) : [];
-    $siparis = json_decode($_POST['siparis'], true);
-    
-    // MaxCargo değerini al
-    $maxCargo = floatval($_POST['cargo_transfer']);
-
-        // Diğer gizli inputlardan gelen değerleri session'a kaydedin
-        $_SESSION['maxCargo2'] = $maxCargo;
-        $_SESSION['cart2'] = $cartData;
-        $_SESSION['accessories_cart2'] = $accessoriesCartData;
-        $_SESSION['jewelry_cart2'] = $jewelryCartData;
-        $_SESSION['homedecor_cart2'] = $homedecorCartData;
-        $_SESSION['siparis2'] = $siparis;
- 
-       
-        
-        // Ödeme sayfasına yönlendir
-        header("Location: ../stripe/checkout.html");
-        exit;
+// --- Zorunlu alan kontrolü ---
+$required = ['name', 'surname', 'address', 'city', 'province', 'postal', 'phone', 'email', 'country'];
+$missing  = empty($items); // sepet boşsa devam etme
+foreach ($required as $r) {
+    if ($in[$r] === '') {
+        $missing = true;
+        break;
     }
 }
-?>
+if ($isLoggedIn && ($in['addname'] === '' || $adsoyad === '')) {
+    $missing = true;
+}
+// Kanada (country=2) için geçerli bir province (eyalet) zorunlu. "USA" placeholder/sentinel'i
+// Kanada'da geçersiz (vergi/kargo için kritik). Client-side ile aynı kural; JS kapalıyken de korur.
+if ($in['country'] === '2' && ($in['province'] === '' || $in['province'] === 'USA')) {
+    $missing = true;
+}
+if ($missing) {
+    header('Location: ../checkout.php');
+    exit;
+}
+
+// --- Vergi hesabı (MAS-25): province_tax oranına göre, sadece Kanada (country=2) ---
+$baseAmount = $totalAmount;            // vergisiz tutar (string, number_format'lı)
+$taxRate    = 0.0;
+if ($in['country'] === '2') {
+    try {
+        $tq = $db->prepare("SELECT rate FROM province_tax WHERE code = ?");
+        $tq->execute([$in['province']]);
+        $rr = $tq->fetchColumn();
+        if ($rr !== false) { $taxRate = (float) $rr; }
+    } catch (\Throwable $e) {
+        $taxRate = 0.0; // tablo yoksa vergi eklenmez (checkout yine çalışır)
+    }
+}
+$taxAmount     = round(((float) $baseAmount) * $taxRate / 100, 2);
+$grandTotal    = ((float) $baseAmount) + $taxAmount;
+$taxAmountStr  = number_format($taxAmount, 2, '.', '');
+$grandTotalStr = number_format($grandTotal, 2, '.', '');
+
+// --- Bülten opt-in (MAS-26) --- "I would like to receive e-mails..." tiki işaretliyse
+// müşteri e-postasını abone listesine (mail.site_mail) ekle. footer newsletter ile aynı kaynak.
+if (!empty($_POST['campaign']) && filter_var($in['email'], FILTER_VALIDATE_EMAIL)) {
+    try {
+        $chk = $db->prepare("SELECT COUNT(*) FROM mail WHERE site_mail = ?");
+        $chk->execute([$in['email']]);
+        if ((int) $chk->fetchColumn() === 0) {
+            $db->prepare("INSERT INTO mail (site_mail) VALUES (?)")->execute([$in['email']]);
+        }
+    } catch (\Throwable $e) {
+        error_log('[control] bülten abone kaydı yapılamadı: ' . $e->getMessage());
+    }
+}
+
+// --- Session'a temel bilgiler (geriye dönük uyumluluk + stripe/checkout.php tutar için) ---
+foreach ($textFields as $f) {
+    $_SESSION[$f] = $in[$f];
+}
+$_SESSION['userId']  = $userId;
+$_SESSION['adsoyad'] = $adsoyad;
+$_SESSION['maxCargo'] = $maxCargo;
+if ($isLoggedIn) {
+    $_SESSION['totalAmount'] = $totalAmount;
+} else {
+    $_SESSION['huso'] = $totalAmount;
+}
+
+// Benzersiz sipariş no
+$siparisId = time() . '_' . ($isLoggedIn ? $userId : mt_rand(0, 9999));
+$_SESSION['siparisId'] = $siparisId;
+
+// --- Tek payload --- ($items ve $totalAmount yukarıda hesaplandı)
+$_SESSION['masq_order_payload'] = [
+    'siparisId'   => $siparisId,
+    'userId'      => $userId,
+    'isGuest'     => !$isLoggedIn,
+    'baseAmount'  => $baseAmount,    // vergisiz
+    'taxRate'     => $taxRate,       // yüzde
+    'taxAmount'   => $taxAmountStr,  // hesaplanan vergi
+    'totalAmount' => $grandTotalStr, // base + vergi (kaydedilen/ödenen tutar)
+    'maxCargo'    => $maxCargo,
+    'adsoyad'     => $adsoyad,
+    'addname'     => $isLoggedIn ? $in['addname'] : 'No account',
+    'customer'    => [
+        'name'     => $in['name'],
+        'surname'  => $in['surname'],
+        'address'  => $in['address'],
+        'city'     => $in['city'],
+        'province' => $in['province'],
+        'postal'   => $in['postal'],
+        'phone'    => $in['phone'],
+        'email'    => $in['email'],
+        'country'  => $in['country'],
+    ],
+    'billing'     => [
+        'namebill'     => $in['namebill'],
+        'surnamebill'  => $in['surnamebill'],
+        'addressbill'  => $in['addressbill'],
+        'citybill'     => $in['citybill'],
+        'provincebill' => $in['provincebill'],
+        'postalbill'   => $in['postalbill'],
+    ],
+    'items'       => $items,
+];
+
+// Stripe ödeme sayfasına yönlendir
+header('Location: ../stripe/pay.php');
+exit;

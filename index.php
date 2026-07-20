@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $basePath = '';
 $noExzoom = true;
 require_once __DIR__ . '/includes/init.php';
@@ -13,6 +13,10 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
 <?php include __DIR__ . '/functions/analytics.php'; ?>
 <?php include __DIR__ . '/includes/head-meta.php'; ?>
 <?php include __DIR__ . '/includes/head-css.php'; ?>
+<?php if (!empty($sayac['resim4'])): ?>
+    <!-- LCP preload: anasayfa banner görseli erken ve yüksek öncelikle çekilsin (PageSpeed LCP) -->
+    <link rel="preload" as="image" href="admin/resimler/<?=htmlspecialchars($sayac['resim4'])?>" fetchpriority="high">
+<?php endif; ?>
 <?php include __DIR__ . '/includes/head-js.php'; ?>
 
     <!-- Cookie Banner JS -->
@@ -45,12 +49,11 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
     }
     </script>
 
-    <!-- Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-16643612077"></script>
+    <!-- Google Ads: ayrı gtag.js kütüphane yüklemesi kaldırıldı (analytics.php zaten yüklüyor);
+         tek kütüphane birden fazla ID destekler → ~140KB tasarruf (perf) -->
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
     gtag('config', 'AW-16643612077');
     function gtag_report_conversion(url) {
         var callback = function () { if (typeof(url) != 'undefined') { window.location = url; } };
@@ -264,7 +267,7 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
                     <a href="<?=$hizmet['kategori']?>">
                         <div class="single_choice wow fadeInUp" data-wow-delay="0.1s" data-wow-duration="1.1s">
                             <div class="choice_thumb">
-                                <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+                                <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
                             </div>
                             <div class="choice_text">
                                 <h4><a href="<?=$hizmet['kategori']?>"><?=$hizmet['adi']?></a></h4>
@@ -310,9 +313,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="bagpurses-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -335,9 +338,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="accessories-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -373,9 +376,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="accessories-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -398,9 +401,9 @@ foreach($hizmett as $hizmet) { ?>
             <figure>
             <div class="product_thumb" onmouseover="showSecondImage(this)" onmouseout="hideSecondImage(this)">
     <a href="bagpurses-detail.php?id=<?= $hizmet['id'] ?>">
-        <img src="admin/resimler/<?=$hizmet['resim']?>" alt="">
+        <img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt="">
         <?php if ($hizmet['resim1'] !== null): ?>
-            <img class="second_image" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
+            <img class="second_image" loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim1']?>" alt="">
         <?php endif; ?>
     </a>
 </div>
@@ -637,7 +640,7 @@ foreach($hizmett as $hizmet) { ?>
                         <article class="single_blog wow fadeInUp" data-wow-delay="0.1s" data-wow-duration="1.1s">
                             <figure>
                                 <div class="blog_thumb">
-                                    <a href="blog-details.php?id=<?= $hizmet['id'] ?>"><img src="admin/resimler/<?=$hizmet['resim']?>" alt=""></a>
+                                    <a href="blog-details.php?id=<?= $hizmet['id'] ?>"><img loading="lazy" decoding="async" src="admin/resimler/<?=$hizmet['resim']?>" alt=""></a>
                                 </div>
                                 <figcaption class="blog_content">
                                     <h3><a href="blog-details.php?id=<?= $hizmet['id'] ?>"><?=$hizmet['adi']?> </a></h3>

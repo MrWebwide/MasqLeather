@@ -10,7 +10,7 @@ include("../admin/include/fonksiyonlar.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <!-- jqueryscript.net junk linki kaldirildi (template kalintisi, gereksiz 3rd-party istek) - perf -->
     <link href="https://fonts.googleapis.com/css?family=Muli:400,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/minty/bootstrap.min.css">
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css'>
@@ -45,8 +45,14 @@ h1 {
     padding-bottom: 1cm;
     font-family: "Montserrat", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 45px;
-    line-height: 20px;
+    line-height: 1.2; /* MAS-94: 20px idi → mobilde başlık 2 satıra sarınca satırlar üst üste biniyordu */
     font-weight: 300;
+}
+
+/* MAS-94: dar ekranda kutu taşmasın, başlık küçülsün */
+@media only screen and (max-width: 480px) {
+    .login-container { padding: 40px 24px 48px 24px; max-width: 92vw; }
+    h1 { font-size: 34px; padding-bottom: 0.6cm; }
 }
 
 form {
@@ -211,7 +217,7 @@ label {
                 <input type="hidden" name="email" id="email" value="">
             </div>
             <div class="form-group col-md-12">
-                <button class="button2" style="--clr:#d67900;" type="submit" id="sifreSifirla"><span>Verification</span><i></i></button>
+                <button class="button2" style="--clr:#d67900;" type="submit" id="sifreSifirla"><span>Reset Password</span><i></i></button>
             </div>
         </div>
     </form>

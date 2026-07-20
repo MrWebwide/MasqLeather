@@ -1,0 +1,33 @@
+/* masq-crop.css — Admin görsel kırpma editörü modal stilleri */
+#masq-crop-modal { display: none; position: fixed; inset: 0; z-index: 2147483000; }
+#masq-crop-modal.open { display: block; }
+#masq-crop-modal .mc-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); }
+#masq-crop-modal .mc-dialog {
+    position: relative; width: min(940px, 94vw); max-height: 92vh; margin: 4vh auto;
+    background: #fff; border-radius: 12px; display: flex; flex-direction: column;
+    overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+#masq-crop-modal .mc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid #eee; font-weight: 600; color: #333;
+}
+#masq-crop-modal .mc-x { border: none; background: none; font-size: 26px; line-height: 1; cursor: pointer; color: #999; }
+#masq-crop-modal .mc-body { padding: 12px 18px; background: #f5f5f5; }
+#masq-crop-modal .mc-stage { max-height: 56vh; }
+#masq-crop-modal .mc-stage img { max-width: 100%; display: block; }
+#masq-crop-modal .mc-tools {
+    display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+    justify-content: space-between; padding: 12px 18px; border-top: 1px solid #f0f0f0;
+}
+#masq-crop-modal .mc-ratios, #masq-crop-modal .mc-acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+#masq-crop-modal .mc-lbl { font-size: 13px; color: #777; margin-right: 2px; }
+#masq-crop-modal .mc-tools button {
+    border: 1px solid #ddd; background: #fafafa; border-radius: 6px;
+    padding: 6px 11px; cursor: pointer; font-size: 13px; color: #333; line-height: 1.2;
+}
+#masq-crop-modal .mc-tools button:hover { background: #f0f0f0; }
+#masq-crop-modal .mc-ratios button.active { background: #AB6E35; color: #fff; border-color: #AB6E35; }
+#masq-crop-modal .mc-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 18px; border-top: 1px solid #eee; }
+#masq-crop-modal .mc-cancel { border: 1px solid #ddd; background: #fff; border-radius: 8px; padding: 9px 20px; cursor: pointer; }
+#masq-crop-modal .mc-apply { border: none; background: #AB6E35; color: #fff; border-radius: 8px; padding: 9px 24px; cursor: pointer; font-weight: 600; }
+#masq-crop-modal .mc-apply:hover { background: #965d2a; }

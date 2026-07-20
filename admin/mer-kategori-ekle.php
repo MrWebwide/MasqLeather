@@ -31,7 +31,7 @@ $seo= seflink($adi);
 
 $tur = "mer_kategori";
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
 
 
@@ -119,7 +119,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 	
 	if(empty($resim_tmp))
 	{
-		$duzenlenecek_id = $_GET['id'];
+		$duzenlenecek_id = intval($_GET['id']);
 		$ayar_kaydi = $db->query("SELECT * FROM mer_kategori WHERE id = '$id'")->fetch(PDO::FETCH_ASSOC);
 		$resim = $ayar_kaydi['resim'];
 	}
@@ -165,6 +165,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 		
 		
 		
+	 if (!empty($_POST['resim_sil'])) { $resim = 'resim-yok'; } // MAS-86(b): görseli sil
 	 $simdi1 = $db->prepare("update mer_kategori set adi=:adi,sira=:sira,resim=:resim,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,aciklama=:aciklama,seo=:seo,tur=:tur,guncelleme_tarihi=:guncelleme_tarihi where id=:id");
 	$ekle1 = $simdi1->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"kategori"=>$kategori,"aciklama"=>$aciklama,"seo"=>$seo,"tur"=>$tur,"onaciklama"=>$onaciklama,"durum"=>$durum,"guncelleme_tarihi"=>$tarih,"id"=>$id));
 	if($ekle1){
@@ -199,7 +200,7 @@ if($_POST['kaydet'] and $_GET['islem']=='duzenle'){
 if($_GET['islem']=='duzenle'){
 	
 	
-	$gid = $_GET['id'];
+	$gid = intval($_GET['id']);
 	
 	$guncelle = $db->query("select * from mer_kategori where id='$gid'")->fetch(PDO::FETCH_ASSOC);
 }
@@ -316,10 +317,19 @@ if($_GET['islem']=='duzenle'){
 					
 				</div>
 <div id="queue"></div>
-                                      
-                                      
+
+                                      <!-- MAS-86: Kategori başlık arka plan görseli (opsiyonel) -->
+                                      <div class="mb-3">
+                                        <label for="formFile" class="form-label">Kategori Başlık Arka Plan Görseli (opsiyonel — kategori sayfasında başlığın arkasında görünür, boş bırakılabilir)</label>
+                                        <input class="form-control" type="file" name="resim" id="formFile" data-crop-ratio="16/5">
+                                        <?php if (!empty($guncelle['resim']) && $guncelle['resim'] !== 'resim-yok'): ?>
+                                            <img src="resimler/<?=$guncelle['resim']?>" width="200" style="margin-top:8px;">
+                                            <div style="margin-top:6px;"><label style="font-weight:normal;"><input type="checkbox" name="resim_sil" value="1"> Bu görseli sil</label></div>
+                                        <?php endif; ?>
+                                      </div>
+
                                         <div class="mb-3">
-                                 
+
                                            <input type="submit" name="kaydet" class="btn btn-primary" value="Kaydet">
                                       </div>
                                       </div>
@@ -378,7 +388,7 @@ if($_GET['islem']=='duzenle'){
 	                    var id = $(this).attr('data-id');
 	                    $('input[name="img'+id+'"]').val(data);
 	                    $('#url').val('<?php echo $site; ?>resimler/'+data);
-	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','../resimler/'+data);
+	                    $('.uploaddis[data-id="'+id+'"] .yuklendi img').attr('src','resimler/'+data);
 	                    $('.uploaddis[data-id="'+id+'"]').removeClass('aktif');
 	                    $('.uploaddis[data-id="'+id+'"]').addClass('pasif');
 	                }

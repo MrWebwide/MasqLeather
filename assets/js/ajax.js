@@ -35,6 +35,7 @@ $(document).ready(function() {
     $(".add-to-cart").click(function(e) {
         e.preventDefault(); // Default behavior engellenmesi
 
+        var $btnWrapper = $(this).closest(".btn-wrapper"); // MAS-106: "Added ✓" animasyonu sadece başarıda oynatılacak
         var form = $(this).closest("form"); // Formu bulmak için en yakın formu seçin
         var productId = form.find("input[name='productId']").val();
         var productName = form.find("input[name='productName']").val();
@@ -45,6 +46,27 @@ $(document).ready(function() {
         var productCargo = form.find("input[name='productCargo']").val();
         var productCargos = form.find("input[name='productCargos']").val();
         var producttur = form.find("input[name='producttur']").val();
+
+        // MAS-46: yapılandırılabilir selector seçimlerini topla + zorunlu doğrulama
+        var secim = {};
+        var eksik = false;
+        form.find("select.masq-option-select").each(function() {
+            var name = $(this).attr("name") || "";
+            var m = name.match(/secim\[(\d+)\]/);
+            if (!m) return;
+            var val = $(this).val();
+            if ($(this).prop("required") && (!val || val === "")) {
+                eksik = true;
+                $(this).css("border-color", "#c0392b");
+            } else {
+                $(this).css("border-color", "");
+            }
+            if (val) { secim[m[1]] = val; }
+        });
+        if (eksik) {
+            alert("Lütfen zorunlu seçenekleri seçiniz.");
+            return;
+        }
 
         $.ajax({
             type: "POST",
@@ -59,6 +81,7 @@ $(document).ready(function() {
                 productCargo: productCargo,
                 productCargos: productCargos,
                 producttur:producttur,
+                secim: secim, // MAS-46: {option_id: value_id}
                 addToCart: 1 // Bu alanın eklenmesi önemlidir, AJAX işleminin çalışmasını sağlar
             },
             success: function(response) {
@@ -67,9 +90,21 @@ $(document).ready(function() {
 
                 // Toplam fiyatı güncelleyin
                 subTotal += productPrice * productQuantity;
-                
+
                 // Sadece en son eklenen ürünün altında sub total'i Showin
                 $("#subTotal .price").text('$' + subTotal.toFixed(2));
+
+                // MAS-106: "Added ✓" animasyonu YALNIZCA ürün gerçekten eklendiğinde oynatılır.
+                // Eskiden animasyon touchstart'ta ayrı tetikleniyordu → mobilde dokunuş scroll'a
+                // dönüşünce click (dolayısıyla AJAX) hiç çalışmadan "eklendi" görünüyordu.
+                $btnWrapper.addClass('add');
+                setTimeout(function () { $btnWrapper.removeClass('add'); }, 2200);
+            },
+            // MAS-106: AJAX sessizce başarısız olunca (mobilde zayıf bağlantı/oturum)
+            // kullanıcıya bildirilir; animasyon oynatılmaz.
+            error: function() {
+                $btnWrapper.removeClass('add');
+                alert('The product could not be added to your cart. Please check your connection and try again.');
             }
         });
     });
@@ -391,59 +426,7 @@ $(document).ready(function() {
 
 
 
-// newsletter //
-
-$(document).ready(function() {
-    $('#newsletter_form').submit(function(e) {
-        e.preventDefault();
-
-        var email = $('input[name="email"]').val();
-        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        // Email formatını kontrol et
-        if (!emailPattern.test(email)) {
-            $('#message_success').hide();
-            $('#message_failed').text("Please enter a valid email address.").show();
-            setTimeout(function() {
-                $('#message_failed').fadeOut();
-            }, 3000);
-            return; // E-posta formatı geçersizse formu gönderme
-        }
-
-        var formData = $(this).serialize();
-
-        $.ajax({
-            type: 'POST',
-            url: './functions/mailer/newsletter.php',
-            data: formData,
-            dataType: 'json', // JSON yanıtı beklediğimizi belirtir
-            success: function(response) {
-                if (response.success) {
-                    $('#message_success').show();
-                    $('#message_failed').hide();
-                } else {
-                    $('#message_success').hide();
-                    $('#message_failed').text(response.message).show();
-                }
-
-                setTimeout(function() {
-                    $('#message_success').fadeOut();
-                    $('#message_failed').fadeOut();
-                }, 3000);
-            },
-            error: function(xhr, status, error) {
-                console.log(xhr.responseText);
-                $('#message_success').hide();
-                $('#message_failed').text("There was an error. Please try again.").show();
-
-                setTimeout(function() {
-                    $('#message_success').fadeOut();
-                    $('#message_failed').fadeOut();
-                }, 3000);
-            }
-        });
-    });
-});
+// newsletter handler moved to assets/js/newsletter.js (site-wide, MAS-26)
 
 
 
