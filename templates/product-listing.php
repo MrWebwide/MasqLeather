@@ -80,11 +80,13 @@ if (!isset($extraStyles)) $extraStyles = '';
                             ['title' => 'Bags & Purses', 'catTable' => 'urun_kategori',  'prodTable' => 'urunler',     'catPage' => 'bagpurses-category.php'],
                             ['title' => 'Accessories',   'catTable' => 'bolge_kategori', 'prodTable' => 'accessories', 'catPage' => 'accessories-category.php'],
                         ];
+                        require_once __DIR__ . '/../includes/cat_counts.php';
                         foreach ($sidebarGroups as $grp):
-                            $rows = $db->query("SELECT bk.adi, COUNT(b.id) AS urun_sayisi
-                                                FROM {$grp['catTable']} AS bk
-                                                LEFT JOIN {$grp['prodTable']} AS b ON bk.adi = b.kategori
-                                                GROUP BY bk.adi");
+                            // MAS-102: landing sayfası sol menüsü de üst menüyle AYNI sırada (sira ASC)
+                            // ve AYNI sayımla (yalnızca durum='on') olsun → ortak helper.
+                            // Eskiden buradaki sorgu alfabetik sıralıyor ve pasif ürünleri de sayıyordu
+                            // (ör. bagpurses.php'de "Laptop Bags(2)" ama 0 aktif ürün).
+                            $rows = masq_category_counts($db, $grp['catTable'], $grp['prodTable']);
                         ?>
                             <div class="shop_widget_list categories">
                                 <div class="shop_widget_title categories_title">

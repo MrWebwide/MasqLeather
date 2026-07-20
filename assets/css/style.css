@@ -11078,3 +11078,19 @@ margin-top: 16px;
     transition: transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .masq-page-transition.grow { transform: scale(1); }
+
+/* ============================================================
+   MAS-108: Best Seller sekmesi ürünleri görünmüyordu.
+   WOW.js, .wow elemanlarına inline "visibility:hidden" verip yalnızca SCROLL olayında
+   görünür yapıyor. Best Seller sekmesi başlangıçta gizli (display:none) olduğundan
+   içindeki ürünler hiç tetiklenmiyor; sekmeye basınca da scroll olmadığı için görünmez
+   kalıyordu (özellikle mobilde). Ürün sekmelerindeki kartları WOW'dan BAĞIMSIZ, her
+   zaman görünür yapıyoruz (JS event'ine bağlı kalmadan — kesin çözüm).
+   Not: !important, WOW'un inline visibility:hidden'ını ezer.
+   ============================================================ */
+.product_container .wow,
+.product_section .product_gallery .wow,
+.product_style2 .product_gallery .wow {
+    visibility: visible !important;
+    animation-name: fadeInUp !important;
+}
