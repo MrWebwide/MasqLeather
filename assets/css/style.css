@@ -11080,17 +11080,79 @@ margin-top: 16px;
 .masq-page-transition.grow { transform: scale(1); }
 
 /* ============================================================
-   MAS-108: Best Seller sekmesi ürünleri görünmüyordu.
-   WOW.js, .wow elemanlarına inline "visibility:hidden" verip yalnızca SCROLL olayında
-   görünür yapıyor. Best Seller sekmesi başlangıçta gizli (display:none) olduğundan
-   içindeki ürünler hiç tetiklenmiyor; sekmeye basınca da scroll olmadığı için görünmez
-   kalıyordu (özellikle mobilde). Ürün sekmelerindeki kartları WOW'dan BAĞIMSIZ, her
-   zaman görünür yapıyoruz (JS event'ine bağlı kalmadan — kesin çözüm).
-   Not: !important, WOW'un inline visibility:hidden'ını ezer.
+   MAS-108 — KESİN ÇÖZÜM (mobil/iOS): "New Products / Best Seller" sekmeleri.
+
+   Kök neden: Tema, PASİF sekmeyi `display:none` yerine `height:0; overflow:hidden`
+   ile gizliyor (bkz. global `.tab-content > .tab-pane` kuralı yukarıda). Masaüstünde
+   sorun yok; ama iOS Safari'de `height:0 -> height:auto` ile açılan bir bloğu, bir
+   scroll/dokunma compositing'i zorlayana kadar YENİDEN BOYAMIYOR (bilinen repaint
+   bug'ı). Bu yüzden mobilde "Best Seller'a basınca boş; biraz kaydırınca ürünler
+   geliyor" oluyordu. Önceki iki deneme (shown.bs.tab + .wow visibility) yalnızca WOW
+   görünürlüğünü açıyordu; repaint'i zorlamadığı için iOS'ta hâlâ boş kalıyordu.
+
+   Çözüm: Ana sayfa ürün sekmelerinde (yalnızca `.tab-content.product_container` —
+   site genelindeki başka tab'lara dokunmaz) pasif pane'i STANDART Bootstrap gibi
+   `display:none`, aktif pane'i `display:block` yap. display none<->block geçişi kutu
+   ağacını değiştirir → her cihazda (iOS dahil) garantili relayout + repaint.
+   Ayrıca WOW'un gizlediği kartları görünür tutuyoruz ki scroll beklemeden gelsinler.
    ============================================================ */
+.tab-content.product_container > .tab-pane {
+    display: none;
+    height: auto;
+    opacity: 1;
+    overflow: visible;
+}
+.tab-content.product_container > .tab-pane.active {
+    display: block;
+}
 .product_container .wow,
 .product_section .product_gallery .wow,
 .product_style2 .product_gallery .wow {
     visibility: visible !important;
     animation-name: fadeInUp !important;
 }
+
+/* ============================================================
+   MAS-108 batch — Mercantile hero (.my-slider) + sekme butonu tıklanabilirliği.
+
+   (1) SEKME BUTONU TIKLANMIYOR (mobil): Hero `position:relative; z-index:1` ve ≤767px'te
+       `margin-bottom:-122px` ile ürün bölümünün ÜSTÜNE biniyordu. Konumlandırılmış hero,
+       kaynak sırasına rağmen sekme BUTONLARININ üzerine boyanıp dokunuşu YUTUYORDU →
+       "Best Seller'a basamıyorum". Ürün bölümünü z-index ile üste alıyoruz + negatif
+       margin bindirmesini kaldırıyoruz. (iOS repaint tarafı yukarıdaki display:none ile.)
+
+   (2) TABLET'TE "GARİP BOŞLUK": Slick slide'ları slider yüksekliğini tam doldurmadığı için
+       altında boş alan kalıyordu; mobilde bu -122px hack'iyle gizleniyordu ama tablette
+       (768–991px, -122px yok) boşluk görünür kalıyordu. Slide/track/list'e height:100%
+       verince görsel tüm hero'yu doldurur → boşluk kapanır, hack'e gerek kalmaz.
+   ============================================================ */
+/* Ölçümle doğrulanan asıl sebep: slider + slick sarmalayıcıları (list/track/slide)
+   yüksekliği doğru alıyordu AMA <img> `height:100%`'i almayıp DOĞAL en-boy oranıyla
+   (kısa) çiziliyordu → slider ile görsel arasında büyük BOŞ alan kalıyordu (mobil ~366px,
+   tablet ~366px). Çözüm: slider'ı ve görseli AYNI net yüksekliğe (CSS değişkeni ile senkron)
+   sabitle; görsel object-fit:cover ile o yüksekliği kırparak TAM doldursun. */
+.my-slider { --heroH: 100vh; height: var(--heroH) !important; overflow: hidden; }
+.my-slider .slick-list,
+.my-slider .slick-track,
+.my-slider .slick-slide { height: var(--heroH) !important; }
+.my-slider img,
+.my-slider .slick-slide img {
+    height: var(--heroH) !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+/* Tablet + büyük telefon: 100vh çok uzundu; makul yükseklik + negatif margin bindirmesini
+   pozitife çevir (bindirme sekme butonlarını da kapatıyordu). */
+@media only screen and (max-width: 991px) {
+  .my-slider { --heroH: 60vh; margin-bottom: 24px !important; }
+  /* "Aşağı kaydır" chevron göstergesi (3 ok): kısa hero'da gereksiz + ürünlerin üstüne
+     biniyordu → mobil/tablette gizle. */
+  .mouse-btn-down { display: none !important; }
+}
+@media only screen and (max-width: 575px) {
+  .my-slider { --heroH: 45vh; }
+}
+
+/* Ürün bölümü hero'nun ÜSTÜNDE ve tıklanabilir kalsın (sekme butonları dahil). */
+.product_section { position: relative; z-index: 2; }

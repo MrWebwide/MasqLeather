@@ -94,10 +94,18 @@ $pageKeywords    = $yazi['yazi4'] ?? '';
     <div><img src="assets/img/shutterstock/stock-photo-handwoven-hammam-turkish-cotton-towel-on-wooden-background-1260443416-transformed.jpeg" alt=""></div>
     <div><img src="assets/img/shutterstock/stock-photo-interior-design-of-ethnic-living-room-interior-with-colorful-pillows-brown-sofa-wooden-bench-2256940479-transformed.jpeg" alt=""></div>
   </div>
-  <button class="prev"><i class="fas fa-arrow-left fa-2x"
-    style="padding-top: 0.5cm; color: white;     text-shadow: 2px 2px 3px black;"></i></button>
-<button class="next"><i class="fas fa-arrow-right fa-2x"
-    style="padding-top: 0.5cm; color: white;     text-shadow: 2px 2px 3px black;"></i></button>
+  <!-- MAS-108 batch: oklar inline SVG (siteninki Font Awesome v4; markup ise v5 `fas`
+       kullandığı için glyph render olmuyor, kırık kutu çıkıyordu). SVG font'a bağlı değil. -->
+  <button class="prev" aria-label="Previous slide">
+    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none"
+         stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+         style="filter: drop-shadow(2px 2px 3px rgba(0,0,0,.7));"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+  <button class="next" aria-label="Next slide">
+    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none"
+         stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+         style="filter: drop-shadow(2px 2px 3px rgba(0,0,0,.7));"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
 
     <style>
     .chevron{

@@ -120,14 +120,25 @@
     
     $('.select_option').niceSelect();
 
-    /* Tab panelindeki .wow elemanları: WOW.js sadece scroll'da tetiklendiği için
-       gizli tab'a (örn. Best Seller) geçince ürünler görünmez kalıyordu.
-       Tab görünür olur olmaz elemanları göster ve animasyonu başlat. */
-    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
-        var $pane = $($(this).attr('href'));
-        $pane.find('.wow').each(function () {
-            $(this).css('visibility', 'visible').addClass('animated');
-        });
+    /* MAS-108 (kesin çözüm): "New Products / Best Seller" sekme geçişini Bootstrap
+       eklentisinin transition/transitionend zamanlamasına ve WOW'a GÜVENMEDEN kendimiz
+       garanti ediyoruz. Pasif pane artık display:none (style.css) → iOS repaint bug'ı
+       biter; .active sınıfını ve WOW görünürlüğünü de elle uyguluyoruz. Delege edildiği
+       için her iki ana sayfada (Leather + Mercantile), mobil dahil, "basınca anında". */
+    $(document).on('click', '#nav-tab a[data-toggle="tab"]', function (e) {
+        e.preventDefault();
+        var $a = $(this);
+        var $pane = $($a.attr('href'));
+        if (!$pane.length) { return; }
+
+        $a.closest('#nav-tab').find('a').removeClass('active').attr('aria-selected', 'false');
+        $a.addClass('active').attr('aria-selected', 'true');
+
+        $pane.closest('.tab-content').children('.tab-pane').removeClass('show active');
+        $pane.addClass('show active');
+
+        // WOW'un gizlediği kartları scroll beklemeden göster
+        $pane.find('.wow').css('visibility', 'visible').addClass('animated');
     });
  
     
@@ -140,11 +151,8 @@
     });
     
 
-    $('#nav-tab a').on('click', function (e) {
-        e.preventDefault()
-        $(this).tab('show')
-      })
-    
+    /* (Eski #nav-tab .tab('show') handler'ı kaldırıldı — yukarıdaki delege edilmiş
+       MAS-108 handler'ı sekme geçişini Bootstrap'e bağlı kalmadan yönetiyor.) */
 
     /*---canvas menu activation---*/
     $('.opener').on('click', function(){
