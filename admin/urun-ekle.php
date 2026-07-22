@@ -33,13 +33,13 @@ $yazi11 = post_str('yazi11');
 $yazi12 = post_str('yazi12');
 $yazi13 = post_str('yazi13');
 $yazi14 = post_str('yazi14');
-// yazi15..19: eski color-variant görsel kopyaları — artık kullanılmıyor (MAS-28).
-// Detail sayfası görseli varyantın canlı resim'inden çekiyor; bu kolonlar boş bırakılır.
-$yazi15 = '';
-$yazi16 = '';
-$yazi17 = '';
-$yazi18 = '';
-$yazi19 = '';
+// MAS-111: yazi15..19 artık ek renk varyantı slotları (5 → 10). Eskiden kullanılmayan
+// görsel-kopya kolonlarıydı; şimdi color_variants_form.php'den gelen ID'leri saklıyor.
+$yazi15 = post_str('yazi15');
+$yazi16 = post_str('yazi16');
+$yazi17 = post_str('yazi17');
+$yazi18 = post_str('yazi18');
+$yazi19 = post_str('yazi19');
 $yazi20 = post_str('yazi20');
 $yazi21 = post_str('yazi21');
 $yazi22 = post_str('yazi22');
