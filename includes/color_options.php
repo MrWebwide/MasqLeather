@@ -6,24 +6,31 @@
  * ürünün asıl fotoğrafı değişince bu kopya bayatlıyordu (bug). Ayrıca durum kontrolü
  * her varyant için ayrı sorguyla (N+1) ve yanlış tabloda (hep 'urunler') yapılıyordu.
  *
- * Yeni: varyant ID'leri yazi10..14'te. Görsel + durum, varyant ürünün KENDİ tablosundan
- * TEK sorguda CANLI çekilir → her zaman güncel, N+1 yok, doğru tablo.
+ * Yeni: varyant ID'leri yazi10..19'da (MAS-111: 5 → 10 slot). Görsel + durum, varyant
+ * ürünün KENDİ tablosundan TEK sorguda CANLI çekilir → her zaman güncel, N+1 yok, doğru tablo.
  *
  * @param PDO    $db
  * @param string $table       Varyant tablosu (urunler/accessories/jewe/homedecor)
  * @param string $detailPage  Varyant linki için detay sayfası (örn. 'bagpurses-detail.php')
- * @param array  $row         Mevcut ürün satırı (yazi10..yazi14 = varyant ürün ID'leri)
+ * @param array  $row         Mevcut ürün satırı (yazi10..yazi19 = varyant ürün ID'leri)
  * @param string $basePath    Görsel/link prefix (varsayılan './')
  */
 function masq_render_color_options(PDO $db, string $table, string $detailPage, array $row, string $basePath = './'): void
 {
     $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
 
-    // Varyant ID'lerini sıralı + tekilleştirilmiş topla
+    // Varyant ID'lerini sıralı + tekilleştirilmiş topla.
+    // MAS-111: yazi15..19 eskiden görsel DOSYA ADI tutuyordu (ör. "183-towel.png"). Bu
+    // slotlar artık varyant ID'si için kullanılıyor; eski/bayat dosya-adı değerleri (int)
+    // cast edilince sahte varyant üretmesin diye YALNIZCA tam sayı olanları kabul ediyoruz.
     $ids = [];
-    foreach (['yazi10', 'yazi11', 'yazi12', 'yazi13', 'yazi14'] as $slot) {
-        if (!empty($row[$slot]) && !in_array((int) $row[$slot], $ids, true)) {
-            $ids[] = (int) $row[$slot];
+    foreach (['yazi10', 'yazi11', 'yazi12', 'yazi13', 'yazi14',
+              'yazi15', 'yazi16', 'yazi17', 'yazi18', 'yazi19'] as $slot) {
+        $val = isset($row[$slot]) ? trim((string) $row[$slot]) : '';
+        if ($val === '' || !ctype_digit($val)) { continue; } // boş ya da eski dosya adı → atla
+        $vid = (int) $val;
+        if ($vid > 0 && !in_array($vid, $ids, true)) {
+            $ids[] = $vid;
         }
     }
     if (!$ids) {

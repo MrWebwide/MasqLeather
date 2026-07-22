@@ -14,7 +14,11 @@
  *   $guncelle  (array)   düzenlenen ürün satırı (yoksa boş array)
  */
 
-$cvSlots    = ['yazi10', 'yazi11', 'yazi12', 'yazi13', 'yazi14'];
+// MAS-111: renk slotu sayısı 5 → 10'a çıkarıldı. yazi15..19 eski (kullanılmayan) görsel-
+// kopya kolonlarıydı (MAS-28'de boşaltıldı); şema değişmeden ek 5 varyant için yeniden
+// kullanılıyor. Daha fazlası gerekirse yeni kolon (yazi23+) eklenmeli.
+$cvSlots    = ['yazi10', 'yazi11', 'yazi12', 'yazi13', 'yazi14',
+               'yazi15', 'yazi16', 'yazi17', 'yazi18', 'yazi19'];
 $cvTableSafe = preg_replace('/[^a-zA-Z0-9_]/', '', $cvTable);
 $cvProducts = $db->query("SELECT id, adi FROM {$cvTableSafe} ORDER BY adi ASC", PDO::FETCH_ASSOC)->fetchAll();
 $cvCurrentId = isset($guncelle['id']) ? (int) $guncelle['id'] : 0;
