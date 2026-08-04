@@ -35,6 +35,17 @@
         $key   = trim($key);
         $value = trim($value);
 
+        // Sarmalayan tırnakları soy: STRIPE_WEBHOOK_SECRET="whsec_x" -> whsec_x
+        // (Tırnaklar değerin parçası sayılırsa Stripe imza doğrulaması "invalid
+        // signature" ile patlar ve sipariş sessizce kaybolur — bir kez yaşandı.)
+        $len = strlen($value);
+        if ($len >= 2) {
+            $first = $value[0];
+            if (($first === '"' || $first === "'") && $value[$len - 1] === $first) {
+                $value = substr($value, 1, -1);
+            }
+        }
+
         // Don't overwrite existing environment variables
         if (getenv($key) !== false) {
             continue;
