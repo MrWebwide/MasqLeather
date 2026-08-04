@@ -67,8 +67,26 @@ if (isset($_POST['kaydet_mail'])) {
     }
 }
 
+// --- Üretilmiş kuponları iptal et
+// Özelliği kapatmak SADECE yeni kupon üretimini durdurur; daha önce dağıtılmış
+// kuponlar `cupon` tablosunda geçerli kalmaya devam eder ve müşterilerin gelen
+// kutusunda durur. "Kapattık ama indirim hâlâ uygulanıyor" şikayetinin sebebi budur.
+if (isset($_POST['iptal_kuponlar'])) {
+    $onekIptal = preg_replace('/[^A-Z0-9]/', '', strtoupper($_POST['iptal_onek'] ?? 'WELCOME'));
+    if ($onekIptal === '') { $onekIptal = 'WELCOME'; }
+    try {
+        // Sadece KULLANILMAMIŞ olanlar silinir; kullanılmışlar sipariş geçmişi için durur.
+        $del = $db->prepare("DELETE FROM cupon WHERE adi LIKE :p AND durum = '0'");
+        $del->execute([':p' => $onekIptal . '-%']);
+        $mesaj = '<div class="alert alert-success">' . $del->rowCount()
+               . ' adet kullanılmamış kupon iptal edildi. (Kullanılmış kuponlara dokunulmadı.)</div>';
+    } catch (\Throwable $e) {
+        $mesaj = '<div class="alert alert-danger">Hata: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    }
+}
+
 // --- Mevcut değerleri çek
-$cfg = ['aktif' => 1, 'oran' => '10.00', 'kod_onek' => 'WELCOME'];
+$cfg = ['aktif' => 0, 'oran' => '10.00', 'kod_onek' => 'WELCOME'];
 $tpl = ['konu' => '', 'icerik' => ''];
 try {
     $row = $db->query("SELECT aktif, oran, kod_onek FROM newsletter_indirim WHERE id = 1")->fetch(PDO::FETCH_ASSOC);
@@ -78,6 +96,27 @@ try {
 } catch (\Throwable $e) {
     $tabloYok = true;
 }
+// --- Üretilmiş kupon istatistiği (kullanılmış / kullanılmamış)
+$kupon = ['toplam' => 0, 'kullanilmis' => 0, 'bekleyen' => 0];
+try {
+    $onekStat = preg_replace('/[^A-Z0-9]/', '', strtoupper($cfg['kod_onek'] ?? 'WELCOME'));
+    if ($onekStat === '') { $onekStat = 'WELCOME'; }
+    $ks = $db->prepare(
+        "SELECT COUNT(*) AS toplam,
+                SUM(CASE WHEN durum = '1' THEN 1 ELSE 0 END) AS kullanilmis,
+                SUM(CASE WHEN durum = '1' THEN 0 ELSE 1 END) AS bekleyen
+         FROM cupon WHERE adi LIKE :p"
+    );
+    $ks->execute([':p' => $onekStat . '-%']);
+    if ($kr = $ks->fetch(PDO::FETCH_ASSOC)) {
+        $kupon = [
+            'toplam'      => (int) $kr['toplam'],
+            'kullanilmis' => (int) $kr['kullanilmis'],
+            'bekleyen'    => (int) $kr['bekleyen'],
+        ];
+    }
+} catch (\Throwable $e) {}
+
 if ($tabloYok) {
     $mesaj = '<div class="alert alert-danger"><strong>newsletter_indirim</strong> / <strong>mail_sablon</strong> tablosu bulunamadı. Lütfen önce <code>db/migrations/2026_07_09_newsletter_indirim.sql</code> dosyasını çalıştırın.</div>';
 }
@@ -129,6 +168,31 @@ if ($tabloYok) {
                                             </div>
                                             <button type="submit" name="kaydet_ayar" value="1" class="btn btn-primary">Ayarları Kaydet</button>
                                         </form>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-4" style="border:1px solid #e5e5e5;">
+                                    <div class="card-body">
+                                        <h6 style="font-weight:600;">Dağıtılmış Kuponlar</h6>
+                                        <p style="font-size:13px;color:#888;margin-bottom:10px;">
+                                            Yukarıdaki ayarı kapatmak <strong>sadece yeni kupon üretimini</strong> durdurur.
+                                            Daha önce gönderilmiş kuponlar geçerli kalır ve müşteriler kullanmaya devam edebilir.
+                                            İndirimi tamamen bitirmek için bekleyen kuponları da iptal etmelisin.
+                                        </p>
+                                        <p style="margin-bottom:12px;">
+                                            <span class="badge bg-primary">Toplam: <?= $kupon['toplam'] ?></span>
+                                            <span class="badge bg-secondary">Kullanılmış: <?= $kupon['kullanilmis'] ?></span>
+                                            <span class="badge bg-danger">Bekleyen (hâlâ geçerli): <?= $kupon['bekleyen'] ?></span>
+                                        </p>
+                                        <?php if ($kupon['bekleyen'] > 0) { ?>
+                                        <form method="post" onsubmit="return confirm('Kullanılmamış <?= $kupon['bekleyen'] ?> kupon iptal edilecek. Bu kuponlara sahip müşteriler artık indirim kullanamayacak. Onaylıyor musun?');">
+                                            <input type="hidden" name="iptal_onek" value="<?= htmlspecialchars($cfg['kod_onek'] ?? 'WELCOME') ?>">
+                                            <button type="submit" name="iptal_kuponlar" value="1" class="btn btn-danger">
+                                                Bekleyen <?= $kupon['bekleyen'] ?> Kuponu İptal Et
+                                            </button>
+                                        </form>
+                                        <small class="text-muted">Kullanılmış kuponlar sipariş geçmişi için korunur, silinmez.</small>
+                                        <?php } ?>
                                     </div>
                                 </div>
 

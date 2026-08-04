@@ -53,6 +53,17 @@ if ($_POST['kaydet'] && empty($_GET['islem'])) {
 }
 
 if ($_POST['kaydet'] && $_GET['islem'] == 'duzenle') {
+    // Kategori DEĞİŞTİYSE eski kategorinin indirimini geri al.
+    // Kampanya indirimi ürün satırına (jewe.kampanya) damgalandığı için, kategori
+    // değiştirilince eski kategorideki ürünler indirimli kalıyordu — panelde hiçbir
+    // kampanya görünmediği icin kaynağı bulunamayan "hayalet indirim" bundan doğuyor.
+    $eskiKatQ = $db->prepare("SELECT kategori FROM jewekampanya WHERE id = ?");
+    $eskiKatQ->execute([$id]);
+    $eskiKategori = (string) $eskiKatQ->fetchColumn();
+    if ($eskiKategori !== '' && $eskiKategori !== $kategori) {
+        $db->prepare("UPDATE jewe SET kampanya = 0 WHERE kategori = ?")->execute([$eskiKategori]);
+    }
+
     // Kampanya güncelle
     $simdi1 = $db->prepare("update jewekampanya set adi=:adi, sira=:sira, resim=:resim, kategori=:kategori, durum=:durum, onaciklama=:onaciklama, fiyat=:fiyat, seo=:seo, tur=:tur, guncelleme_tarihi=:guncelleme_tarihi where id=:id");
     $ekle1 = $simdi1->execute(array("adi" => $adi, "sira" => $sira, "resim" => $resim, "kategori" => $kategori, "fiyat" => $fiyat, "seo" => $seo, "tur" => $tur, "onaciklama" => $onaciklama, "durum" => $durum, "guncelleme_tarihi" => $tarih, "id" => $id));

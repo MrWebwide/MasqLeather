@@ -2,15 +2,18 @@
 -- Panelden yönetilir: indirim oranı, açık/kapalı, kupon kod öneki + mail metni (mail_sablon).
 
 -- 1) İndirim ayarları (tek satır)
+-- ÖNEMLİ: varsayılan KAPALI (aktif=0). İlk sürümde DEFAULT 1 idi; SQL uygulanır
+-- uygulanmaz özellik kendiliğinden açıldı ve kimsenin haberi olmadan müşterilere
+-- %10 kupon gitmeye başladı. Açma kararı panelden bilinçli verilmelidir.
 CREATE TABLE IF NOT EXISTS newsletter_indirim (
     id       INT PRIMARY KEY AUTO_INCREMENT,
-    aktif    TINYINT(1)    NOT NULL DEFAULT 1,      -- 1: kayıt olana indirim maili gönder
+    aktif    TINYINT(1)    NOT NULL DEFAULT 0,      -- 0: kapalı. Panelden açılır.
     oran     DECIMAL(5,2)  NOT NULL DEFAULT 10.00,  -- yüzde indirim (cupon.fiyat ile aynı mantık)
     kod_onek VARCHAR(20)   NOT NULL DEFAULT 'WELCOME'
 );
 
 INSERT INTO newsletter_indirim (id, aktif, oran, kod_onek)
-SELECT 1, 1, 10.00, 'WELCOME'
+SELECT 1, 0, 10.00, 'WELCOME'
 WHERE NOT EXISTS (SELECT 1 FROM newsletter_indirim WHERE id = 1);
 
 -- 2) Mail şablonu (MAS-83 sistemine eklenir → admin > Mail Metinleri sayfasından da düzenlenebilir)

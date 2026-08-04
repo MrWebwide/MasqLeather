@@ -114,6 +114,7 @@ if($yetki == 'yetkili') {
                 <li><a href="mailayarlari.php"><i class="fa fa-circle"></i>User Accounts</a></li>
                 <li><a href="mail-metinleri.php"><i class="fa fa-circle"></i>Mail Texts</a></li>
                 <li><a href="newsletter-indirim.php"><i class="fa fa-circle"></i>Newsletter Discount</a></li>
+                <li><a href="indirimler.php"><i class="fa fa-circle"></i>Aktif İndirimler</a></li>
                 <li><a href="bekleyen-siparisler.php"><i class="fa fa-circle"></i>Düşmemiş Siparişler
                     <?php try { $__pc = (int) $db->query("SELECT COUNT(*) FROM pending_orders WHERE status <> 'completed'")->fetchColumn(); if ($__pc > 0) { echo '<span class="badge bg-danger" style="display:inline-block;margin-left:8px;vertical-align:middle;">' . $__pc . '</span>'; } } catch (\Throwable $e) {} ?>
                 </a></li>
