@@ -609,12 +609,15 @@ $(document).ready(function() {
 
                     // MAS-97: province bir <select> (input değildi → eskiden hiç dolmuyordu)
                     $('select[name="province"]').val(data.province || 'USA');
+                    // MAS-76: ABD adresinde province = eyalet kodu (eski kayitlarda "USA" -> secilmemis)
+                    $('#us_state').val(countryValue == 3 && data.province && data.province !== 'USA' ? data.province : '');
 
                     // MAS-97: nice-select özel dropdown'ları native .val() ile güncellenmez;
                     // görünen değerin de değişmesi için plugin'in update'ini çağır.
                     if ($.fn.niceSelect) {
                         $('select[name="country"]').niceSelect('update');
                         $('select[name="province"]').niceSelect('update');
+                        $('#us_state').niceSelect('update');
                     }
 
                     // MAS-97: ülkeye bağlı province göster/gizle + City/State etiketleri güncellensin
@@ -635,6 +638,7 @@ $(document).ready(function() {
         $('textarea[name="address"]').val('');
         $('input[name="city"]').val('');
         $('select[name="province"]').val('USA'); // MAS-97: placeholder ("Select Province")
+        $('#us_state').val(''); // MAS-76
         $('input[name="postal"]').val('');
         $('input[name="phone"]').val('');
         $('input[name="email"]').val('');
@@ -644,6 +648,7 @@ $(document).ready(function() {
         if ($.fn.niceSelect) {
             $('select[name="country"]').niceSelect('update');
             $('select[name="province"]').niceSelect('update');
+            $('#us_state').niceSelect('update');
         }
     }
 });
@@ -693,31 +698,8 @@ $(document).ready(function() {
 
               
 
-                        <div id="eyalet" class="checkout_form_input">
-    <label for="province">Province <span>*</span></label>
-    <select class="select_option cenk" id="issiot" name="province" required>
-        <option value="USA">Select Province</option>
-        <option value="AB">Alberta</option>
-        <option value="BC">British Columbia</option>
-        <option value="MB">Manitoba</option>
-        <option value="NB">New Brunswick</option>
-        <option value="NL">Newfoundland and Labrador</option>
-        <option value="NS">Nova Scotia</option>
-        <option value="ON">Ontario</option>
-        <option value="PE">Prince Edward Island</option>
-        <option value="QC">Quebec</option>
-        <option value="SK">Saskatchewan</option>
-        <option value="NT">Northwest Territories</option>
-        <option value="NU">Nunavut</option>
-        <option value="YT">Yukon</option>
-    </select>
-</div>
-
-
-
-
-
-                       
+                        <!-- MAS-76: adres alan sirasi Name -> Address -> City -> Province/State -> Postal/Zip.
+                             ABD icin ayri State listesi (us_state); control.php US siparisinde province'a yazar. -->
                         <div class="checkout_form_input">
                             <label>First Name <span>*</span></label>
                             <input type="text" name="name" required>
@@ -726,17 +708,90 @@ $(document).ready(function() {
                             <label>Last Name <span>*</span></label>
                             <input type="text" name="surname" required><br>
                         </div>
-                           <div class="checkout_form_input">
-                            <label id="province_label">City <span>*</span></label>
-                            <input type="text" name="city" required><br>
-                        </div>
                         <div class="checkout_form_input">
                             <label>Address <span>*</span></label>
                             <textarea type="text" name="address" required></textarea>
                         </div>
-                        
-                     
-                      
+                        <div class="checkout_form_input">
+                            <label id="province_label">City <span>*</span></label>
+                            <input type="text" name="city" required><br>
+                        </div>
+                        <div id="eyalet" class="checkout_form_input">
+                            <label for="province">Province <span>*</span></label>
+                            <select class="select_option cenk" id="issiot" name="province" required>
+                                <option value="USA">Select Province</option>
+                                <option value="AB">Alberta</option>
+                                <option value="BC">British Columbia</option>
+                                <option value="MB">Manitoba</option>
+                                <option value="NB">New Brunswick</option>
+                                <option value="NL">Newfoundland and Labrador</option>
+                                <option value="NS">Nova Scotia</option>
+                                <option value="ON">Ontario</option>
+                                <option value="PE">Prince Edward Island</option>
+                                <option value="QC">Quebec</option>
+                                <option value="SK">Saskatchewan</option>
+                                <option value="NT">Northwest Territories</option>
+                                <option value="NU">Nunavut</option>
+                                <option value="YT">Yukon</option>
+                            </select>
+                        </div>
+                        <div id="us-eyalet" class="checkout_form_input" style="display:none">
+                            <label for="us_state">State <span>*</span></label>
+                            <select class="select_option cenk" id="us_state" name="us_state">
+                                <option value="">Select State</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DE">Delaware</option>
+                                <option value="DC">District of Columbia</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NY">New York</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VT">Vermont</option>
+                                <option value="VA">Virginia</option>
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
+                        </div>
                         <div class="checkout_form_input">
                             <label id="postal_code_label">Postal Code <span>*</span></label>
                             <input type="text" name="postal" required>
@@ -824,15 +879,18 @@ $(document).ready(function() {
             
                             if (selectedCountry === "2") { // Kanada seçildiğinde
 
-                                provinceLabel.text("City");
-                                postalCodeLabel.text("Postal Code *");
+                                provinceLabel.html("City <span>*</span>");
+                                postalCodeLabel.html("Postal Code <span>*</span>");
                                 eyalet.show(); // Görünürlüğü kapatmak için
+                                $("#us-eyalet").hide(); // MAS-76
                                 $("#issiot").prop("required", true);
 
                             } else if (selectedCountry === "3") { // Amerika seçildiğinde
-                                provinceLabel.text("State and City");
-                                postalCodeLabel.text("Zip Code *");
+                                // MAS-76: State artik ayri listede (#us_state); City sadece sehir
+                                provinceLabel.html("City <span>*</span>");
+                                postalCodeLabel.html("Zip Code <span>*</span>");
                                 eyalet.hide(); // Görünürlüğü kapatmak için
+                                $("#us-eyalet").show();
                                 // MAS-85: US'te province select gizli; 'required' kalırsa tarayıcı
                                 // gizli-zorunlu alan yüzünden "Proceed to Payment"i SESSİZCE bloklar.
                                 $("#issiot").prop("required", false);
@@ -1184,6 +1242,7 @@ $_SESSION['huso'] = number_format($totalAmount, 2);
                     });
                     if (!country || country === '1') { missing.push('Country'); }           // ülke seçilmemiş
                     if (country === '2' && (!province || province === 'USA')) { missing.push('Province'); } // Kanada eyaleti
+                    if (country === '3' && !$('#us_state').val()) { missing.push('State'); } // MAS-76: ABD eyaleti
 
                     var $warn = $('#checkout-warning');
                     if (missing.length) {
@@ -1356,6 +1415,16 @@ JSEOF;
             return;
         }
         if (provinceSel) provinceSel.setCustomValidity('');
+
+        // MAS-76: ABD (3) ise State zorunlu
+        var stateSel = document.getElementById('us_state');
+        if (country === "3" && stateSel && stateSel.value === "") {
+            event.preventDefault();
+            stateSel.setCustomValidity('Please select a state.');
+            stateSel.reportValidity();
+            return;
+        }
+        if (stateSel) stateSel.setCustomValidity('');
 
         // Aksi halde native submit devam eder; tarayıcı diğer zorunlu alanları (email vb.) doğrular.
     });

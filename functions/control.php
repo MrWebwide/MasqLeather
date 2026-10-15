@@ -36,6 +36,13 @@ foreach ($textFields as $f) {
     $in[$f] = isset($_POST[$f]) ? trim($_POST[$f]) : '';
 }
 
+// MAS-76: ABD (country=3) için eyalet ayrı listeden (us_state) gelir; province'a yazılır.
+// Vergi sadece Kanada'da hesaplandığı için US eyalet kodu (NY, CA...) vergiyi etkilemez.
+if ($in['country'] === '3') {
+    $usState = strtoupper(trim($_POST['us_state'] ?? ''));
+    $in['province'] = preg_match('/^[A-Z]{2}$/', $usState) ? $usState : '';
+}
+
 $adsoyad  = $isLoggedIn ? ($_SESSION['adsoyad'] ?? '') : 'No account';
 $userId   = $isLoggedIn ? $_SESSION['id'] : 'No account';
 $maxCargo = isset($_POST['cargo_transfer']) ? floatval($_POST['cargo_transfer']) : 0;

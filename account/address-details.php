@@ -65,6 +65,11 @@ if(isset($_POST['kaydet'])) {
     $name = $_POST['name'] ?? '';
     $surname = $_POST['surname'] ?? '';
     $country = $_POST['country'] ?? '';
+    // MAS-76: ABD adresinde eyalet ayrı listeden gelir, province'a yazılır (checkout ile aynı)
+    if ($country === '3') {
+        $usState = strtoupper(trim($_POST['us_state'] ?? ''));
+        $province = preg_match('/^[A-Z]{2}$/', $usState) ? $usState : 'USA';
+    }
 
     if ($editId > 0) {
         // MAS-109: mevcut adresi güncelle — yalnızca bu kullanıcının kaydı (güvenlik: userid şartı)
@@ -275,6 +280,32 @@ margin-bottom:30px;
                                         </select>
                                       </div>
 
+                                      <!-- MAS-76: ABD eyaleti (country=3 iken görünür) -->
+                                      <div class="form-floating mb-3 col-3" id="addr-state-wrap" style="display:none">
+                                      <label for="floatingInput">State</label>
+                                        <select class="form-control" name="us_state" id="addr-state">
+                                            <?php
+                                            $usStates = array(
+                                                'AL'=>'Alabama','AK'=>'Alaska','AZ'=>'Arizona','AR'=>'Arkansas','CA'=>'California','CO'=>'Colorado',
+                                                'CT'=>'Connecticut','DE'=>'Delaware','DC'=>'District of Columbia','FL'=>'Florida','GA'=>'Georgia',
+                                                'HI'=>'Hawaii','ID'=>'Idaho','IL'=>'Illinois','IN'=>'Indiana','IA'=>'Iowa','KS'=>'Kansas',
+                                                'KY'=>'Kentucky','LA'=>'Louisiana','ME'=>'Maine','MD'=>'Maryland','MA'=>'Massachusetts',
+                                                'MI'=>'Michigan','MN'=>'Minnesota','MS'=>'Mississippi','MO'=>'Missouri','MT'=>'Montana',
+                                                'NE'=>'Nebraska','NV'=>'Nevada','NH'=>'New Hampshire','NJ'=>'New Jersey','NM'=>'New Mexico',
+                                                'NY'=>'New York','NC'=>'North Carolina','ND'=>'North Dakota','OH'=>'Ohio','OK'=>'Oklahoma',
+                                                'OR'=>'Oregon','PA'=>'Pennsylvania','RI'=>'Rhode Island','SC'=>'South Carolina',
+                                                'SD'=>'South Dakota','TN'=>'Tennessee','TX'=>'Texas','UT'=>'Utah','VT'=>'Vermont',
+                                                'VA'=>'Virginia','WA'=>'Washington','WV'=>'West Virginia','WI'=>'Wisconsin','WY'=>'Wyoming'
+                                            );
+                                            $stateSaved = (($guncelle['country'] ?? '') == '3') ? $provSaved : '';
+                                            echo '<option value="">Select State</option>';
+                                            foreach ($usStates as $sc => $sn) {
+                                                echo '<option value="' . $sc . '"' . ($stateSaved===$sc ? ' selected' : '') . '>' . $sn . '</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                      </div>
+
                                       <div class="form-floating mb-3 col-3">
                                       <label for="floatingInput" id="addr-city-label">City</label>
                                         <input type="text" class="form-control" name="city" value="<?=$guncelle['city']?>" required>
@@ -335,17 +366,20 @@ $(function () {
     var $provWrap = $('#addr-province-wrap');
     var $prov     = $('#addr-province');
     var $cityLbl  = $('#addr-city-label');
+    var $stWrap   = $('#addr-state-wrap'); // MAS-76
+    var $state    = $('#addr-state');
 
     function applyCountry() {
         var c = $country.val();
-        if (c === '3') { // ABD: province seçilmez, state şehirle birlikte yazılır
+        if (c === '3') { // ABD: province yerine State listesi (MAS-76)
             $provWrap.hide();
             $prov.val('USA');
-            $cityLbl.text('State and City');
+            $stWrap.show();
         } else {
             $provWrap.show();
-            $cityLbl.text('City');
+            $stWrap.hide();
         }
+        $cityLbl.text('City');
     }
     $country.on('change', function () {
         $country[0].setCustomValidity('');
@@ -371,7 +405,15 @@ $(function () {
             return false;
         }
         $prov[0].setCustomValidity('');
+        if (c === '3' && !$state.val()) {
+            e.preventDefault();
+            $state[0].setCustomValidity('Please select a state.');
+            $state[0].reportValidity();
+            return false;
+        }
+        $state[0].setCustomValidity('');
     });
+    $state.on('change', function () { $state[0].setCustomValidity(''); });
 });
 </script>         
                                       
