@@ -116,7 +116,15 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
 
     </style>
 
-<?php if ($campaign['durum'] === 'on'): ?>
+<?php if ($campaign['durum'] === 'on'):
+    // MAS-112: popup tipi panelden (Promo Banner) seçilir: 'link' = görsel banner, 'newsletter' = e-posta formu
+    $popTur  = ($campaign['tur'] ?? '') === 'newsletter' ? 'newsletter' : 'link';
+    $popDesc = ($campaign['aciklama'] ?? '') !== '' ? $campaign['aciklama'] : ($campaign['onaciklama'] ?? '');
+    $popImg  = !empty($campaign['logo']) ? 'admin/resimler/' . $campaign['logo'] : '';
+    $popLink = $campaign['yazi2'] ?? '';
+    $popBtn  = trim($campaign['yazi3'] ?? '') !== '' ? $campaign['yazi3'] : 'Subscribe';
+    $popCard = ($popTur === 'newsletter' || $popImg === ''); // görselsiz banner da kart olarak gösterilir
+?>
     <style>
         /* CSS Animasyonu */
         @keyframes fadeIn {
@@ -127,21 +135,69 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
             opacity: 0; /* Başlangıçta görünmez olacak */
             animation: fadeIn 1s ease-in-out 1s forwards; /* Animasyonu ekliyoruz */
         }
+        /* MAS-112: newsletter popup kartı */
+        .campaign.campaign--card {
+            width: 420px; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow-y: auto;
+            background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+            text-align: center;
+        }
+        .campaign--card .campaign-card__img { display: block; width: 100%; max-height: 240px; object-fit: cover; border-radius: 12px 12px 0 0; }
+        .campaign--card .campaign-card__body { padding: 28px 28px 30px; }
+        .campaign--card .close-btn { top: 6px; right: 10px; font-size: 30px; line-height: 1; color: #333; text-shadow: 0 0 6px #fff; }
+        .campaign--card .campaign-card__title { font-family: "Playfair Display", serif; font-size: 28px; line-height: 1.25; margin: 0 0 10px; color: #222; }
+        .campaign--card .campaign-card__desc { font-size: 15px; line-height: 1.55; color: #555; margin: 0 0 20px; }
+        .campaign--card form { display: flex; flex-direction: column; gap: 10px; }
+        .campaign--card input[type=email] { height: 46px; border: 1px solid #ccc; border-radius: 6px; padding: 0 14px; font-size: 15px; width: 100%; }
+        .campaign--card button[type=submit] { height: 46px; border: 0; border-radius: 6px; background: #1f2430; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer; }
+        .campaign--card button[type=submit]:disabled { opacity: .6; cursor: default; }
+        .campaign--card .campaign-card__msg { display: none; margin-top: 12px; font-size: 14px; }
+        .campaign--card .campaign-card__msg.ok { display: block; color: #2e7d32; }
+        .campaign--card .campaign-card__msg.err { display: block; color: #c0392b; }
+        .campaign--card .campaign-card__cta { display: inline-block; padding: 12px 28px; background: #1f2430; color: #fff; border-radius: 6px; font-weight: 600; }
+        /* popup, cookie bandının (aynı max z-index, DOM'da sonra) üstünde kalsın */
+        .campaign { z-index: 2147483647; }
+        .cookie-banner { z-index: 2147483000 !important; }
+        @media (max-width: 575px) {
+            .campaign--card .campaign-card__img { max-height: 150px; }
+            .campaign--card .campaign-card__body { padding: 20px 20px 22px; }
+            .campaign--card .campaign-card__title { font-size: 24px; }
+            .campaign--card .campaign-card__desc { font-size: 14px; margin-bottom: 16px; }
+        }
     </style>
-    <div class="campaign">
-        <a href="./<?= $campaign['yazi2'] ?>">
-            <img src="admin/resimler/<?= $campaign['logo'] ?>" alt="">
-        </a>
-        <button onclick="closeCampaign()" class="close-btn">×</button>
-        <h1 class="campaign_title"><?= $campaign['adi'] ?></h1>
-        <p class="campaign_desc"><?= $campaign['onaciklama'] ?></p>
+<?php if ($popCard): ?>
+    <div class="campaign campaign--card" role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars($campaign['adi'] ?? '') ?>">
+        <button type="button" onclick="closeCampaign()" class="close-btn" aria-label="Close">×</button>
+        <?php if ($popImg !== ''): ?><img class="campaign-card__img" src="<?= htmlspecialchars($popImg) ?>" alt=""><?php endif; ?>
+        <div class="campaign-card__body">
+            <?php if (trim($campaign['adi'] ?? '') !== ''): ?><h2 class="campaign-card__title"><?= htmlspecialchars($campaign['adi']) ?></h2><?php endif; ?>
+            <?php if (trim($popDesc) !== ''): ?><p class="campaign-card__desc"><?= nl2br(htmlspecialchars($popDesc)) ?></p><?php endif; ?>
+            <?php if ($popTur === 'newsletter'): ?>
+                <form id="campaign_newsletter_form" action="functions/mailer/newsletter.php" method="post" novalidate>
+                    <input type="email" name="email" placeholder="Your email address" autocomplete="email" required>
+                    <button type="submit"><?= htmlspecialchars($popBtn) ?></button>
+                </form>
+                <div class="campaign-card__msg" id="campaign_newsletter_msg"></div>
+            <?php elseif ($popLink !== ''): ?>
+                <a class="campaign-card__cta" href="./<?= htmlspecialchars($popLink) ?>">Shop now</a>
+            <?php endif; ?>
+        </div>
     </div>
+<?php else: ?>
+    <div class="campaign">
+        <?php if ($popLink !== ''): ?><a href="./<?= htmlspecialchars($popLink) ?>"><?php endif; ?>
+            <img src="<?= htmlspecialchars($popImg) ?>" alt="">
+        <?php if ($popLink !== ''): ?></a><?php endif; ?>
+        <button onclick="closeCampaign()" class="close-btn">×</button>
+        <h1 class="campaign_title"><?= htmlspecialchars($campaign['adi'] ?? '') ?></h1>
+        <p class="campaign_desc"><?= htmlspecialchars($popDesc) ?></p>
+    </div>
+<?php endif; ?>
 
     <script>
-        function closeCampaign() {
-            // Cookie oluştur
-            document.cookie = "campaign_closed=true; max-age=700"; // 900 saniye = 15 dakika
-            
+        function closeCampaign(maxAge) {
+            // Cookie oluştur — MAS-112: kapatınca 1 gün, newsletter'a kayıt olunca 1 yıl gösterme
+            document.cookie = "campaign_closed=true; path=/; max-age=" + (maxAge || 86400);
+
             var overlay = document.querySelector('.body_overlay2');
             var campaignDiv = document.querySelector('.campaign');
             if (overlay && campaignDiv) {
@@ -166,8 +222,37 @@ $pageKeywords    = $yazi['sssyazi'] ?? '';
                 if (overlay && campaignDiv) {
                     overlay.classList.add('active');
                     campaignDiv.style.opacity = 1; // Resim gözükmeye başlamadan önce opaklığı ayarla
+                    overlay.addEventListener('click', function () { closeCampaign(); }); // MAS-112: dışarı tıklayınca kapan
                 }
-            }, 1000); // 1.5 saniye (0.5 saniye daha önce)
+            }, 1000);
+
+            // MAS-112: popup newsletter formu → footer ile aynı uç (abone + indirim kuponu maili)
+            var nlForm = document.getElementById('campaign_newsletter_form');
+            if (nlForm) {
+                nlForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    var msg = document.getElementById('campaign_newsletter_msg');
+                    var btn = nlForm.querySelector('button[type=submit]');
+                    var email = nlForm.email.value.trim();
+                    function show(cls, text) { msg.className = 'campaign-card__msg ' + cls; msg.textContent = text; }
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { show('err', 'Please enter a valid email address.'); return; }
+                    btn.disabled = true;
+                    fetch(nlForm.getAttribute('action'), { method: 'POST', body: new FormData(nlForm) })
+                        .then(function (r) { return r.json(); })
+                        .then(function (res) {
+                            if (res.success) {
+                                show('ok', res.message || 'Subscription successful!');
+                                nlForm.style.display = 'none';
+                                document.cookie = "campaign_closed=true; path=/; max-age=31536000";
+                                setTimeout(function () { closeCampaign(31536000); }, 4000);
+                            } else {
+                                show('err', res.message || 'There was an error. Please try again.');
+                                btn.disabled = false;
+                            }
+                        })
+                        .catch(function () { show('err', 'There was an error. Please try again.'); btn.disabled = false; });
+                });
+            }
         });
     </script>
 <?php endif; ?>

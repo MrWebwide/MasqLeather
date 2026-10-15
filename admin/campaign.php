@@ -20,6 +20,12 @@ if($_POST['kaydet']){
 	$yazi3 = $_POST['yazi3'];
 	$yazi2 = $_POST['yazi2'];
 	$yazi4 = $_POST['yazi4'];
+	// MAS-112: popup tipi (link | newsletter), popup açıklaması (top bar'dan ayrı), buton metni
+	$tur = (($_POST['tur'] ?? '') === 'newsletter') ? 'newsletter' : 'link';
+	$popupAciklama = trim($_POST['aciklama'] ?? '');
+	$yazi3 = trim($_POST['yazi3'] ?? '');
+	$izinliSayfalar = array('', 'bagpurses.php', 'accessories.php', 'homedecor.php', 'jewelry.php');
+	if (!in_array($yazi2, $izinliSayfalar, true)) { $yazi2 = ''; }
 	$yazi5 = $_POST['yazi5'];
 	$yazi6 = $_POST['yazi6'];
 	$yazi7 = $_POST['yazi7'];
@@ -72,9 +78,15 @@ $seo= seflink($ayarlar['site_title'] ?? 'campaign'); // MAS-77: $site_title tan�
 		}
 	}
 
-	$ekle  = $db->prepare("update campaign set adi=:adi,sira=:sira,resim=:resim,logo=:logo,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,yazi1=:yazi1,yazi3=:yazi3,yazi2=:yazi2,yazi4=:yazi4 where id=:id");
+	// MAS-112: "Remove image" işaretliyse görseli kaldır (newsletter popup görselsiz olabilir)
+	if (!empty($_POST['logo_sil']) && empty($resim_tmp)) {
+		if (!empty($logo) && file_exists("resimler/".$logo)) { @unlink("resimler/".$logo); }
+		$logo = '';
+	}
+
+	$ekle  = $db->prepare("update campaign set adi=:adi,sira=:sira,resim=:resim,logo=:logo,kategori=:kategori,durum=:durum,onaciklama=:onaciklama,aciklama=:aciklama,tur=:tur,yazi1=:yazi1,yazi3=:yazi3,yazi2=:yazi2,yazi4=:yazi4 where id=:id");
 	
-	$simdi = $ekle->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"logo"=>$logo,"kategori"=>$kategori,"durum"=>$durum,"onaciklama"=>$onaciklama,"yazi1"=>$yazi1,"yazi3"=>$yazi3,"yazi2"=>$yazi2,"yazi4"=>$yazi4,"id"=>$id));
+	$simdi = $ekle->execute(array("adi"=>$adi,"sira"=>$sira,"resim"=>$resim,"logo"=>$logo,"kategori"=>$kategori,"durum"=>$durum,"onaciklama"=>$onaciklama,"aciklama"=>$popupAciklama,"tur"=>$tur,"yazi1"=>(string)$yazi1,"yazi3"=>$yazi3,"yazi2"=>$yazi2,"yazi4"=>(string)$yazi4,"id"=>$id));
 	
 	if($simdi){
 		
@@ -146,7 +158,7 @@ $yazi1 = $result['yazi1'];
                         <div class="col">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Campaign Set-up</h5>
+                                    <h5 class="card-title">Promo Banner / Homepage Popup</h5>
                                     <p class="card-description">Please fill all of the available spaces.</p>
                                     <?=$mesaj?>
                                     <form method="post" enctype="multipart/form-data" >
@@ -159,34 +171,63 @@ $yazi1 = $result['yazi1'];
     <span class="thumb">|||</span>
   </label>
 </div>
+                                    <p class="text-muted mb-3">Homepage popup: shown when a visitor lands on the homepage. Once closed it stays hidden for 1 day (after a newsletter sign-up: 1 year).</p>
+<?php
+// MAS-112: popup tipi + açıklama (eski kayıtlarda açıklama onaciklama'daydı → fallback)
+$popTur = ($guncelle['tur'] ?? '') === 'newsletter' ? 'newsletter' : 'link';
+$popAciklama = ($guncelle['aciklama'] ?? '') !== '' ? $guncelle['aciklama'] : ($guncelle['onaciklama'] ?? '');
+$popLink = $guncelle['yazi2'] ?? '';
+?>
+                                    <div class="mb-3">
+                                        <h5>Popup Type</h5>
+                                        <select class="form-select" name="tur" id="popup-tur">
+                                            <option value="link" <?= $popTur === 'link' ? 'selected' : '' ?>>Image banner (links to a category)</option>
+                                            <option value="newsletter" <?= $popTur === 'newsletter' ? 'selected' : '' ?>>Newsletter sign-up form (discount)</option>
+                                        </select>
+                                        <small class="text-muted" id="popup-tur-help-newsletter">Visitors enter their e-mail; they are added to Newsletter Subscribers and receive the discount code set in <a href="newsletter-indirim.php">System &rarr; Newsletter Discount</a>.</small>
+                                    </div>
+
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="floatingInput" name="adi" placeholder="Campaign Title" value="<?=$guncelle['adi']?>">
-                                        <label for="floatingInput">Campaign Title</label>
+                                        <input type="text" class="form-control" id="floatingInput" name="adi" placeholder="Popup Title" value="<?=htmlspecialchars($guncelle['adi'] ?? '')?>">
+                                        <label for="floatingInput">Popup Title</label>
                                       </div>
-                                      
-                                      
-                                         
-                                      
-									  <h5>Campaign Description</h5>
-									
-									<div class=" mb-3">
-												
-												 <textarea class="form-control" name="onaciklama" rows="10" cols="100"><?=$guncelle['onaciklama']?></textarea>
-											   
-											 </div>
-                                      
-											 <div class="mb-3">
+
+										  <h5>Popup Description</h5>
+										<div class=" mb-3">
+													 <textarea class="form-control" name="aciklama" rows="4" cols="100"><?=htmlspecialchars($popAciklama)?></textarea>
+												 </div>
+
+                                    <div class="form-floating mb-3" id="popup-buton-wrap">
+                                        <input type="text" class="form-control" name="yazi3" placeholder="Subscribe" value="<?=htmlspecialchars($guncelle['yazi3'] ?? '')?>">
+                                        <label>Button Text (default: Subscribe)</label>
+                                    </div>
+
+												 <div class="mb-3" id="popup-link-wrap">
     <h5>Category Redirect</h5>
-    <p>(By default the top category is always shown, you must re-select the category with each edit)</p>
+    <p>(Where the visitor goes when clicking the popup image)</p>
     <select class="form-select"  name="yazi2">
-        <option value="bagpurses.php" >Bags & Purses</option>
-		<option value="accessories.php" >Accessories</option>
-		<option value="homedecor.php" >Home Decor</option>
-		<option value="jewelry.php" >Jewelry</option>
-    
+        <option value="" <?= $popLink === '' ? 'selected' : '' ?>>No link</option>
+        <option value="bagpurses.php" <?= $popLink === 'bagpurses.php' ? 'selected' : '' ?>>Bags & Purses</option>
+		<option value="accessories.php" <?= $popLink === 'accessories.php' ? 'selected' : '' ?>>Accessories</option>
+		<option value="homedecor.php" <?= $popLink === 'homedecor.php' ? 'selected' : '' ?>>Home Decor</option>
+		<option value="jewelry.php" <?= $popLink === 'jewelry.php' ? 'selected' : '' ?>>Jewelry</option>
     </select>
 </div>
 
+<script>
+// MAS-112: kategori yönlendirmesi sadece görsel banner tipinde, buton metni sadece newsletter'da
+document.addEventListener("DOMContentLoaded", function() {
+  var tur = document.getElementById("popup-tur");
+  function uygula() {
+    var nl = tur.value === "newsletter";
+    document.getElementById("popup-link-wrap").style.display = nl ? "none" : "";
+    document.getElementById("popup-buton-wrap").style.display = nl ? "" : "none";
+    document.getElementById("popup-tur-help-newsletter").style.display = nl ? "" : "none";
+  }
+  tur.addEventListener("change", uygula);
+  uygula();
+});
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -216,10 +257,11 @@ document.addEventListener("DOMContentLoaded", function() {
                                       
                                     
                                         <div class="mb-3">
-                                        <label for="formFile" class="form-label">Campaign İmage</label>
+                                        <label for="formFile" class="form-label">Popup Image (optional for the newsletter popup)</label>
                                         <input class="form-control" type="file" name="logo" id="formFile">
                                         
-                                         <img src="resimler/<?=$guncelle['logo']?>" width="100">
+                                         <?php if (!empty($guncelle['logo'])) { ?><img src="resimler/<?=$guncelle['logo']?>" width="100">
+                                         <div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="logo_sil" value="1" id="logo_sil"><label class="form-check-label" for="logo_sil">Remove image</label></div><?php } ?>
                                       </div>
 
                                       <h5>Homepage Top Bar</h5>
