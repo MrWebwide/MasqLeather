@@ -37,6 +37,8 @@ $catHeaderImg = (!empty($catRow['resim']) && $catRow['resim'] !== 'resim-yok') ?
 <?php include __DIR__ . '/../includes/head-js.php'; ?>
     <style>
         #exzoom { width: 400px; }
+        /* MAS-113: sol menu yok -> urun alani tam genislik */
+        .shop_right_sidaber--full { width: 100%; }
         <?=$extraStyles?>
     </style>
 </head>
@@ -64,38 +66,9 @@ $catHeaderImg = (!empty($catRow['resim']) && $catRow['resim'] !== 'resim-yok') ?
             <div class="row">
                 <div class="col-12">
                     <div class="shop_page_inner d-flex ">
-                        <div class="shop_sidebar_widget">
-                        <?php
-                        // Marka'ya göre sidebar kategorileri: Mercantile (Jewelry + Home Decor)
-                        // vs Leather (Bags & Purses + Accessories). Önceden Bags/Accessories sabitti.
-                        $isMercantile = (isset($headerFile) && strpos($headerFile, 'mer') !== false);
-                        $sidebarGroups = $isMercantile ? [
-                            ['title' => 'Jewelry',    'catTable' => 'jewe_kategori', 'prodTable' => 'jewe',      'catPage' => 'jewelry-category.php'],
-                            ['title' => 'Home Decor', 'catTable' => 'mer_kategori',  'prodTable' => 'homedecor', 'catPage' => 'homedecor-category.php'],
-                        ] : [
-                            ['title' => 'Bags & Purses', 'catTable' => 'urun_kategori',  'prodTable' => 'urunler',     'catPage' => 'bagpurses-category.php'],
-                            ['title' => 'Accessories',   'catTable' => 'bolge_kategori', 'prodTable' => 'accessories', 'catPage' => 'accessories-category.php'],
-                        ];
-                        require_once __DIR__ . '/../includes/cat_counts.php';
-                        foreach ($sidebarGroups as $grp):
-                            // MAS-102: sol menü, üst menü ile AYNI sırada olsun (sira ASC) → ortak helper.
-                            $rows = masq_category_counts($db, $grp['catTable'], $grp['prodTable']);
-                        ?>
-                            <div class="shop_widget_list categories">
-                                <div class="shop_widget_title categories_title">
-                                    <h3><?= $grp['title'] ?></h3>
-                                </div>
-                                <div class="widget_categories">
-                                    <ul>
-                                    <?php foreach ($rows as $hizmetka): ?>
-                                    <li><a href="<?= $grp['catPage'] ?>?kategori=<?= urlencode($hizmetka['adi']) ?>"><?= $hizmetka['adi'] ?>(<?= $hizmetka['urun_sayisi'] ?>)</a></li>
-                                    <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                        </div>
-                        <div class="shop_right_sidaber">
+                        <!-- MAS-113: sol kategori menusu kaldirildi (urunler tam genislik, satirda 3 buyuk foto).
+                             Alt kategorilere ust menuden ulasiliyor. -->
+                        <div class="shop_right_sidaber shop_right_sidaber--full">
                             <div class="shop_gallery">
                                 <div class="row">
                                 <?php
